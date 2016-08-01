@@ -1,0 +1,520 @@
+Determining if files malloc.h exist failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_3e8c4/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_3e8c4.dir/build.make CMakeFiles/cmTC_3e8c4.dir/build
+Building C object CMakeFiles/cmTC_3e8c4.dir/CheckIncludeFiles.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc     -o CMakeFiles/cmTC_3e8c4.dir/CheckIncludeFiles.c.o   -c /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+/Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c:2:10: fatal error: 'malloc.h' file not found
+#include <malloc.h>
+         ^
+1 error generated.
+make[1]: *** [CMakeFiles/cmTC_3e8c4.dir/CheckIncludeFiles.c.o] Error 1
+make: *** [cmTC_3e8c4/fast] Error 2
+
+Source:
+/* */
+#include <malloc.h>
+
+
+int main(void){return 0;}
+
+Determining if the function memalign exists failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_3a388/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_3a388.dir/build.make CMakeFiles/cmTC_3a388.dir/build
+Building C object CMakeFiles/cmTC_3a388.dir/CheckFunctionExists.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=memalign   -o CMakeFiles/cmTC_3a388.dir/CheckFunctionExists.c.o   -c /usr/local/Cellar/cmake/3.5.2/share/cmake/Modules/CheckFunctionExists.c
+Linking C executable cmTC_3a388
+/usr/local/Cellar/cmake/3.5.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3a388.dir/link.txt --verbose=1
+/Library/Developer/CommandLineTools/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=memalign -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_3a388.dir/CheckFunctionExists.c.o  -o cmTC_3a388  
+Undefined symbols for architecture x86_64:
+  "_memalign", referenced from:
+      _main in CheckFunctionExists.c.o
+ld: symbol(s) not found for architecture x86_64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+make[1]: *** [cmTC_3a388] Error 1
+make: *** [cmTC_3a388/fast] Error 2
+
+
+Determining if files malloc.h exist failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_69b02/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_69b02.dir/build.make CMakeFiles/cmTC_69b02.dir/build
+Building C object CMakeFiles/cmTC_69b02.dir/CheckIncludeFiles.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc     -o CMakeFiles/cmTC_69b02.dir/CheckIncludeFiles.c.o   -c /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+/Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c:2:10: fatal error: 'malloc.h' file not found
+#include <malloc.h>
+         ^
+1 error generated.
+make[1]: *** [CMakeFiles/cmTC_69b02.dir/CheckIncludeFiles.c.o] Error 1
+make: *** [cmTC_69b02/fast] Error 2
+
+Source:
+/* */
+#include <malloc.h>
+
+
+int main(void){return 0;}
+
+Determining if the function memalign exists failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_2a98a/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_2a98a.dir/build.make CMakeFiles/cmTC_2a98a.dir/build
+Building C object CMakeFiles/cmTC_2a98a.dir/CheckFunctionExists.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=memalign   -o CMakeFiles/cmTC_2a98a.dir/CheckFunctionExists.c.o   -c /usr/local/Cellar/cmake/3.5.2/share/cmake/Modules/CheckFunctionExists.c
+Linking C executable cmTC_2a98a
+/usr/local/Cellar/cmake/3.5.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2a98a.dir/link.txt --verbose=1
+/Library/Developer/CommandLineTools/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=memalign -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_2a98a.dir/CheckFunctionExists.c.o  -o cmTC_2a98a  
+Undefined symbols for architecture x86_64:
+  "_memalign", referenced from:
+      _main in CheckFunctionExists.c.o
+ld: symbol(s) not found for architecture x86_64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+make[1]: *** [cmTC_2a98a] Error 1
+make: *** [cmTC_2a98a/fast] Error 2
+
+
+Determining if files malloc.h exist failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_4f683/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_4f683.dir/build.make CMakeFiles/cmTC_4f683.dir/build
+Building C object CMakeFiles/cmTC_4f683.dir/CheckIncludeFiles.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc     -o CMakeFiles/cmTC_4f683.dir/CheckIncludeFiles.c.o   -c /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+/Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c:2:10: fatal error: 'malloc.h' file not found
+#include <malloc.h>
+         ^
+1 error generated.
+make[1]: *** [CMakeFiles/cmTC_4f683.dir/CheckIncludeFiles.c.o] Error 1
+make: *** [cmTC_4f683/fast] Error 2
+
+Source:
+/* */
+#include <malloc.h>
+
+
+int main(void){return 0;}
+
+Determining if the function memalign exists failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_0a913/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_0a913.dir/build.make CMakeFiles/cmTC_0a913.dir/build
+Building C object CMakeFiles/cmTC_0a913.dir/CheckFunctionExists.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=memalign   -o CMakeFiles/cmTC_0a913.dir/CheckFunctionExists.c.o   -c /usr/local/Cellar/cmake/3.5.2/share/cmake/Modules/CheckFunctionExists.c
+Linking C executable cmTC_0a913
+/usr/local/Cellar/cmake/3.5.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_0a913.dir/link.txt --verbose=1
+/Library/Developer/CommandLineTools/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=memalign -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_0a913.dir/CheckFunctionExists.c.o  -o cmTC_0a913  
+Undefined symbols for architecture x86_64:
+  "_memalign", referenced from:
+      _main in CheckFunctionExists.c.o
+ld: symbol(s) not found for architecture x86_64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+make[1]: *** [cmTC_0a913] Error 1
+make: *** [cmTC_0a913/fast] Error 2
+
+
+Determining if files malloc.h exist failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_f76b6/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_f76b6.dir/build.make CMakeFiles/cmTC_f76b6.dir/build
+Building C object CMakeFiles/cmTC_f76b6.dir/CheckIncludeFiles.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc     -o CMakeFiles/cmTC_f76b6.dir/CheckIncludeFiles.c.o   -c /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+/Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c:2:10: fatal error: 'malloc.h' file not found
+#include <malloc.h>
+         ^
+1 error generated.
+make[1]: *** [CMakeFiles/cmTC_f76b6.dir/CheckIncludeFiles.c.o] Error 1
+make: *** [cmTC_f76b6/fast] Error 2
+
+Source:
+/* */
+#include <malloc.h>
+
+
+int main(void){return 0;}
+
+Determining if the function memalign exists failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_5e542/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_5e542.dir/build.make CMakeFiles/cmTC_5e542.dir/build
+Building C object CMakeFiles/cmTC_5e542.dir/CheckFunctionExists.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=memalign   -o CMakeFiles/cmTC_5e542.dir/CheckFunctionExists.c.o   -c /usr/local/Cellar/cmake/3.5.2/share/cmake/Modules/CheckFunctionExists.c
+Linking C executable cmTC_5e542
+/usr/local/Cellar/cmake/3.5.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_5e542.dir/link.txt --verbose=1
+/Library/Developer/CommandLineTools/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=memalign -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_5e542.dir/CheckFunctionExists.c.o  -o cmTC_5e542  
+Undefined symbols for architecture x86_64:
+  "_memalign", referenced from:
+      _main in CheckFunctionExists.c.o
+ld: symbol(s) not found for architecture x86_64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+make[1]: *** [cmTC_5e542] Error 1
+make: *** [cmTC_5e542/fast] Error 2
+
+
+Determining if files malloc.h exist failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_b20af/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_b20af.dir/build.make CMakeFiles/cmTC_b20af.dir/build
+Building C object CMakeFiles/cmTC_b20af.dir/CheckIncludeFiles.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc     -o CMakeFiles/cmTC_b20af.dir/CheckIncludeFiles.c.o   -c /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+/Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c:2:10: fatal error: 'malloc.h' file not found
+#include <malloc.h>
+         ^
+1 error generated.
+make[1]: *** [CMakeFiles/cmTC_b20af.dir/CheckIncludeFiles.c.o] Error 1
+make: *** [cmTC_b20af/fast] Error 2
+
+Source:
+/* */
+#include <malloc.h>
+
+
+int main(void){return 0;}
+
+Determining if the function memalign exists failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_c5a79/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_c5a79.dir/build.make CMakeFiles/cmTC_c5a79.dir/build
+Building C object CMakeFiles/cmTC_c5a79.dir/CheckFunctionExists.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=memalign   -o CMakeFiles/cmTC_c5a79.dir/CheckFunctionExists.c.o   -c /usr/local/Cellar/cmake/3.5.2/share/cmake/Modules/CheckFunctionExists.c
+Linking C executable cmTC_c5a79
+/usr/local/Cellar/cmake/3.5.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c5a79.dir/link.txt --verbose=1
+/Library/Developer/CommandLineTools/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=memalign -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_c5a79.dir/CheckFunctionExists.c.o  -o cmTC_c5a79  
+Undefined symbols for architecture x86_64:
+  "_memalign", referenced from:
+      _main in CheckFunctionExists.c.o
+ld: symbol(s) not found for architecture x86_64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+make[1]: *** [cmTC_c5a79] Error 1
+make: *** [cmTC_c5a79/fast] Error 2
+
+
+Determining if files malloc.h exist failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_1aee2/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_1aee2.dir/build.make CMakeFiles/cmTC_1aee2.dir/build
+Building C object CMakeFiles/cmTC_1aee2.dir/CheckIncludeFiles.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc     -o CMakeFiles/cmTC_1aee2.dir/CheckIncludeFiles.c.o   -c /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+/Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c:2:10: fatal error: 'malloc.h' file not found
+#include <malloc.h>
+         ^
+1 error generated.
+make[1]: *** [CMakeFiles/cmTC_1aee2.dir/CheckIncludeFiles.c.o] Error 1
+make: *** [cmTC_1aee2/fast] Error 2
+
+Source:
+/* */
+#include <malloc.h>
+
+
+int main(void){return 0;}
+
+Determining if the function memalign exists failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_72674/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_72674.dir/build.make CMakeFiles/cmTC_72674.dir/build
+Building C object CMakeFiles/cmTC_72674.dir/CheckFunctionExists.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=memalign   -o CMakeFiles/cmTC_72674.dir/CheckFunctionExists.c.o   -c /usr/local/Cellar/cmake/3.5.2/share/cmake/Modules/CheckFunctionExists.c
+Linking C executable cmTC_72674
+/usr/local/Cellar/cmake/3.5.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_72674.dir/link.txt --verbose=1
+/Library/Developer/CommandLineTools/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=memalign -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_72674.dir/CheckFunctionExists.c.o  -o cmTC_72674  
+Undefined symbols for architecture x86_64:
+  "_memalign", referenced from:
+      _main in CheckFunctionExists.c.o
+ld: symbol(s) not found for architecture x86_64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+make[1]: *** [cmTC_72674] Error 1
+make: *** [cmTC_72674/fast] Error 2
+
+
+Determining if files malloc.h exist failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_7bf55/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_7bf55.dir/build.make CMakeFiles/cmTC_7bf55.dir/build
+Building C object CMakeFiles/cmTC_7bf55.dir/CheckIncludeFiles.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc     -o CMakeFiles/cmTC_7bf55.dir/CheckIncludeFiles.c.o   -c /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+/Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c:2:10: fatal error: 'malloc.h' file not found
+#include <malloc.h>
+         ^
+1 error generated.
+make[1]: *** [CMakeFiles/cmTC_7bf55.dir/CheckIncludeFiles.c.o] Error 1
+make: *** [cmTC_7bf55/fast] Error 2
+
+Source:
+/* */
+#include <malloc.h>
+
+
+int main(void){return 0;}
+
+Determining if the function memalign exists failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_78210/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_78210.dir/build.make CMakeFiles/cmTC_78210.dir/build
+Building C object CMakeFiles/cmTC_78210.dir/CheckFunctionExists.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=memalign   -o CMakeFiles/cmTC_78210.dir/CheckFunctionExists.c.o   -c /usr/local/Cellar/cmake/3.5.2/share/cmake/Modules/CheckFunctionExists.c
+Linking C executable cmTC_78210
+/usr/local/Cellar/cmake/3.5.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_78210.dir/link.txt --verbose=1
+/Library/Developer/CommandLineTools/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=memalign -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_78210.dir/CheckFunctionExists.c.o  -o cmTC_78210  
+Undefined symbols for architecture x86_64:
+  "_memalign", referenced from:
+      _main in CheckFunctionExists.c.o
+ld: symbol(s) not found for architecture x86_64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+make[1]: *** [cmTC_78210] Error 1
+make: *** [cmTC_78210/fast] Error 2
+
+
+Determining if files malloc.h exist failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_8b166/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_8b166.dir/build.make CMakeFiles/cmTC_8b166.dir/build
+Building C object CMakeFiles/cmTC_8b166.dir/CheckIncludeFiles.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc     -o CMakeFiles/cmTC_8b166.dir/CheckIncludeFiles.c.o   -c /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+/Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c:2:10: fatal error: 'malloc.h' file not found
+#include <malloc.h>
+         ^
+1 error generated.
+make[1]: *** [CMakeFiles/cmTC_8b166.dir/CheckIncludeFiles.c.o] Error 1
+make: *** [cmTC_8b166/fast] Error 2
+
+Source:
+/* */
+#include <malloc.h>
+
+
+int main(void){return 0;}
+
+Determining if the function memalign exists failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_8f76e/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_8f76e.dir/build.make CMakeFiles/cmTC_8f76e.dir/build
+Building C object CMakeFiles/cmTC_8f76e.dir/CheckFunctionExists.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=memalign   -o CMakeFiles/cmTC_8f76e.dir/CheckFunctionExists.c.o   -c /usr/local/Cellar/cmake/3.5.2/share/cmake/Modules/CheckFunctionExists.c
+Linking C executable cmTC_8f76e
+/usr/local/Cellar/cmake/3.5.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8f76e.dir/link.txt --verbose=1
+/Library/Developer/CommandLineTools/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=memalign -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_8f76e.dir/CheckFunctionExists.c.o  -o cmTC_8f76e  
+Undefined symbols for architecture x86_64:
+  "_memalign", referenced from:
+      _main in CheckFunctionExists.c.o
+ld: symbol(s) not found for architecture x86_64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+make[1]: *** [cmTC_8f76e] Error 1
+make: *** [cmTC_8f76e/fast] Error 2
+
+
+Determining if files malloc.h exist failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_53d0a/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_53d0a.dir/build.make CMakeFiles/cmTC_53d0a.dir/build
+Building C object CMakeFiles/cmTC_53d0a.dir/CheckIncludeFiles.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc     -o CMakeFiles/cmTC_53d0a.dir/CheckIncludeFiles.c.o   -c /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+/Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c:2:10: fatal error: 'malloc.h' file not found
+#include <malloc.h>
+         ^
+1 error generated.
+make[1]: *** [CMakeFiles/cmTC_53d0a.dir/CheckIncludeFiles.c.o] Error 1
+make: *** [cmTC_53d0a/fast] Error 2
+
+Source:
+/* */
+#include <malloc.h>
+
+
+int main(void){return 0;}
+
+Determining if the function memalign exists failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_e1f7e/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_e1f7e.dir/build.make CMakeFiles/cmTC_e1f7e.dir/build
+Building C object CMakeFiles/cmTC_e1f7e.dir/CheckFunctionExists.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=memalign   -o CMakeFiles/cmTC_e1f7e.dir/CheckFunctionExists.c.o   -c /usr/local/Cellar/cmake/3.5.2/share/cmake/Modules/CheckFunctionExists.c
+Linking C executable cmTC_e1f7e
+/usr/local/Cellar/cmake/3.5.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e1f7e.dir/link.txt --verbose=1
+/Library/Developer/CommandLineTools/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=memalign -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_e1f7e.dir/CheckFunctionExists.c.o  -o cmTC_e1f7e  
+Undefined symbols for architecture x86_64:
+  "_memalign", referenced from:
+      _main in CheckFunctionExists.c.o
+ld: symbol(s) not found for architecture x86_64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+make[1]: *** [cmTC_e1f7e] Error 1
+make: *** [cmTC_e1f7e/fast] Error 2
+
+
+Determining if files malloc.h exist failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_388c9/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_388c9.dir/build.make CMakeFiles/cmTC_388c9.dir/build
+Building C object CMakeFiles/cmTC_388c9.dir/CheckIncludeFiles.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc     -o CMakeFiles/cmTC_388c9.dir/CheckIncludeFiles.c.o   -c /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+/Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c:2:10: fatal error: 'malloc.h' file not found
+#include <malloc.h>
+         ^
+1 error generated.
+make[1]: *** [CMakeFiles/cmTC_388c9.dir/CheckIncludeFiles.c.o] Error 1
+make: *** [cmTC_388c9/fast] Error 2
+
+Source:
+/* */
+#include <malloc.h>
+
+
+int main(void){return 0;}
+
+Determining if the function memalign exists failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_90796/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_90796.dir/build.make CMakeFiles/cmTC_90796.dir/build
+Building C object CMakeFiles/cmTC_90796.dir/CheckFunctionExists.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=memalign   -o CMakeFiles/cmTC_90796.dir/CheckFunctionExists.c.o   -c /usr/local/Cellar/cmake/3.5.2/share/cmake/Modules/CheckFunctionExists.c
+Linking C executable cmTC_90796
+/usr/local/Cellar/cmake/3.5.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_90796.dir/link.txt --verbose=1
+/Library/Developer/CommandLineTools/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=memalign -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_90796.dir/CheckFunctionExists.c.o  -o cmTC_90796  
+Undefined symbols for architecture x86_64:
+  "_memalign", referenced from:
+      _main in CheckFunctionExists.c.o
+ld: symbol(s) not found for architecture x86_64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+make[1]: *** [cmTC_90796] Error 1
+make: *** [cmTC_90796/fast] Error 2
+
+
+Determining if files malloc.h exist failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_9a8e9/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_9a8e9.dir/build.make CMakeFiles/cmTC_9a8e9.dir/build
+Building C object CMakeFiles/cmTC_9a8e9.dir/CheckIncludeFiles.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc     -o CMakeFiles/cmTC_9a8e9.dir/CheckIncludeFiles.c.o   -c /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+/Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c:2:10: fatal error: 'malloc.h' file not found
+#include <malloc.h>
+         ^
+1 error generated.
+make[1]: *** [CMakeFiles/cmTC_9a8e9.dir/CheckIncludeFiles.c.o] Error 1
+make: *** [cmTC_9a8e9/fast] Error 2
+
+Source:
+/* */
+#include <malloc.h>
+
+
+int main(void){return 0;}
+
+Determining if the function memalign exists failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_f74c6/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_f74c6.dir/build.make CMakeFiles/cmTC_f74c6.dir/build
+Building C object CMakeFiles/cmTC_f74c6.dir/CheckFunctionExists.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=memalign   -o CMakeFiles/cmTC_f74c6.dir/CheckFunctionExists.c.o   -c /usr/local/Cellar/cmake/3.5.2/share/cmake/Modules/CheckFunctionExists.c
+Linking C executable cmTC_f74c6
+/usr/local/Cellar/cmake/3.5.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f74c6.dir/link.txt --verbose=1
+/Library/Developer/CommandLineTools/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=memalign -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_f74c6.dir/CheckFunctionExists.c.o  -o cmTC_f74c6  
+Undefined symbols for architecture x86_64:
+  "_memalign", referenced from:
+      _main in CheckFunctionExists.c.o
+ld: symbol(s) not found for architecture x86_64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+make[1]: *** [cmTC_f74c6] Error 1
+make: *** [cmTC_f74c6/fast] Error 2
+
+
+Determining if files malloc.h exist failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_959a2/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_959a2.dir/build.make CMakeFiles/cmTC_959a2.dir/build
+Building C object CMakeFiles/cmTC_959a2.dir/CheckIncludeFiles.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc     -o CMakeFiles/cmTC_959a2.dir/CheckIncludeFiles.c.o   -c /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+/Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c:2:10: fatal error: 'malloc.h' file not found
+#include <malloc.h>
+         ^
+1 error generated.
+make[1]: *** [CMakeFiles/cmTC_959a2.dir/CheckIncludeFiles.c.o] Error 1
+make: *** [cmTC_959a2/fast] Error 2
+
+Source:
+/* */
+#include <malloc.h>
+
+
+int main(void){return 0;}
+
+Determining if the function memalign exists failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_e4a72/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_e4a72.dir/build.make CMakeFiles/cmTC_e4a72.dir/build
+Building C object CMakeFiles/cmTC_e4a72.dir/CheckFunctionExists.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=memalign   -o CMakeFiles/cmTC_e4a72.dir/CheckFunctionExists.c.o   -c /usr/local/Cellar/cmake/3.5.2/share/cmake/Modules/CheckFunctionExists.c
+Linking C executable cmTC_e4a72
+/usr/local/Cellar/cmake/3.5.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e4a72.dir/link.txt --verbose=1
+/Library/Developer/CommandLineTools/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=memalign -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_e4a72.dir/CheckFunctionExists.c.o  -o cmTC_e4a72  
+Undefined symbols for architecture x86_64:
+  "_memalign", referenced from:
+      _main in CheckFunctionExists.c.o
+ld: symbol(s) not found for architecture x86_64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+make[1]: *** [cmTC_e4a72] Error 1
+make: *** [cmTC_e4a72/fast] Error 2
+
+
+Determining if files malloc.h exist failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_38a75/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_38a75.dir/build.make CMakeFiles/cmTC_38a75.dir/build
+Building C object CMakeFiles/cmTC_38a75.dir/CheckIncludeFiles.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc     -o CMakeFiles/cmTC_38a75.dir/CheckIncludeFiles.c.o   -c /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+/Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp/CheckIncludeFiles.c:2:10: fatal error: 'malloc.h' file not found
+#include <malloc.h>
+         ^
+1 error generated.
+make[1]: *** [CMakeFiles/cmTC_38a75.dir/CheckIncludeFiles.c.o] Error 1
+make: *** [cmTC_38a75/fast] Error 2
+
+Source:
+/* */
+#include <malloc.h>
+
+
+int main(void){return 0;}
+
+Determining if the function memalign exists failed with the following output:
+Change Dir: /Users/wm/Code/previous-code-635-branches-branch_realtime/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_4c0fa/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_4c0fa.dir/build.make CMakeFiles/cmTC_4c0fa.dir/build
+Building C object CMakeFiles/cmTC_4c0fa.dir/CheckFunctionExists.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=memalign   -o CMakeFiles/cmTC_4c0fa.dir/CheckFunctionExists.c.o   -c /usr/local/Cellar/cmake/3.5.2/share/cmake/Modules/CheckFunctionExists.c
+Linking C executable cmTC_4c0fa
+/usr/local/Cellar/cmake/3.5.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4c0fa.dir/link.txt --verbose=1
+/Library/Developer/CommandLineTools/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=memalign -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_4c0fa.dir/CheckFunctionExists.c.o  -o cmTC_4c0fa  
+Undefined symbols for architecture x86_64:
+  "_memalign", referenced from:
+      _main in CheckFunctionExists.c.o
+ld: symbol(s) not found for architecture x86_64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+make[1]: *** [cmTC_4c0fa] Error 1
+make: *** [cmTC_4c0fa/fast] Error 2
+
+

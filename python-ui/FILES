@@ -1,0 +1,20 @@
+Code:
+- config.py	- Previous configuration INI file handling
+- debugui.py	- Debugger UI (works also as standalone)
+- dialogs.py	- Different dialogs shown by Previous UI
+- previous.py	- Communication with Previous and config option handling
+- previousui	- Wrapper script for previousui.py with suitable default options
+- previousui.py	- Previous UI main: option handling, main window etc
+- Makefile	- Rules for installing
+- uihelpers.py	- Misc helpers for Previous UI
+
+Data files:
+- previous-icon.png	- Window icon
+- previous.png		- About dialog image
+- previousui.desktop	- Previous UI .desktop file for application launchers
+
+Documentation:
+- release-notes.txt	- UI & code changes
+- FILES			- This file
+- README		- Previous UI intro / description
+- TODO			- missing features etc
