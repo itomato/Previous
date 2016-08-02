@@ -1,6 +1,8 @@
 
 
-Previous 1.4
+Previous 1.4i+
+
+![](./src/Previous-icon.png)
 
 [http://previous.alternative-system.com/](http://previous.alternative-system.com/)
 
