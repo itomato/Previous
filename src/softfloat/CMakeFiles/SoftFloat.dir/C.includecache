@@ -1,0 +1,46 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/wjk/Code/previous-code/src/softfloat/mamesf.h
+inttypes.h
+/home/wjk/Code/previous-code/src/softfloat/inttypes.h
+
+/home/wjk/Code/previous-code/src/softfloat/milieu.h
+mamesf.h
+/home/wjk/Code/previous-code/src/softfloat/mamesf.h
+
+/home/wjk/Code/previous-code/src/softfloat/softfloat-macros.h
+
+/home/wjk/Code/previous-code/src/softfloat/softfloat-specialize.h
+
+/home/wjk/Code/previous-code/src/softfloat/softfloat.c
+milieu.h
+/home/wjk/Code/previous-code/src/softfloat/milieu.h
+softfloat.h
+/home/wjk/Code/previous-code/src/softfloat/softfloat.h
+softfloat-specialize.h
+/home/wjk/Code/previous-code/src/softfloat/softfloat-specialize.h
+
+/home/wjk/Code/previous-code/src/softfloat/softfloat.h
+mamesf.h
+/home/wjk/Code/previous-code/src/softfloat/mamesf.h
+softfloat-macros.h
+/home/wjk/Code/previous-code/src/softfloat/softfloat-macros.h
+
+/home/wjk/Code/previous-code/src/softfloat/softfloat_decimal.c
+softfloat.h
+/home/wjk/Code/previous-code/src/softfloat/softfloat.h
+
+/home/wjk/Code/previous-code/src/softfloat/softfloat_fpsp.c
+softfloat.h
+/home/wjk/Code/previous-code/src/softfloat/softfloat.h
+softfloat_fpsp_tables.h
+/home/wjk/Code/previous-code/src/softfloat/softfloat_fpsp_tables.h
+
+/home/wjk/Code/previous-code/src/softfloat/softfloat_fpsp_tables.h
+

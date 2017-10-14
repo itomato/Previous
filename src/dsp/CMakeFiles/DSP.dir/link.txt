@@ -1,0 +1,2 @@
+/usr/bin/ar qc libDSP.a  CMakeFiles/DSP.dir/dsp.c.o CMakeFiles/DSP.dir/dsp_core.c.o CMakeFiles/DSP.dir/dsp_cpu.c.o CMakeFiles/DSP.dir/dsp_disasm.c.o
+/usr/bin/ranlib libDSP.a

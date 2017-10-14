@@ -1,0 +1,560 @@
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_1ba5b/fast"
+/usr/bin/make -f CMakeFiles/cmTC_1ba5b.dir/build.make CMakeFiles/cmTC_1ba5b.dir/build
+make[1]: Entering directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_1ba5b.dir/CheckSymbolExists.c.o
+/usr/bin/cc     -o CMakeFiles/cmTC_1ba5b.dir/CheckSymbolExists.c.o   -c /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_1ba5b
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1ba5b.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_1ba5b.dir/CheckSymbolExists.c.o  -o cmTC_1ba5b -rdynamic 
+CMakeFiles/cmTC_1ba5b.dir/CheckSymbolExists.c.o: In function `main':
+CheckSymbolExists.c:(.text+0x1b): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_1ba5b.dir/build.make:97: recipe for target 'cmTC_1ba5b' failed
+make[1]: *** [cmTC_1ba5b] Error 1
+make[1]: Leaving directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_1ba5b/fast' failed
+make: *** [cmTC_1ba5b/fast] Error 2
+
+File /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_87ffb/fast"
+/usr/bin/make -f CMakeFiles/cmTC_87ffb.dir/build.make CMakeFiles/cmTC_87ffb.dir/build
+make[1]: Entering directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_87ffb.dir/CheckFunctionExists.c.o
+/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_87ffb.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.7/Modules/CheckFunctionExists.c
+Linking C executable cmTC_87ffb
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_87ffb.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_87ffb.dir/CheckFunctionExists.c.o  -o cmTC_87ffb -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_87ffb.dir/build.make:97: recipe for target 'cmTC_87ffb' failed
+make[1]: *** [cmTC_87ffb] Error 1
+make[1]: Leaving directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_87ffb/fast' failed
+make: *** [cmTC_87ffb/fast] Error 2
+
+
+Determining if files sys/filio.h exist failed with the following output:
+Change Dir: /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_50102/fast"
+/usr/bin/make -f CMakeFiles/cmTC_50102.dir/build.make CMakeFiles/cmTC_50102.dir/build
+make[1]: Entering directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_50102.dir/CheckIncludeFiles.c.o
+/usr/bin/cc    -Wall -Wwrite-strings -Wsign-compare -Wmissing-prototypes -Wstrict-prototypes -Wcast-qual -g -O0 -Wbad-function-cast -Wpointer-arith  -Wformat-security -std=gnu99    -o CMakeFiles/cmTC_50102.dir/CheckIncludeFiles.c.o   -c /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckIncludeFiles.c:2:23: fatal error: sys/filio.h: No such file or directory
+ #include <sys/filio.h>
+                       ^
+compilation terminated.
+CMakeFiles/cmTC_50102.dir/build.make:65: recipe for target 'CMakeFiles/cmTC_50102.dir/CheckIncludeFiles.c.o' failed
+make[1]: *** [CMakeFiles/cmTC_50102.dir/CheckIncludeFiles.c.o] Error 1
+make[1]: Leaving directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_50102/fast' failed
+make: *** [cmTC_50102/fast] Error 2
+
+Source:
+/* */
+#include <sys/filio.h>
+
+
+int main(void){return 0;}
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_62df0/fast"
+/usr/bin/make -f CMakeFiles/cmTC_62df0.dir/build.make CMakeFiles/cmTC_62df0.dir/build
+make[1]: Entering directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_62df0.dir/CheckSymbolExists.c.o
+/usr/bin/cc     -o CMakeFiles/cmTC_62df0.dir/CheckSymbolExists.c.o   -c /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_62df0
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_62df0.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_62df0.dir/CheckSymbolExists.c.o  -o cmTC_62df0 -rdynamic 
+CMakeFiles/cmTC_62df0.dir/CheckSymbolExists.c.o: In function `main':
+CheckSymbolExists.c:(.text+0x1b): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_62df0.dir/build.make:97: recipe for target 'cmTC_62df0' failed
+make[1]: *** [cmTC_62df0] Error 1
+make[1]: Leaving directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_62df0/fast' failed
+make: *** [cmTC_62df0/fast] Error 2
+
+File /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_a8191/fast"
+/usr/bin/make -f CMakeFiles/cmTC_a8191.dir/build.make CMakeFiles/cmTC_a8191.dir/build
+make[1]: Entering directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_a8191.dir/CheckFunctionExists.c.o
+/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_a8191.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.7/Modules/CheckFunctionExists.c
+Linking C executable cmTC_a8191
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a8191.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_a8191.dir/CheckFunctionExists.c.o  -o cmTC_a8191 -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_a8191.dir/build.make:97: recipe for target 'cmTC_a8191' failed
+make[1]: *** [cmTC_a8191] Error 1
+make[1]: Leaving directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_a8191/fast' failed
+make: *** [cmTC_a8191/fast] Error 2
+
+
+Determining if files sys/filio.h exist failed with the following output:
+Change Dir: /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_601a2/fast"
+/usr/bin/make -f CMakeFiles/cmTC_601a2.dir/build.make CMakeFiles/cmTC_601a2.dir/build
+make[1]: Entering directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_601a2.dir/CheckIncludeFiles.c.o
+/usr/bin/cc    -Wall -Wwrite-strings -Wsign-compare -Wmissing-prototypes -Wstrict-prototypes -Wcast-qual -g -O0 -Wbad-function-cast -Wpointer-arith  -Wformat-security -std=gnu99    -o CMakeFiles/cmTC_601a2.dir/CheckIncludeFiles.c.o   -c /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckIncludeFiles.c:2:23: fatal error: sys/filio.h: No such file or directory
+ #include <sys/filio.h>
+                       ^
+compilation terminated.
+CMakeFiles/cmTC_601a2.dir/build.make:65: recipe for target 'CMakeFiles/cmTC_601a2.dir/CheckIncludeFiles.c.o' failed
+make[1]: *** [CMakeFiles/cmTC_601a2.dir/CheckIncludeFiles.c.o] Error 1
+make[1]: Leaving directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_601a2/fast' failed
+make: *** [cmTC_601a2/fast] Error 2
+
+Source:
+/* */
+#include <sys/filio.h>
+
+
+int main(void){return 0;}
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_c6889/fast"
+/usr/bin/make -f CMakeFiles/cmTC_c6889.dir/build.make CMakeFiles/cmTC_c6889.dir/build
+make[1]: Entering directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c6889.dir/CheckSymbolExists.c.o
+/usr/bin/cc     -o CMakeFiles/cmTC_c6889.dir/CheckSymbolExists.c.o   -c /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_c6889
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c6889.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_c6889.dir/CheckSymbolExists.c.o  -o cmTC_c6889 -rdynamic 
+CMakeFiles/cmTC_c6889.dir/CheckSymbolExists.c.o: In function `main':
+CheckSymbolExists.c:(.text+0x1b): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_c6889.dir/build.make:97: recipe for target 'cmTC_c6889' failed
+make[1]: *** [cmTC_c6889] Error 1
+make[1]: Leaving directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_c6889/fast' failed
+make: *** [cmTC_c6889/fast] Error 2
+
+File /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_dc59f/fast"
+/usr/bin/make -f CMakeFiles/cmTC_dc59f.dir/build.make CMakeFiles/cmTC_dc59f.dir/build
+make[1]: Entering directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_dc59f.dir/CheckFunctionExists.c.o
+/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_dc59f.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.7/Modules/CheckFunctionExists.c
+Linking C executable cmTC_dc59f
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_dc59f.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_dc59f.dir/CheckFunctionExists.c.o  -o cmTC_dc59f -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_dc59f.dir/build.make:97: recipe for target 'cmTC_dc59f' failed
+make[1]: *** [cmTC_dc59f] Error 1
+make[1]: Leaving directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_dc59f/fast' failed
+make: *** [cmTC_dc59f/fast] Error 2
+
+
+Determining if files sys/filio.h exist failed with the following output:
+Change Dir: /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_c06f5/fast"
+/usr/bin/make -f CMakeFiles/cmTC_c06f5.dir/build.make CMakeFiles/cmTC_c06f5.dir/build
+make[1]: Entering directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c06f5.dir/CheckIncludeFiles.c.o
+/usr/bin/cc    -Wall -Wwrite-strings -Wsign-compare -Wmissing-prototypes -Wstrict-prototypes -Wcast-qual -g -O0 -Wbad-function-cast -Wpointer-arith  -D__USE_MINGW_ANSI_STDIO=1 -Wformat-security -std=gnu99    -o CMakeFiles/cmTC_c06f5.dir/CheckIncludeFiles.c.o   -c /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckIncludeFiles.c:2:23: fatal error: sys/filio.h: No such file or directory
+ #include <sys/filio.h>
+                       ^
+compilation terminated.
+CMakeFiles/cmTC_c06f5.dir/build.make:65: recipe for target 'CMakeFiles/cmTC_c06f5.dir/CheckIncludeFiles.c.o' failed
+make[1]: *** [CMakeFiles/cmTC_c06f5.dir/CheckIncludeFiles.c.o] Error 1
+make[1]: Leaving directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_c06f5/fast' failed
+make: *** [cmTC_c06f5/fast] Error 2
+
+Source:
+/* */
+#include <sys/filio.h>
+
+
+int main(void){return 0;}
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_d2887/fast"
+/usr/bin/make -f CMakeFiles/cmTC_d2887.dir/build.make CMakeFiles/cmTC_d2887.dir/build
+make[1]: Entering directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_d2887.dir/CheckSymbolExists.c.o
+/usr/bin/cc     -o CMakeFiles/cmTC_d2887.dir/CheckSymbolExists.c.o   -c /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_d2887
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d2887.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_d2887.dir/CheckSymbolExists.c.o  -o cmTC_d2887 -rdynamic 
+CMakeFiles/cmTC_d2887.dir/CheckSymbolExists.c.o: In function `main':
+CheckSymbolExists.c:(.text+0x1b): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_d2887.dir/build.make:97: recipe for target 'cmTC_d2887' failed
+make[1]: *** [cmTC_d2887] Error 1
+make[1]: Leaving directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_d2887/fast' failed
+make: *** [cmTC_d2887/fast] Error 2
+
+File /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_5828d/fast"
+/usr/bin/make -f CMakeFiles/cmTC_5828d.dir/build.make CMakeFiles/cmTC_5828d.dir/build
+make[1]: Entering directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_5828d.dir/CheckFunctionExists.c.o
+/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_5828d.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.7/Modules/CheckFunctionExists.c
+Linking C executable cmTC_5828d
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_5828d.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_5828d.dir/CheckFunctionExists.c.o  -o cmTC_5828d -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_5828d.dir/build.make:97: recipe for target 'cmTC_5828d' failed
+make[1]: *** [cmTC_5828d] Error 1
+make[1]: Leaving directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_5828d/fast' failed
+make: *** [cmTC_5828d/fast] Error 2
+
+
+Determining if files sys/filio.h exist failed with the following output:
+Change Dir: /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_bab67/fast"
+/usr/bin/make -f CMakeFiles/cmTC_bab67.dir/build.make CMakeFiles/cmTC_bab67.dir/build
+make[1]: Entering directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_bab67.dir/CheckIncludeFiles.c.o
+/usr/bin/cc    -Wall -Wwrite-strings -Wsign-compare -Wmissing-prototypes -Wstrict-prototypes -Wcast-qual -g -O0 -Wbad-function-cast -Wpointer-arith  -D__USE_MINGW_ANSI_STDIO=1 -Wformat-security -std=gnu99    -o CMakeFiles/cmTC_bab67.dir/CheckIncludeFiles.c.o   -c /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckIncludeFiles.c:2:23: fatal error: sys/filio.h: No such file or directory
+ #include <sys/filio.h>
+                       ^
+compilation terminated.
+CMakeFiles/cmTC_bab67.dir/build.make:65: recipe for target 'CMakeFiles/cmTC_bab67.dir/CheckIncludeFiles.c.o' failed
+make[1]: *** [CMakeFiles/cmTC_bab67.dir/CheckIncludeFiles.c.o] Error 1
+make[1]: Leaving directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_bab67/fast' failed
+make: *** [cmTC_bab67/fast] Error 2
+
+Source:
+/* */
+#include <sys/filio.h>
+
+
+int main(void){return 0;}
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_9342e/fast"
+/usr/bin/make -f CMakeFiles/cmTC_9342e.dir/build.make CMakeFiles/cmTC_9342e.dir/build
+make[1]: Entering directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_9342e.dir/CheckSymbolExists.c.o
+/usr/bin/cc     -o CMakeFiles/cmTC_9342e.dir/CheckSymbolExists.c.o   -c /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_9342e
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9342e.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_9342e.dir/CheckSymbolExists.c.o  -o cmTC_9342e -rdynamic 
+CMakeFiles/cmTC_9342e.dir/CheckSymbolExists.c.o: In function `main':
+CheckSymbolExists.c:(.text+0x1b): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_9342e.dir/build.make:97: recipe for target 'cmTC_9342e' failed
+make[1]: *** [cmTC_9342e] Error 1
+make[1]: Leaving directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_9342e/fast' failed
+make: *** [cmTC_9342e/fast] Error 2
+
+File /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_edf35/fast"
+/usr/bin/make -f CMakeFiles/cmTC_edf35.dir/build.make CMakeFiles/cmTC_edf35.dir/build
+make[1]: Entering directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_edf35.dir/CheckFunctionExists.c.o
+/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_edf35.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.7/Modules/CheckFunctionExists.c
+Linking C executable cmTC_edf35
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_edf35.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_edf35.dir/CheckFunctionExists.c.o  -o cmTC_edf35 -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_edf35.dir/build.make:97: recipe for target 'cmTC_edf35' failed
+make[1]: *** [cmTC_edf35] Error 1
+make[1]: Leaving directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_edf35/fast' failed
+make: *** [cmTC_edf35/fast] Error 2
+
+
+Determining if files sys/filio.h exist failed with the following output:
+Change Dir: /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_6ab22/fast"
+/usr/bin/make -f CMakeFiles/cmTC_6ab22.dir/build.make CMakeFiles/cmTC_6ab22.dir/build
+make[1]: Entering directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_6ab22.dir/CheckIncludeFiles.c.o
+/usr/bin/cc    -Wall -Wwrite-strings -Wsign-compare -Wmissing-prototypes -Wstrict-prototypes -Wcast-qual -g -O0 -Wbad-function-cast -Wpointer-arith  -D__USE_MINGW_ANSI_STDIO=1 -Wformat-security -std=gnu99    -o CMakeFiles/cmTC_6ab22.dir/CheckIncludeFiles.c.o   -c /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckIncludeFiles.c:2:23: fatal error: sys/filio.h: No such file or directory
+ #include <sys/filio.h>
+                       ^
+compilation terminated.
+CMakeFiles/cmTC_6ab22.dir/build.make:65: recipe for target 'CMakeFiles/cmTC_6ab22.dir/CheckIncludeFiles.c.o' failed
+make[1]: *** [CMakeFiles/cmTC_6ab22.dir/CheckIncludeFiles.c.o] Error 1
+make[1]: Leaving directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_6ab22/fast' failed
+make: *** [cmTC_6ab22/fast] Error 2
+
+Source:
+/* */
+#include <sys/filio.h>
+
+
+int main(void){return 0;}
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_a3ad4/fast"
+/usr/bin/make -f CMakeFiles/cmTC_a3ad4.dir/build.make CMakeFiles/cmTC_a3ad4.dir/build
+make[1]: Entering directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_a3ad4.dir/CheckSymbolExists.c.o
+/usr/bin/cc     -o CMakeFiles/cmTC_a3ad4.dir/CheckSymbolExists.c.o   -c /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_a3ad4
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a3ad4.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_a3ad4.dir/CheckSymbolExists.c.o  -o cmTC_a3ad4 -rdynamic 
+CMakeFiles/cmTC_a3ad4.dir/CheckSymbolExists.c.o: In function `main':
+CheckSymbolExists.c:(.text+0x1b): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_a3ad4.dir/build.make:97: recipe for target 'cmTC_a3ad4' failed
+make[1]: *** [cmTC_a3ad4] Error 1
+make[1]: Leaving directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_a3ad4/fast' failed
+make: *** [cmTC_a3ad4/fast] Error 2
+
+File /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_73d28/fast"
+/usr/bin/make -f CMakeFiles/cmTC_73d28.dir/build.make CMakeFiles/cmTC_73d28.dir/build
+make[1]: Entering directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_73d28.dir/CheckFunctionExists.c.o
+/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_73d28.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.7/Modules/CheckFunctionExists.c
+Linking C executable cmTC_73d28
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_73d28.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_73d28.dir/CheckFunctionExists.c.o  -o cmTC_73d28 -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_73d28.dir/build.make:97: recipe for target 'cmTC_73d28' failed
+make[1]: *** [cmTC_73d28] Error 1
+make[1]: Leaving directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_73d28/fast' failed
+make: *** [cmTC_73d28/fast] Error 2
+
+
+Determining if files sys/filio.h exist failed with the following output:
+Change Dir: /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_647c4/fast"
+/usr/bin/make -f CMakeFiles/cmTC_647c4.dir/build.make CMakeFiles/cmTC_647c4.dir/build
+make[1]: Entering directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_647c4.dir/CheckIncludeFiles.c.o
+/usr/bin/cc    -Wall -Wwrite-strings -Wsign-compare -Wmissing-prototypes -Wstrict-prototypes -Wcast-qual -g -O0 -Wbad-function-cast -Wpointer-arith  -D__USE_MINGW_ANSI_STDIO=1 -Wformat-security -std=gnu99    -o CMakeFiles/cmTC_647c4.dir/CheckIncludeFiles.c.o   -c /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckIncludeFiles.c:2:23: fatal error: sys/filio.h: No such file or directory
+ #include <sys/filio.h>
+                       ^
+compilation terminated.
+CMakeFiles/cmTC_647c4.dir/build.make:65: recipe for target 'CMakeFiles/cmTC_647c4.dir/CheckIncludeFiles.c.o' failed
+make[1]: *** [CMakeFiles/cmTC_647c4.dir/CheckIncludeFiles.c.o] Error 1
+make[1]: Leaving directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_647c4/fast' failed
+make: *** [cmTC_647c4/fast] Error 2
+
+Source:
+/* */
+#include <sys/filio.h>
+
+
+int main(void){return 0;}
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_43688/fast"
+/usr/bin/make -f CMakeFiles/cmTC_43688.dir/build.make CMakeFiles/cmTC_43688.dir/build
+make[1]: Entering directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_43688.dir/CheckSymbolExists.c.o
+/usr/bin/cc     -o CMakeFiles/cmTC_43688.dir/CheckSymbolExists.c.o   -c /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_43688
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_43688.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_43688.dir/CheckSymbolExists.c.o  -o cmTC_43688 -rdynamic 
+CMakeFiles/cmTC_43688.dir/CheckSymbolExists.c.o: In function `main':
+CheckSymbolExists.c:(.text+0x1b): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_43688.dir/build.make:97: recipe for target 'cmTC_43688' failed
+make[1]: *** [cmTC_43688] Error 1
+make[1]: Leaving directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_43688/fast' failed
+make: *** [cmTC_43688/fast] Error 2
+
+File /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_30933/fast"
+/usr/bin/make -f CMakeFiles/cmTC_30933.dir/build.make CMakeFiles/cmTC_30933.dir/build
+make[1]: Entering directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_30933.dir/CheckFunctionExists.c.o
+/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_30933.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.7/Modules/CheckFunctionExists.c
+Linking C executable cmTC_30933
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_30933.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_30933.dir/CheckFunctionExists.c.o  -o cmTC_30933 -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_30933.dir/build.make:97: recipe for target 'cmTC_30933' failed
+make[1]: *** [cmTC_30933] Error 1
+make[1]: Leaving directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_30933/fast' failed
+make: *** [cmTC_30933/fast] Error 2
+
+
+Determining if files sys/filio.h exist failed with the following output:
+Change Dir: /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_7fc96/fast"
+/usr/bin/make -f CMakeFiles/cmTC_7fc96.dir/build.make CMakeFiles/cmTC_7fc96.dir/build
+make[1]: Entering directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_7fc96.dir/CheckIncludeFiles.c.o
+/usr/bin/cc    -Wall -Wwrite-strings -Wsign-compare -Wmissing-prototypes -Wstrict-prototypes -Wcast-qual -g -O0 -Wbad-function-cast -Wpointer-arith  -D__USE_MINGW_ANSI_STDIO=1 -Wformat-security -std=gnu99    -o CMakeFiles/cmTC_7fc96.dir/CheckIncludeFiles.c.o   -c /home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp/CheckIncludeFiles.c:2:23: fatal error: sys/filio.h: No such file or directory
+ #include <sys/filio.h>
+                       ^
+compilation terminated.
+CMakeFiles/cmTC_7fc96.dir/build.make:65: recipe for target 'CMakeFiles/cmTC_7fc96.dir/CheckIncludeFiles.c.o' failed
+make[1]: *** [CMakeFiles/cmTC_7fc96.dir/CheckIncludeFiles.c.o] Error 1
+make[1]: Leaving directory '/home/wjk/Code/previous-code/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_7fc96/fast' failed
+make: *** [cmTC_7fc96/fast] Error 2
+
+Source:
+/* */
+#include <sys/filio.h>
+
+
+int main(void){return 0;}
+
