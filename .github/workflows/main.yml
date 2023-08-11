@@ -10,14 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    
-    
-      - name: Configure Git User
-        run: |
-          git config --global user.name "itomato"
-          git config --global user.email "itomato@juddy.org"
-
-    
+        
       - name: Checkout GitHub Repository
         uses: actions/checkout@v2
 
@@ -39,6 +32,8 @@ jobs:
       - name: Copy SVN changes to GitHub Repository
         run: |
           cp -r previous-code/* .
+          git config --global user.name "itomato"
+          git config --global user.email "itomato@juddy.org"
           git add .
           git commit -m "Sync with SVN" || echo "No changes to commit"
           git push origin master
