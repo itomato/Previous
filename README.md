@@ -2,7 +2,7 @@
 
 [http://previous.alternative-system.com/](http://previous.alternative-system.com/)
 
-
+[![Sync SVN with GitHub and Build](https://github.com/itomato/Previous/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/itomato/Previous/actions/workflows/main.yml)
 Contents:
 ---------
 1. License
