@@ -15,6 +15,9 @@ jobs:
 
       - name: Set up Subversion
         run: sudo apt-get install -y subversion
+        
+      - name: Install SDL2 Library
+        run: sudo apt-get install -y libsdl2-dev
 
       - name: Pull Changes from SVN
         run: |
