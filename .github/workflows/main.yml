@@ -26,6 +26,9 @@ jobs:
         
       - name: Install SDL2 Library
         run: sudo apt-get install -y libsdl2-dev
+        
+      - name: Install CMake and Build Tools
+        run: sudo apt-get install -y cmake g++
 
       - name: Pull Changes from SVN
         run: |
@@ -40,8 +43,6 @@ jobs:
           git commit -m "Sync with SVN" || echo "No changes to commit"
           git push origin master
 
-      - name: Install CMake and Build Tools
-        run: sudo apt-get install -y cmake g++
 
       - name: Configure and Build with CMake
         run: |
