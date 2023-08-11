@@ -17,7 +17,7 @@ Contents:
 6. Contributors
 7. Contact
 
-#License
+# License
  ----------
 
 This program is free software; you can redistribute it and/or modify it under
@@ -36,7 +36,7 @@ this program; if not, write to the
  MA  02110-1301, USA
 
 
-#About Previous
+# About Previous
  -----------------
 
 Previous is a NeXT Computer emulator based on the Atari emulator Previous. It uses 
@@ -64,7 +64,7 @@ Previous emulates the following machines:
 - NeXTdimension Graphics Board
 
 
-#Compiling and installing
+# Compiling and installing
  ---------------------------
 
 For using Previous, you need to have installed the following libraries:
@@ -105,7 +105,7 @@ by typing "make". If all works fine, you'll get the executable "Previous" in
 the src/ subdirectory of the build tree.
 
 
-#Status
+# Status
  ---------
 
 Previous is still work in progress. Some hardware is not yet emulated:
@@ -161,7 +161,7 @@ There are remaining problems with the host to emulated machine interface for
 input devices.
 
 
- #Known issues
+ # Known issues
  ---------------
 
 - Un-emulated hardware may cause problems in certain situations (see above).
@@ -186,7 +186,7 @@ input devices.
 
 
 
-#Release notes
+# Release notes
  ----------------
 
   Previous v1.0:
@@ -215,7 +215,7 @@ input devices.
   > Improves Real Time Clock. Time is now handled correctly.
 
 
-#Running Previous
+# Running Previous
  -------------------
 
 For running the emulator, you need an image of the boot ROM of the emulated 
@@ -226,7 +226,7 @@ pressing F12, toggle between fullscreen and windowed mode by pressing F11
 and initiate a clean shut down by pressing F10 (emulates the power button).
 
 
-#Contributors
+# Contributors
  ---------------
 
 Many thanks go to the members of the NeXT International Forums for their
@@ -236,7 +236,7 @@ Eckhardt, Jason Stevens, Vaughan Kaufman and Peter Leonard!
 This emulator would not exist without their help.
 
 
-#Contact
+# Contact
  ----------
 
 If you want to contact the authors of Previous, please have a look at the 
