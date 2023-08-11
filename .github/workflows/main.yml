@@ -2,7 +2,7 @@ name: Sync SVN with GitHub and Build
 
 on:
   schedule:
-    - cron: '0 2 * * MON' # Run every week
+    - cron: '0 * * * *' # Run every hour
 
 jobs:
   sync-and-build:
