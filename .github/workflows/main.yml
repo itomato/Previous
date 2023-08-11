@@ -1,0 +1,39 @@
+name: Sync SVN with GitHub and Build
+
+on:
+  schedule:
+    - cron: '0 2 * * MON' # Run every week
+
+jobs:
+  sync-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout GitHub Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Subversion
+        run: sudo apt-get install -y subversion
+
+      - name: Pull Changes from SVN
+        run: |
+          svn checkout https://svn.code.sf.net/p/previous/code/trunk previous-code
+          cd previous-code
+          svn log -r HEAD
+
+      - name: Copy SVN changes to GitHub Repository
+        run: |
+          cp -r previous-code/* .
+          git add .
+          git commit -m "Sync with SVN" || echo "No changes to commit"
+          git push origin master
+
+      - name: Install CMake and Build Tools
+        run: sudo apt-get install -y cmake g++
+
+      - name: Configure and Build with CMake
+        run: |
+          mkdir build
+          cd build
+          cmake ../previous-code
+          make
