@@ -10,6 +10,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    
+    
+      - name: Configure Git User
+        run: |
+          git config --global user.name "itomato"
+          git config --global user.email "itomato@juddy.org"
+
+    
       - name: Checkout GitHub Repository
         uses: actions/checkout@v2
 
