@@ -1,9 +1,9 @@
 name: Sync SVN with GitHub and Build
 
 on:
+  workflow_dispatch: # Allow manual triggering
   schedule:
-    workflow_dispatch: # Allow manual triggering
-    - cron: '0 * * * *' # Run every hour
+    - cron: '0 2 * * MON' # Run every Monday at 2:00 AM
 
 jobs:
   sync-and-build:
