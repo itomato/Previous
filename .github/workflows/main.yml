@@ -1,4 +1,4 @@
-name: Sync SVN with GitHub and Build
+name: Sync SVN with GitHub
 
 on:
   workflow_dispatch: # Allow manual triggering
@@ -20,9 +20,6 @@ jobs:
       - name: Install SDL2 Library
         run: sudo apt-get install -y libsdl2-dev
         
-      - name: Install CMake and Build Tools
-        run: sudo apt-get install -y cmake g++
-
       - name: Pull Changes from SVN
         run: |
           svn checkout https://svn.code.sf.net/p/previous/code/trunk previous-code
@@ -37,11 +34,3 @@ jobs:
           git add .
           git commit -m "Sync with SVN" || echo "No changes to commit"
           git push origin master
-
-
-      - name: Configure and Build with CMake
-        run: |
-          mkdir build
-          cd build
-          cmake ../previous-code
-          make
