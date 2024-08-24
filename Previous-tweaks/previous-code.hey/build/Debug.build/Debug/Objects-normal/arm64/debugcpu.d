@@ -1,0 +1,36 @@
+dependencies: \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/debug/debugcpu.c \
+  /Users/wjk/Code/Previous-tweaks/previous-code/config.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/includes/main.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/debug/breakcond.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/includes/configuration.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/debug/debugui.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/debug/debug_priv.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/debug/debugcpu.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/debug/evaluate.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/hatari-glue.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/sysdeps.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/sysconfig.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/compat.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/uae/string.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/uae/types.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/options_cpu.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/debug/history.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/debug/log.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/includes/m68000.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/memory.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/maccess.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/newcpu.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/readcpu.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/machdep/m68k.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/events.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/machdep/rpt.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/uae/time.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/softfloat/softfloat.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/custom.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/includes/cycInt.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/debug/profile.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/includes/str.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/debug/symbols.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/debug/68kDisass.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/debug/vars.h

@@ -1,0 +1,49 @@
+Target dependency graph (20 targets)
+Target 'uninstall' in project 'Previous'
+➜ Explicit dependency on target 'ZERO_CHECK' in project 'Previous'
+Target 'install' in project 'Previous'
+➜ Explicit dependency on target 'ALL_BUILD' in project 'Previous'
+Target 'distclean' in project 'Previous'
+➜ Explicit dependency on target 'ZERO_CHECK' in project 'Previous'
+Target 'PreviOSUITests' in project 'Previous'
+➜ Explicit dependency on target 'PreviOS' in project 'Previous'
+Target 'PreviOSTests' in project 'Previous'
+➜ Explicit dependency on target 'PreviOS' in project 'Previous'
+Target 'PreviOS' in project 'Previous' (no dependencies)
+Target 'ALL_BUILD' in project 'Previous'
+➜ Explicit dependency on target 'Previous' in project 'Previous'
+➜ Explicit dependency on target 'Debug' in project 'Previous'
+➜ Explicit dependency on target 'SoftFloat' in project 'Previous'
+➜ Explicit dependency on target 'GuiSdl' in project 'Previous'
+➜ Explicit dependency on target 'build68k' in project 'Previous'
+➜ Explicit dependency on target 'gencpu' in project 'Previous'
+➜ Explicit dependency on target 'UaeCpu' in project 'Previous'
+➜ Explicit dependency on target 'DSP' in project 'Previous'
+➜ Explicit dependency on target 'Dimension' in project 'Previous'
+➜ Explicit dependency on target 'Slirp' in project 'Previous'
+➜ Explicit dependency on target 'ditool' in project 'Previous'
+➜ Explicit dependency on target 'ZERO_CHECK' in project 'Previous'
+Target 'ZERO_CHECK' in project 'Previous' (no dependencies)
+Target 'ditool' in project 'Previous' (no dependencies)
+Target 'Previous' in project 'Previous'
+➜ Explicit dependency on target 'osx_bundle_dirs' in project 'Previous'
+➜ Explicit dependency on target 'Debug' in project 'Previous'
+➜ Explicit dependency on target 'SoftFloat' in project 'Previous'
+➜ Explicit dependency on target 'GuiSdl' in project 'Previous'
+➜ Explicit dependency on target 'UaeCpu' in project 'Previous'
+➜ Explicit dependency on target 'DSP' in project 'Previous'
+➜ Explicit dependency on target 'Dimension' in project 'Previous'
+➜ Explicit dependency on target 'Slirp' in project 'Previous'
+Target 'Slirp' in project 'Previous' (no dependencies)
+Target 'Dimension' in project 'Previous' (no dependencies)
+Target 'DSP' in project 'Previous' (no dependencies)
+Target 'UaeCpu' in project 'Previous'
+➜ Explicit dependency on target 'build68k' in project 'Previous'
+➜ Explicit dependency on target 'gencpu' in project 'Previous'
+Target 'gencpu' in project 'Previous'
+➜ Explicit dependency on target 'build68k' in project 'Previous'
+Target 'build68k' in project 'Previous' (no dependencies)
+Target 'GuiSdl' in project 'Previous' (no dependencies)
+Target 'SoftFloat' in project 'Previous' (no dependencies)
+Target 'Debug' in project 'Previous' (no dependencies)
+Target 'osx_bundle_dirs' in project 'Previous' (no dependencies)

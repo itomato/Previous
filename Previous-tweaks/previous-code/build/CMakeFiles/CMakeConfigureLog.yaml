@@ -1,0 +1,1802 @@
+
+---
+events:
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeDetermineSystem.cmake:211 (message)"
+      - "CMakeLists.txt:14 (project)"
+    message: |
+      The system is: Darwin - 23.5.0 - arm64
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:14 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+      Compiler: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc 
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      1
+      ld: library 'System' not found
+      clang: error: linker command failed with exit code 1 (use -v to see invocation)
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:14 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+      Compiler: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc 
+      Build flags: 
+      Id flags: -c 
+      
+      The output was:
+      0
+      
+      
+      Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CMakeCCompilerId.o"
+      
+      The C compiler identification is AppleClang, found in:
+        /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/3.27.2/CompilerIdC/CMakeCCompilerId.o
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:126 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:14 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+      Compiler: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ 
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      1
+      ld: library 'c++' not found
+      clang: error: linker command failed with exit code 1 (use -v to see invocation)
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:126 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:14 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+      Compiler: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ 
+      Build flags: 
+      Id flags: -c 
+      
+      The output was:
+      0
+      
+      
+      Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CMakeCXXCompilerId.o"
+      
+      The CXX compiler identification is AppleClang, found in:
+        /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/3.27.2/CompilerIdCXX/CMakeCXXCompilerId.o
+      
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:57 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:14 (project)"
+    checks:
+      - "Detecting C compiler ABI info"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-wV6BNs"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-wV6BNs"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "CMAKE_C_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-wV6BNs'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_6de76/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_6de76.dir/build.make CMakeFiles/cmTC_6de76.dir/build
+        Building C object CMakeFiles/cmTC_6de76.dir/CMakeCCompilerABI.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13   -v -Wl,-v -MD -MT CMakeFiles/cmTC_6de76.dir/CMakeCCompilerABI.c.o -MF CMakeFiles/cmTC_6de76.dir/CMakeCCompilerABI.c.o.d -o CMakeFiles/cmTC_6de76.dir/CMakeCCompilerABI.c.o -c /opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeCCompilerABI.c
+        Apple clang version 15.0.0 (clang-1500.3.9.4)
+        Target: arm64-apple-darwin23.5.0
+        Thread model: posix
+        InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+        clang: warning: -Wl,-v: 'linker' input unused [-Wunused-command-line-argument]
+         "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang" -cc1 -triple arm64-apple-macosx10.13.0 -Wundef-prefix=TARGET_OS_ -Wdeprecated-objc-isa-usage -Werror=deprecated-objc-isa-usage -Werror=implicit-function-declaration -emit-obj -mrelax-all --mrelax-relocations -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -mframe-pointer=non-leaf -fno-strict-return -ffp-contract=on -fno-rounding-math -funwind-tables=1 -fobjc-msgsend-selector-stubs -target-sdk-version=14.5 -fvisibility-inlines-hidden-static-local-var -target-cpu apple-m1 -target-feature +v8.5a -target-feature +crc -target-feature +lse -target-feature +rdm -target-feature +crypto -target-feature +dotprod -target-feature +fp-armv8 -target-feature +neon -target-feature +fp16fml -target-feature +ras -target-feature +rcpc -target-feature +zcm -target-feature +zcz -target-feature +fullfp16 -target-feature +sm4 -target-feature +sha3 -target-feature +sha2 -target-feature +aes -target-abi darwinpcs -debugger-tuning=lldb -target-linker-version 1053.12 -v -fcoverage-compilation-dir=/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-wV6BNs -resource-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0 -dependency-file CMakeFiles/cmTC_6de76.dir/CMakeCCompilerABI.c.o.d -skip-unused-modulemap-deps -MT CMakeFiles/cmTC_6de76.dir/CMakeCCompilerABI.c.o -sys-header-deps -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -internal-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/local/include -internal-isystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include -internal-externc-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include -internal-externc-isystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -Wno-reorder-init-list -Wno-implicit-int-float-conversion -Wno-c99-designator -Wno-final-dtor-non-final-class -Wno-extra-semi-stmt -Wno-misleading-indentation -Wno-quoted-include-in-framework-header -Wno-implicit-fallthrough -Wno-enum-enum-conversion -Wno-enum-float-conversion -Wno-elaborated-enum-base -Wno-reserved-identifier -Wno-gnu-folding-constant -fdebug-compilation-dir=/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-wV6BNs -ferror-limit 19 -stack-protector 1 -fstack-check -mdarwin-stkchk-strong-link -fblocks -fencode-extended-block-signature -fregister-global-dtors-with-atexit -fgnuc-version=4.2.1 -fmax-type-align=16 -fcommon -clang-vendor-feature=+disableNonDependentMemberExprInCurrentInstantiation -fno-odr-hash-protocols -clang-vendor-feature=+enableAggressiveVLAFolding -clang-vendor-feature=+revert09abecef7bbf -clang-vendor-feature=+thisNoAlignAttr -clang-vendor-feature=+thisNoNullAttr -mllvm -disable-aligned-alloc-awareness=1 -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_6de76.dir/CMakeCCompilerABI.c.o -x c /opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeCCompilerABI.c
+        clang -cc1 version 15.0.0 (clang-1500.3.9.4) default target arm64-apple-darwin23.5.0
+        ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/local/include"
+        ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/Library/Frameworks"
+        #include "..." search starts here:
+        #include <...> search starts here:
+         /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include
+         /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include
+         /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include
+         /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/System/Library/Frameworks (framework directory)
+        End of search list.
+        Linking C executable cmTC_6de76
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6de76.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names  -v -Wl,-v CMakeFiles/cmTC_6de76.dir/CMakeCCompilerABI.c.o -o cmTC_6de76 
+        Apple clang version 15.0.0 (clang-1500.3.9.4)
+        Target: arm64-apple-darwin23.5.0
+        Thread model: posix
+        InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+         "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" -demangle -lto_library /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib -dynamic -arch arm64 -platform_version macos 11.0.0 14.5 -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -o cmTC_6de76 -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTC_6de76.dir/CMakeCCompilerABI.c.o -lSystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/lib/darwin/libclang_rt.osx.a
+        @(#)PROGRAM:ld PROJECT:ld-1053.12
+        BUILD 10:15:51 Mar 29 2024
+        configured to support archs: armv6 armv7 armv7s arm64 arm64e arm64_32 i386 x86_64 x86_64h armv6m armv7k armv7m armv7em
+        will use ld-classic for: armv6 armv7 armv7s arm64_32 i386 armv6m armv7k armv7m armv7em
+        LTO support using: LLVM version 15.0.0 (static support for 29, runtime is 29)
+        TAPI support using: Apple TAPI version 15.0.0 (tapi-1500.3.2.2)
+        Library search paths:
+        	/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/lib
+        	/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/lib/swift
+        Framework search paths:
+        	/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/System/Library/Frameworks
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:127 (message)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:14 (project)"
+    message: |
+      Parsed C implicit include dir info: rv=done
+        found start of include info
+        found start of implicit include info
+          add: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include]
+          add: [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include]
+          add: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
+        end of search list found
+        collapse include dir [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include] ==> [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include]
+        collapse include dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include]
+        collapse include dir [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include] ==> [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
+        implicit include dirs: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include;/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:152 (message)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:14 (project)"
+    message: |
+      Parsed C implicit link information:
+        link line regex: [^( *|.*[/\\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        ignore line: [Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-wV6BNs']
+        ignore line: []
+        ignore line: [Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_6de76/fast]
+        ignore line: [/Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_6de76.dir/build.make CMakeFiles/cmTC_6de76.dir/build]
+        ignore line: [Building C object CMakeFiles/cmTC_6de76.dir/CMakeCCompilerABI.c.o]
+        ignore line: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13   -v -Wl -v -MD -MT CMakeFiles/cmTC_6de76.dir/CMakeCCompilerABI.c.o -MF CMakeFiles/cmTC_6de76.dir/CMakeCCompilerABI.c.o.d -o CMakeFiles/cmTC_6de76.dir/CMakeCCompilerABI.c.o -c /opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeCCompilerABI.c]
+        ignore line: [Apple clang version 15.0.0 (clang-1500.3.9.4)]
+        ignore line: [Target: arm64-apple-darwin23.5.0]
+        ignore line: [Thread model: posix]
+        ignore line: [InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin]
+        ignore line: [clang: warning: -Wl -v: 'linker' input unused [-Wunused-command-line-argument]]
+        ignore line: [ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang" -cc1 -triple arm64-apple-macosx10.13.0 -Wundef-prefix=TARGET_OS_ -Wdeprecated-objc-isa-usage -Werror=deprecated-objc-isa-usage -Werror=implicit-function-declaration -emit-obj -mrelax-all --mrelax-relocations -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -mframe-pointer=non-leaf -fno-strict-return -ffp-contract=on -fno-rounding-math -funwind-tables=1 -fobjc-msgsend-selector-stubs -target-sdk-version=14.5 -fvisibility-inlines-hidden-static-local-var -target-cpu apple-m1 -target-feature +v8.5a -target-feature +crc -target-feature +lse -target-feature +rdm -target-feature +crypto -target-feature +dotprod -target-feature +fp-armv8 -target-feature +neon -target-feature +fp16fml -target-feature +ras -target-feature +rcpc -target-feature +zcm -target-feature +zcz -target-feature +fullfp16 -target-feature +sm4 -target-feature +sha3 -target-feature +sha2 -target-feature +aes -target-abi darwinpcs -debugger-tuning=lldb -target-linker-version 1053.12 -v -fcoverage-compilation-dir=/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-wV6BNs -resource-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0 -dependency-file CMakeFiles/cmTC_6de76.dir/CMakeCCompilerABI.c.o.d -skip-unused-modulemap-deps -MT CMakeFiles/cmTC_6de76.dir/CMakeCCompilerABI.c.o -sys-header-deps -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -internal-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/local/include -internal-isystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include -internal-externc-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include -internal-externc-isystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -Wno-reorder-init-list -Wno-implicit-int-float-conversion -Wno-c99-designator -Wno-final-dtor-non-final-class -Wno-extra-semi-stmt -Wno-misleading-indentation -Wno-quoted-include-in-framework-header -Wno-implicit-fallthrough -Wno-enum-enum-conversion -Wno-enum-float-conversion -Wno-elaborated-enum-base -Wno-reserved-identifier -Wno-gnu-folding-constant -fdebug-compilation-dir=/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-wV6BNs -ferror-limit 19 -stack-protector 1 -fstack-check -mdarwin-stkchk-strong-link -fblocks -fencode-extended-block-signature -fregister-global-dtors-with-atexit -fgnuc-version=4.2.1 -fmax-type-align=16 -fcommon -clang-vendor-feature=+disableNonDependentMemberExprInCurrentInstantiation -fno-odr-hash-protocols -clang-vendor-feature=+enableAggressiveVLAFolding -clang-vendor-feature=+revert09abecef7bbf -clang-vendor-feature=+thisNoAlignAttr -clang-vendor-feature=+thisNoNullAttr -mllvm -disable-aligned-alloc-awareness=1 -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_6de76.dir/CMakeCCompilerABI.c.o -x c /opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeCCompilerABI.c]
+        ignore line: [clang -cc1 version 15.0.0 (clang-1500.3.9.4) default target arm64-apple-darwin23.5.0]
+        ignore line: [ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/local/include"]
+        ignore line: [ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/Library/Frameworks"]
+        ignore line: [#include "..." search starts here:]
+        ignore line: [#include <...> search starts here:]
+        ignore line: [ /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include]
+        ignore line: [ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include]
+        ignore line: [ /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
+        ignore line: [ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/System/Library/Frameworks (framework directory)]
+        ignore line: [End of search list.]
+        ignore line: [Linking C executable cmTC_6de76]
+        ignore line: [/opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6de76.dir/link.txt --verbose=1]
+        ignore line: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl -search_paths_first -Wl -headerpad_max_install_names  -v -Wl -v CMakeFiles/cmTC_6de76.dir/CMakeCCompilerABI.c.o -o cmTC_6de76 ]
+        ignore line: [Apple clang version 15.0.0 (clang-1500.3.9.4)]
+        ignore line: [Target: arm64-apple-darwin23.5.0]
+        ignore line: [Thread model: posix]
+        ignore line: [InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin]
+        link line: [ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" -demangle -lto_library /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib -dynamic -arch arm64 -platform_version macos 11.0.0 14.5 -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -o cmTC_6de76 -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTC_6de76.dir/CMakeCCompilerABI.c.o -lSystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/lib/darwin/libclang_rt.osx.a]
+          arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld] ==> ignore
+          arg [-demangle] ==> ignore
+          arg [-lto_library] ==> ignore, skip following value
+          arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib] ==> skip value of -lto_library
+          arg [-dynamic] ==> ignore
+          arg [-arch] ==> ignore
+          arg [arm64] ==> ignore
+          arg [-platform_version] ==> ignore
+          arg [macos] ==> ignore
+          arg [11.0.0] ==> ignore
+          arg [14.5] ==> ignore
+          arg [-syslibroot] ==> ignore
+          arg [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk] ==> ignore
+          arg [-o] ==> ignore
+          arg [cmTC_6de76] ==> ignore
+          arg [-search_paths_first] ==> ignore
+          arg [-headerpad_max_install_names] ==> ignore
+          arg [-v] ==> ignore
+          arg [CMakeFiles/cmTC_6de76.dir/CMakeCCompilerABI.c.o] ==> ignore
+          arg [-lSystem] ==> lib [System]
+          arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/lib/darwin/libclang_rt.osx.a] ==> lib [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/lib/darwin/libclang_rt.osx.a]
+        Library search paths: [;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/lib;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/lib/swift]
+        Framework search paths: [;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/System/Library/Frameworks]
+        remove lib [System]
+        remove lib [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/lib/darwin/libclang_rt.osx.a]
+        collapse library dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/lib] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/lib]
+        collapse library dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/lib/swift] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/lib/swift]
+        collapse framework dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/System/Library/Frameworks] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/System/Library/Frameworks]
+        implicit libs: []
+        implicit objs: []
+        implicit dirs: [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/lib;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/lib/swift]
+        implicit fwks: [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/System/Library/Frameworks]
+      
+      
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:57 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:14 (project)"
+    checks:
+      - "Detecting CXX compiler ABI info"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-ATuYVz"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-ATuYVz"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "CMAKE_CXX_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-ATuYVz'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_a1157/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_a1157.dir/build.make CMakeFiles/cmTC_a1157.dir/build
+        Building CXX object CMakeFiles/cmTC_a1157.dir/CMakeCXXCompilerABI.cpp.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13   -v -Wl,-v -MD -MT CMakeFiles/cmTC_a1157.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_a1157.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_a1157.dir/CMakeCXXCompilerABI.cpp.o -c /opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeCXXCompilerABI.cpp
+        Apple clang version 15.0.0 (clang-1500.3.9.4)
+        Target: arm64-apple-darwin23.5.0
+        Thread model: posix
+        InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+        clang: warning: -Wl,-v: 'linker' input unused [-Wunused-command-line-argument]
+         "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang" -cc1 -triple arm64-apple-macosx10.13.0 -Wundef-prefix=TARGET_OS_ -Wdeprecated-objc-isa-usage -Werror=deprecated-objc-isa-usage -Werror=implicit-function-declaration -emit-obj -mrelax-all --mrelax-relocations -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -mframe-pointer=non-leaf -fno-strict-return -ffp-contract=on -fno-rounding-math -funwind-tables=1 -fobjc-msgsend-selector-stubs -target-sdk-version=14.5 -fvisibility-inlines-hidden-static-local-var -target-cpu apple-m1 -target-feature +v8.5a -target-feature +crc -target-feature +lse -target-feature +rdm -target-feature +crypto -target-feature +dotprod -target-feature +fp-armv8 -target-feature +neon -target-feature +fp16fml -target-feature +ras -target-feature +rcpc -target-feature +zcm -target-feature +zcz -target-feature +fullfp16 -target-feature +sm4 -target-feature +sha3 -target-feature +sha2 -target-feature +aes -target-abi darwinpcs -debugger-tuning=lldb -target-linker-version 1053.12 -v -fcoverage-compilation-dir=/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-ATuYVz -resource-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0 -dependency-file CMakeFiles/cmTC_a1157.dir/CMakeCXXCompilerABI.cpp.o.d -skip-unused-modulemap-deps -MT CMakeFiles/cmTC_a1157.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -internal-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include/c++/v1 -internal-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/local/include -internal-isystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include -internal-externc-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include -internal-externc-isystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -Wno-reorder-init-list -Wno-implicit-int-float-conversion -Wno-c99-designator -Wno-final-dtor-non-final-class -Wno-extra-semi-stmt -Wno-misleading-indentation -Wno-quoted-include-in-framework-header -Wno-implicit-fallthrough -Wno-enum-enum-conversion -Wno-enum-float-conversion -Wno-elaborated-enum-base -Wno-reserved-identifier -Wno-gnu-folding-constant -fdeprecated-macro -fdebug-compilation-dir=/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-ATuYVz -ferror-limit 19 -stack-protector 1 -fstack-check -mdarwin-stkchk-strong-link -fblocks -fencode-extended-block-signature -fregister-global-dtors-with-atexit -fgnuc-version=4.2.1 -fno-cxx-modules -fcxx-exceptions -fexceptions -fmax-type-align=16 -fcommon -clang-vendor-feature=+disableNonDependentMemberExprInCurrentInstantiation -fno-odr-hash-protocols -clang-vendor-feature=+enableAggressiveVLAFolding -clang-vendor-feature=+revert09abecef7bbf -clang-vendor-feature=+thisNoAlignAttr -clang-vendor-feature=+thisNoNullAttr -mllvm -disable-aligned-alloc-awareness=1 -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_a1157.dir/CMakeCXXCompilerABI.cpp.o -x c++ /opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeCXXCompilerABI.cpp
+        clang -cc1 version 15.0.0 (clang-1500.3.9.4) default target arm64-apple-darwin23.5.0
+        ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/local/include"
+        ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/Library/Frameworks"
+        #include "..." search starts here:
+        #include <...> search starts here:
+         /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include/c++/v1
+         /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include
+         /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include
+         /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include
+         /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/System/Library/Frameworks (framework directory)
+        End of search list.
+        Linking CXX executable cmTC_a1157
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a1157.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names  -v -Wl,-v CMakeFiles/cmTC_a1157.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_a1157 
+        Apple clang version 15.0.0 (clang-1500.3.9.4)
+        Target: arm64-apple-darwin23.5.0
+        Thread model: posix
+        InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+         "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" -demangle -lto_library /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib -dynamic -arch arm64 -platform_version macos 11.0.0 14.5 -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -o cmTC_a1157 -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTC_a1157.dir/CMakeCXXCompilerABI.cpp.o -lc++ -lSystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/lib/darwin/libclang_rt.osx.a
+        @(#)PROGRAM:ld PROJECT:ld-1053.12
+        BUILD 10:15:51 Mar 29 2024
+        configured to support archs: armv6 armv7 armv7s arm64 arm64e arm64_32 i386 x86_64 x86_64h armv6m armv7k armv7m armv7em
+        will use ld-classic for: armv6 armv7 armv7s arm64_32 i386 armv6m armv7k armv7m armv7em
+        LTO support using: LLVM version 15.0.0 (static support for 29, runtime is 29)
+        TAPI support using: Apple TAPI version 15.0.0 (tapi-1500.3.2.2)
+        Library search paths:
+        	/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/lib
+        	/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/lib/swift
+        Framework search paths:
+        	/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/System/Library/Frameworks
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:127 (message)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:14 (project)"
+    message: |
+      Parsed CXX implicit include dir info: rv=done
+        found start of include info
+        found start of implicit include info
+          add: [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include/c++/v1]
+          add: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include]
+          add: [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include]
+          add: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
+        end of search list found
+        collapse include dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include/c++/v1] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include/c++/v1]
+        collapse include dir [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include] ==> [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include]
+        collapse include dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include]
+        collapse include dir [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include] ==> [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
+        implicit include dirs: [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include/c++/v1;/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include;/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:152 (message)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:14 (project)"
+    message: |
+      Parsed CXX implicit link information:
+        link line regex: [^( *|.*[/\\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        ignore line: [Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-ATuYVz']
+        ignore line: []
+        ignore line: [Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_a1157/fast]
+        ignore line: [/Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_a1157.dir/build.make CMakeFiles/cmTC_a1157.dir/build]
+        ignore line: [Building CXX object CMakeFiles/cmTC_a1157.dir/CMakeCXXCompilerABI.cpp.o]
+        ignore line: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13   -v -Wl -v -MD -MT CMakeFiles/cmTC_a1157.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_a1157.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_a1157.dir/CMakeCXXCompilerABI.cpp.o -c /opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
+        ignore line: [Apple clang version 15.0.0 (clang-1500.3.9.4)]
+        ignore line: [Target: arm64-apple-darwin23.5.0]
+        ignore line: [Thread model: posix]
+        ignore line: [InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin]
+        ignore line: [clang: warning: -Wl -v: 'linker' input unused [-Wunused-command-line-argument]]
+        ignore line: [ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang" -cc1 -triple arm64-apple-macosx10.13.0 -Wundef-prefix=TARGET_OS_ -Wdeprecated-objc-isa-usage -Werror=deprecated-objc-isa-usage -Werror=implicit-function-declaration -emit-obj -mrelax-all --mrelax-relocations -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -mframe-pointer=non-leaf -fno-strict-return -ffp-contract=on -fno-rounding-math -funwind-tables=1 -fobjc-msgsend-selector-stubs -target-sdk-version=14.5 -fvisibility-inlines-hidden-static-local-var -target-cpu apple-m1 -target-feature +v8.5a -target-feature +crc -target-feature +lse -target-feature +rdm -target-feature +crypto -target-feature +dotprod -target-feature +fp-armv8 -target-feature +neon -target-feature +fp16fml -target-feature +ras -target-feature +rcpc -target-feature +zcm -target-feature +zcz -target-feature +fullfp16 -target-feature +sm4 -target-feature +sha3 -target-feature +sha2 -target-feature +aes -target-abi darwinpcs -debugger-tuning=lldb -target-linker-version 1053.12 -v -fcoverage-compilation-dir=/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-ATuYVz -resource-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0 -dependency-file CMakeFiles/cmTC_a1157.dir/CMakeCXXCompilerABI.cpp.o.d -skip-unused-modulemap-deps -MT CMakeFiles/cmTC_a1157.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -internal-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include/c++/v1 -internal-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/local/include -internal-isystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include -internal-externc-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include -internal-externc-isystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -Wno-reorder-init-list -Wno-implicit-int-float-conversion -Wno-c99-designator -Wno-final-dtor-non-final-class -Wno-extra-semi-stmt -Wno-misleading-indentation -Wno-quoted-include-in-framework-header -Wno-implicit-fallthrough -Wno-enum-enum-conversion -Wno-enum-float-conversion -Wno-elaborated-enum-base -Wno-reserved-identifier -Wno-gnu-folding-constant -fdeprecated-macro -fdebug-compilation-dir=/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-ATuYVz -ferror-limit 19 -stack-protector 1 -fstack-check -mdarwin-stkchk-strong-link -fblocks -fencode-extended-block-signature -fregister-global-dtors-with-atexit -fgnuc-version=4.2.1 -fno-cxx-modules -fcxx-exceptions -fexceptions -fmax-type-align=16 -fcommon -clang-vendor-feature=+disableNonDependentMemberExprInCurrentInstantiation -fno-odr-hash-protocols -clang-vendor-feature=+enableAggressiveVLAFolding -clang-vendor-feature=+revert09abecef7bbf -clang-vendor-feature=+thisNoAlignAttr -clang-vendor-feature=+thisNoNullAttr -mllvm -disable-aligned-alloc-awareness=1 -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_a1157.dir/CMakeCXXCompilerABI.cpp.o -x c++ /opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
+        ignore line: [clang -cc1 version 15.0.0 (clang-1500.3.9.4) default target arm64-apple-darwin23.5.0]
+        ignore line: [ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/local/include"]
+        ignore line: [ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/Library/Frameworks"]
+        ignore line: [#include "..." search starts here:]
+        ignore line: [#include <...> search starts here:]
+        ignore line: [ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include/c++/v1]
+        ignore line: [ /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/include]
+        ignore line: [ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include]
+        ignore line: [ /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
+        ignore line: [ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/System/Library/Frameworks (framework directory)]
+        ignore line: [End of search list.]
+        ignore line: [Linking CXX executable cmTC_a1157]
+        ignore line: [/opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a1157.dir/link.txt --verbose=1]
+        ignore line: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl -search_paths_first -Wl -headerpad_max_install_names  -v -Wl -v CMakeFiles/cmTC_a1157.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_a1157 ]
+        ignore line: [Apple clang version 15.0.0 (clang-1500.3.9.4)]
+        ignore line: [Target: arm64-apple-darwin23.5.0]
+        ignore line: [Thread model: posix]
+        ignore line: [InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin]
+        link line: [ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" -demangle -lto_library /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib -dynamic -arch arm64 -platform_version macos 11.0.0 14.5 -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -o cmTC_a1157 -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTC_a1157.dir/CMakeCXXCompilerABI.cpp.o -lc++ -lSystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/lib/darwin/libclang_rt.osx.a]
+          arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld] ==> ignore
+          arg [-demangle] ==> ignore
+          arg [-lto_library] ==> ignore, skip following value
+          arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib] ==> skip value of -lto_library
+          arg [-dynamic] ==> ignore
+          arg [-arch] ==> ignore
+          arg [arm64] ==> ignore
+          arg [-platform_version] ==> ignore
+          arg [macos] ==> ignore
+          arg [11.0.0] ==> ignore
+          arg [14.5] ==> ignore
+          arg [-syslibroot] ==> ignore
+          arg [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk] ==> ignore
+          arg [-o] ==> ignore
+          arg [cmTC_a1157] ==> ignore
+          arg [-search_paths_first] ==> ignore
+          arg [-headerpad_max_install_names] ==> ignore
+          arg [-v] ==> ignore
+          arg [CMakeFiles/cmTC_a1157.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+          arg [-lc++] ==> lib [c++]
+          arg [-lSystem] ==> lib [System]
+          arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/lib/darwin/libclang_rt.osx.a] ==> lib [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/lib/darwin/libclang_rt.osx.a]
+        Library search paths: [;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/lib;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/lib/swift]
+        Framework search paths: [;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/System/Library/Frameworks]
+        remove lib [System]
+        remove lib [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/15.0.0/lib/darwin/libclang_rt.osx.a]
+        collapse library dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/lib] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/lib]
+        collapse library dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/lib/swift] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/lib/swift]
+        collapse framework dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/System/Library/Frameworks] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/System/Library/Frameworks]
+        implicit libs: [c++]
+        implicit objs: []
+        implicit dirs: [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/lib;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/lib/swift]
+        implicit fwks: [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/System/Library/Frameworks]
+      
+      
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "cmake/FindReadline.cmake:22 (check_symbol_exists)"
+      - "CMakeLists.txt:71 (find_package)"
+    checks:
+      - "Looking for rl_filename_completion_function"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-SpPmny"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-SpPmny"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_RL_COMPLETION_FUNCTION"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-SpPmny'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_6e98d/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_6e98d.dir/build.make CMakeFiles/cmTC_6e98d.dir/build
+        Building C object CMakeFiles/cmTC_6e98d.dir/CheckSymbolExists.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include/readline -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_6e98d.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_6e98d.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_6e98d.dir/CheckSymbolExists.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-SpPmny/CheckSymbolExists.c
+        Linking C executable cmTC_6e98d
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6e98d.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_6e98d.dir/CheckSymbolExists.c.o -o cmTC_6e98d  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/lib/libreadline.tbd 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckCSourceCompiles.cmake:52 (cmake_check_source_compiles)"
+      - "cmake/FindPCAP.cmake:45 (check_c_source_compiles)"
+      - "CMakeLists.txt:87 (find_package)"
+    checks:
+      - "Performing Test PCAP_LINKS_SOLO"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-eb0k9t"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-eb0k9t"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "PCAP_LINKS_SOLO"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-eb0k9t'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_6a137/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_6a137.dir/build.make CMakeFiles/cmTC_6a137.dir/build
+        Building C object CMakeFiles/cmTC_6a137.dir/src.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc -DPCAP_LINKS_SOLO  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_6a137.dir/src.c.o -MF CMakeFiles/cmTC_6a137.dir/src.c.o.d -o CMakeFiles/cmTC_6a137.dir/src.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-eb0k9t/src.c
+        Linking C executable cmTC_6a137
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6a137.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_6a137.dir/src.c.o -o cmTC_6a137  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/lib/libpcap.tbd 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckFunctionExists.cmake:86 (try_compile)"
+      - "cmake/FindPCAP.cmake:68 (check_function_exists)"
+      - "CMakeLists.txt:87 (find_package)"
+    checks:
+      - "Looking for pcap_get_pfring_id"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-NldZki"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-NldZki"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_PF_RING"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-NldZki'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_4f585/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_4f585.dir/build.make CMakeFiles/cmTC_4f585.dir/build
+        Building C object CMakeFiles/cmTC_4f585.dir/CheckFunctionExists.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pcap_get_pfring_id -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_4f585.dir/CheckFunctionExists.c.o -MF CMakeFiles/cmTC_4f585.dir/CheckFunctionExists.c.o.d -o CMakeFiles/cmTC_4f585.dir/CheckFunctionExists.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-NldZki/CheckFunctionExists.c
+        Linking C executable cmTC_4f585
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4f585.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pcap_get_pfring_id -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_4f585.dir/CheckFunctionExists.c.o -o cmTC_4f585  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/lib/libpcap.tbd 
+        Undefined symbols for architecture arm64:
+          "_pcap_get_pfring_id", referenced from:
+              _main in CheckFunctionExists.c.o
+        ld: symbol(s) not found for architecture arm64
+        clang: error: linker command failed with exit code 1 (use -v to see invocation)
+        make[1]: *** [cmTC_4f585] Error 1
+        make: *** [cmTC_4f585/fast] Error 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckIncludeFiles.cmake:132 (try_compile)"
+      - "CMakeLists.txt:116 (check_include_files)"
+    checks:
+      - "Looking for include file byteswap.h"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-TBGjvA"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-TBGjvA"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_BYTESWAP_H"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-TBGjvA'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_e2da9/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_e2da9.dir/build.make CMakeFiles/cmTC_e2da9.dir/build
+        Building C object CMakeFiles/cmTC_e2da9.dir/HAVE_BYTESWAP_H.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_e2da9.dir/HAVE_BYTESWAP_H.c.o -MF CMakeFiles/cmTC_e2da9.dir/HAVE_BYTESWAP_H.c.o.d -o CMakeFiles/cmTC_e2da9.dir/HAVE_BYTESWAP_H.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-TBGjvA/HAVE_BYTESWAP_H.c
+        /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-TBGjvA/HAVE_BYTESWAP_H.c:2:10: fatal error: 'byteswap.h' file not found
+        #include <byteswap.h>
+                 ^~~~~~~~~~~~
+        1 error generated.
+        make[1]: *** [CMakeFiles/cmTC_e2da9.dir/HAVE_BYTESWAP_H.c.o] Error 1
+        make: *** [cmTC_e2da9/fast] Error 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckIncludeFiles.cmake:132 (try_compile)"
+      - "CMakeLists.txt:117 (check_include_files)"
+    checks:
+      - "Looking for include file strings.h"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-KP9Awn"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-KP9Awn"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_STRINGS_H"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-KP9Awn'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_b2d81/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_b2d81.dir/build.make CMakeFiles/cmTC_b2d81.dir/build
+        Building C object CMakeFiles/cmTC_b2d81.dir/HAVE_STRINGS_H.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_b2d81.dir/HAVE_STRINGS_H.c.o -MF CMakeFiles/cmTC_b2d81.dir/HAVE_STRINGS_H.c.o.d -o CMakeFiles/cmTC_b2d81.dir/HAVE_STRINGS_H.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-KP9Awn/HAVE_STRINGS_H.c
+        Linking C executable cmTC_b2d81
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b2d81.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_b2d81.dir/HAVE_STRINGS_H.c.o -o cmTC_b2d81 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckIncludeFiles.cmake:132 (try_compile)"
+      - "CMakeLists.txt:118 (check_include_files)"
+    checks:
+      - "Looking for include file limits.h"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-1h7LEY"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-1h7LEY"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_LIMITS_H"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-1h7LEY'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_e79c7/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_e79c7.dir/build.make CMakeFiles/cmTC_e79c7.dir/build
+        Building C object CMakeFiles/cmTC_e79c7.dir/HAVE_LIMITS_H.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_e79c7.dir/HAVE_LIMITS_H.c.o -MF CMakeFiles/cmTC_e79c7.dir/HAVE_LIMITS_H.c.o.d -o CMakeFiles/cmTC_e79c7.dir/HAVE_LIMITS_H.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-1h7LEY/HAVE_LIMITS_H.c
+        Linking C executable cmTC_e79c7
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e79c7.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_e79c7.dir/HAVE_LIMITS_H.c.o -o cmTC_e79c7 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckIncludeFiles.cmake:132 (try_compile)"
+      - "CMakeLists.txt:119 (check_include_files)"
+    checks:
+      - "Looking for include file sys/syslimits.h"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-WG9Zri"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-WG9Zri"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_SYS_SYSLIMITS_H"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-WG9Zri'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_13f2f/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_13f2f.dir/build.make CMakeFiles/cmTC_13f2f.dir/build
+        Building C object CMakeFiles/cmTC_13f2f.dir/HAVE_SYS_SYSLIMITS_H.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_13f2f.dir/HAVE_SYS_SYSLIMITS_H.c.o -MF CMakeFiles/cmTC_13f2f.dir/HAVE_SYS_SYSLIMITS_H.c.o.d -o CMakeFiles/cmTC_13f2f.dir/HAVE_SYS_SYSLIMITS_H.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-WG9Zri/HAVE_SYS_SYSLIMITS_H.c
+        Linking C executable cmTC_13f2f
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_13f2f.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_13f2f.dir/HAVE_SYS_SYSLIMITS_H.c.o -o cmTC_13f2f 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckIncludeFiles.cmake:132 (try_compile)"
+      - "CMakeLists.txt:120 (check_include_files)"
+    checks:
+      - "Looking for include file sys/types.h"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-NpQr7M"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-NpQr7M"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_SYS_TYPES_H"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-NpQr7M'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_9e579/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_9e579.dir/build.make CMakeFiles/cmTC_9e579.dir/build
+        Building C object CMakeFiles/cmTC_9e579.dir/HAVE_SYS_TYPES_H.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_9e579.dir/HAVE_SYS_TYPES_H.c.o -MF CMakeFiles/cmTC_9e579.dir/HAVE_SYS_TYPES_H.c.o.d -o CMakeFiles/cmTC_9e579.dir/HAVE_SYS_TYPES_H.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-NpQr7M/HAVE_SYS_TYPES_H.c
+        Linking C executable cmTC_9e579
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9e579.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_9e579.dir/HAVE_SYS_TYPES_H.c.o -o cmTC_9e579 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckIncludeFiles.cmake:132 (try_compile)"
+      - "CMakeLists.txt:121 (check_include_files)"
+    checks:
+      - "Looking for include file sys/xattr.h"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-xKLp6o"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-xKLp6o"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_SYS_XATTR_H"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-xKLp6o'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_a87a8/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_a87a8.dir/build.make CMakeFiles/cmTC_a87a8.dir/build
+        Building C object CMakeFiles/cmTC_a87a8.dir/HAVE_SYS_XATTR_H.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_a87a8.dir/HAVE_SYS_XATTR_H.c.o -MF CMakeFiles/cmTC_a87a8.dir/HAVE_SYS_XATTR_H.c.o.d -o CMakeFiles/cmTC_a87a8.dir/HAVE_SYS_XATTR_H.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-xKLp6o/HAVE_SYS_XATTR_H.c
+        Linking C executable cmTC_a87a8
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a87a8.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_a87a8.dir/HAVE_SYS_XATTR_H.c.o -o cmTC_a87a8 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckIncludeFiles.cmake:132 (try_compile)"
+      - "CMakeLists.txt:122 (check_include_files)"
+    checks:
+      - "Looking for include file tchar.h"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-aAaEkA"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-aAaEkA"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_TCHAR_H"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-aAaEkA'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_0f91e/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_0f91e.dir/build.make CMakeFiles/cmTC_0f91e.dir/build
+        Building C object CMakeFiles/cmTC_0f91e.dir/HAVE_TCHAR_H.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_0f91e.dir/HAVE_TCHAR_H.c.o -MF CMakeFiles/cmTC_0f91e.dir/HAVE_TCHAR_H.c.o.d -o CMakeFiles/cmTC_0f91e.dir/HAVE_TCHAR_H.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-aAaEkA/HAVE_TCHAR_H.c
+        /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-aAaEkA/HAVE_TCHAR_H.c:2:10: fatal error: 'tchar.h' file not found
+        #include <tchar.h>
+                 ^~~~~~~~~
+        1 error generated.
+        make[1]: *** [CMakeFiles/cmTC_0f91e.dir/HAVE_TCHAR_H.c.o] Error 1
+        make: *** [cmTC_0f91e/fast] Error 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckIncludeFiles.cmake:132 (try_compile)"
+      - "CMakeLists.txt:123 (check_include_files)"
+    checks:
+      - "Looking for include file arpa/inet.h"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-8GQtPo"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-8GQtPo"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_ARPA_INET_H"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-8GQtPo'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_945f9/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_945f9.dir/build.make CMakeFiles/cmTC_945f9.dir/build
+        Building C object CMakeFiles/cmTC_945f9.dir/HAVE_ARPA_INET_H.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_945f9.dir/HAVE_ARPA_INET_H.c.o -MF CMakeFiles/cmTC_945f9.dir/HAVE_ARPA_INET_H.c.o.d -o CMakeFiles/cmTC_945f9.dir/HAVE_ARPA_INET_H.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-8GQtPo/HAVE_ARPA_INET_H.c
+        Linking C executable cmTC_945f9
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_945f9.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_945f9.dir/HAVE_ARPA_INET_H.c.o -o cmTC_945f9 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckIncludeFiles.cmake:132 (try_compile)"
+      - "CMakeLists.txt:124 (check_include_files)"
+    checks:
+      - "Looking for include file netinet/in.h"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-UuqZRF"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-UuqZRF"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_NETINET_IN_H"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-UuqZRF'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_67a31/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_67a31.dir/build.make CMakeFiles/cmTC_67a31.dir/build
+        Building C object CMakeFiles/cmTC_67a31.dir/HAVE_NETINET_IN_H.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_67a31.dir/HAVE_NETINET_IN_H.c.o -MF CMakeFiles/cmTC_67a31.dir/HAVE_NETINET_IN_H.c.o.d -o CMakeFiles/cmTC_67a31.dir/HAVE_NETINET_IN_H.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-UuqZRF/HAVE_NETINET_IN_H.c
+        Linking C executable cmTC_67a31
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_67a31.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_67a31.dir/HAVE_NETINET_IN_H.c.o -o cmTC_67a31 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:130 (check_symbol_exists)"
+    checks:
+      - "Looking for bswap_16"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-FCQbvd"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-FCQbvd"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_BSWAP_16"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-FCQbvd'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_e139b/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_e139b.dir/build.make CMakeFiles/cmTC_e139b.dir/build
+        Building C object CMakeFiles/cmTC_e139b.dir/CheckSymbolExists.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_e139b.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_e139b.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_e139b.dir/CheckSymbolExists.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-FCQbvd/CheckSymbolExists.c
+        /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-FCQbvd/CheckSymbolExists.c:2:10: fatal error: 'byteswap.h' file not found
+        #include <byteswap.h>
+                 ^~~~~~~~~~~~
+        1 error generated.
+        make[1]: *** [CMakeFiles/cmTC_e139b.dir/CheckSymbolExists.c.o] Error 1
+        make: *** [cmTC_e139b/fast] Error 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:131 (check_symbol_exists)"
+    checks:
+      - "Looking for bswap_32"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-XmrrVd"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-XmrrVd"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_BSWAP_32"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-XmrrVd'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_8c12c/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_8c12c.dir/build.make CMakeFiles/cmTC_8c12c.dir/build
+        Building C object CMakeFiles/cmTC_8c12c.dir/CheckSymbolExists.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_8c12c.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_8c12c.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_8c12c.dir/CheckSymbolExists.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-XmrrVd/CheckSymbolExists.c
+        /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-XmrrVd/CheckSymbolExists.c:2:10: fatal error: 'byteswap.h' file not found
+        #include <byteswap.h>
+                 ^~~~~~~~~~~~
+        1 error generated.
+        make[1]: *** [CMakeFiles/cmTC_8c12c.dir/CheckSymbolExists.c.o] Error 1
+        make: *** [cmTC_8c12c/fast] Error 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:132 (check_symbol_exists)"
+    checks:
+      - "Looking for setenv"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-ofCArl"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-ofCArl"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_SETENV"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-ofCArl'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_fff12/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_fff12.dir/build.make CMakeFiles/cmTC_fff12.dir/build
+        Building C object CMakeFiles/cmTC_fff12.dir/CheckSymbolExists.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_fff12.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_fff12.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_fff12.dir/CheckSymbolExists.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-ofCArl/CheckSymbolExists.c
+        Linking C executable cmTC_fff12
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_fff12.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_fff12.dir/CheckSymbolExists.c.o -o cmTC_fff12 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:133 (check_symbol_exists)"
+    checks:
+      - "Looking for select"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-c2GRfN"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-c2GRfN"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_SELECT"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-c2GRfN'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_ee72f/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_ee72f.dir/build.make CMakeFiles/cmTC_ee72f.dir/build
+        Building C object CMakeFiles/cmTC_ee72f.dir/CheckSymbolExists.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_ee72f.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_ee72f.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_ee72f.dir/CheckSymbolExists.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-c2GRfN/CheckSymbolExists.c
+        Linking C executable cmTC_ee72f
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ee72f.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_ee72f.dir/CheckSymbolExists.c.o -o cmTC_ee72f 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:134 (check_symbol_exists)"
+    checks:
+      - "Looking for gettimeofday"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-wM8exb"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-wM8exb"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_GETTIMEOFDAY"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-wM8exb'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_1dd85/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_1dd85.dir/build.make CMakeFiles/cmTC_1dd85.dir/build
+        Building C object CMakeFiles/cmTC_1dd85.dir/CheckSymbolExists.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_1dd85.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_1dd85.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_1dd85.dir/CheckSymbolExists.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-wM8exb/CheckSymbolExists.c
+        Linking C executable cmTC_1dd85
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1dd85.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_1dd85.dir/CheckSymbolExists.c.o -o cmTC_1dd85 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:135 (check_symbol_exists)"
+    checks:
+      - "Looking for nanosleep"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-6jF5NK"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-6jF5NK"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_NANOSLEEP"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-6jF5NK'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_80a98/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_80a98.dir/build.make CMakeFiles/cmTC_80a98.dir/build
+        Building C object CMakeFiles/cmTC_80a98.dir/CheckSymbolExists.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_80a98.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_80a98.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_80a98.dir/CheckSymbolExists.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-6jF5NK/CheckSymbolExists.c
+        Linking C executable cmTC_80a98
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_80a98.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_80a98.dir/CheckSymbolExists.c.o -o cmTC_80a98 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:136 (check_symbol_exists)"
+    checks:
+      - "Looking for alphasort"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-FlNxoe"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-FlNxoe"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_ALPHASORT"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-FlNxoe'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_53962/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_53962.dir/build.make CMakeFiles/cmTC_53962.dir/build
+        Building C object CMakeFiles/cmTC_53962.dir/CheckSymbolExists.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_53962.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_53962.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_53962.dir/CheckSymbolExists.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-FlNxoe/CheckSymbolExists.c
+        Linking C executable cmTC_53962
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_53962.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_53962.dir/CheckSymbolExists.c.o -o cmTC_53962 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:137 (check_symbol_exists)"
+    checks:
+      - "Looking for scandir"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-QC6D3n"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-QC6D3n"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_SCANDIR"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-QC6D3n'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_58995/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_58995.dir/build.make CMakeFiles/cmTC_58995.dir/build
+        Building C object CMakeFiles/cmTC_58995.dir/CheckSymbolExists.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_58995.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_58995.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_58995.dir/CheckSymbolExists.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-QC6D3n/CheckSymbolExists.c
+        Linking C executable cmTC_58995
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_58995.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_58995.dir/CheckSymbolExists.c.o -o cmTC_58995 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:138 (check_symbol_exists)"
+    checks:
+      - "Looking for fseeko"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-8ZKjDW"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-8ZKjDW"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_FSEEKO"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-8ZKjDW'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_8eee6/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_8eee6.dir/build.make CMakeFiles/cmTC_8eee6.dir/build
+        Building C object CMakeFiles/cmTC_8eee6.dir/CheckSymbolExists.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_8eee6.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_8eee6.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_8eee6.dir/CheckSymbolExists.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-8ZKjDW/CheckSymbolExists.c
+        Linking C executable cmTC_8eee6
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8eee6.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_8eee6.dir/CheckSymbolExists.c.o -o cmTC_8eee6 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:139 (check_symbol_exists)"
+    checks:
+      - "Looking for ftello"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-yurQoX"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-yurQoX"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_FTELLO"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-yurQoX'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_45d93/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_45d93.dir/build.make CMakeFiles/cmTC_45d93.dir/build
+        Building C object CMakeFiles/cmTC_45d93.dir/CheckSymbolExists.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_45d93.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_45d93.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_45d93.dir/CheckSymbolExists.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-yurQoX/CheckSymbolExists.c
+        Linking C executable cmTC_45d93
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_45d93.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_45d93.dir/CheckSymbolExists.c.o -o cmTC_45d93 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:140 (check_symbol_exists)"
+    checks:
+      - "Looking for flock"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-MvZGiT"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-MvZGiT"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_FLOCK"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-MvZGiT'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_77281/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_77281.dir/build.make CMakeFiles/cmTC_77281.dir/build
+        Building C object CMakeFiles/cmTC_77281.dir/CheckSymbolExists.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_77281.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_77281.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_77281.dir/CheckSymbolExists.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-MvZGiT/CheckSymbolExists.c
+        Linking C executable cmTC_77281
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_77281.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_77281.dir/CheckSymbolExists.c.o -o cmTC_77281 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:141 (check_symbol_exists)"
+    checks:
+      - "Looking for strdup"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-3on9en"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-3on9en"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_STRDUP"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-3on9en'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_e32c8/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_e32c8.dir/build.make CMakeFiles/cmTC_e32c8.dir/build
+        Building C object CMakeFiles/cmTC_e32c8.dir/CheckSymbolExists.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_e32c8.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_e32c8.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_e32c8.dir/CheckSymbolExists.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-3on9en/CheckSymbolExists.c
+        Linking C executable cmTC_e32c8
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e32c8.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_e32c8.dir/CheckSymbolExists.c.o -o cmTC_e32c8 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:142 (check_symbol_exists)"
+    checks:
+      - "Looking for lsetxattr"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-MB4rQ9"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-MB4rQ9"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_LXETXATTR"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-MB4rQ9'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_b9f4b/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_b9f4b.dir/build.make CMakeFiles/cmTC_b9f4b.dir/build
+        Building C object CMakeFiles/cmTC_b9f4b.dir/CheckSymbolExists.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_b9f4b.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_b9f4b.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_b9f4b.dir/CheckSymbolExists.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-MB4rQ9/CheckSymbolExists.c
+        /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-MB4rQ9/CheckSymbolExists.c:8:19: error: use of undeclared identifier 'lsetxattr'
+          return ((int*)(&lsetxattr))[argc];
+                          ^
+        1 error generated.
+        make[1]: *** [CMakeFiles/cmTC_b9f4b.dir/CheckSymbolExists.c.o] Error 1
+        make: *** [cmTC_b9f4b/fast] Error 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:143 (check_symbol_exists)"
+    checks:
+      - "Looking for posix_memalign"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-PzkIE4"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-PzkIE4"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_POSIX_MEMALIGN"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-PzkIE4'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_ad5b9/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_ad5b9.dir/build.make CMakeFiles/cmTC_ad5b9.dir/build
+        Building C object CMakeFiles/cmTC_ad5b9.dir/CheckSymbolExists.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_ad5b9.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_ad5b9.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_ad5b9.dir/CheckSymbolExists.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-PzkIE4/CheckSymbolExists.c
+        Linking C executable cmTC_ad5b9
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ad5b9.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_ad5b9.dir/CheckSymbolExists.c.o -o cmTC_ad5b9 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:144 (check_symbol_exists)"
+    checks:
+      - "Looking for aligned_alloc"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-MalPK4"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-MalPK4"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_ALIGNED_ALLOC"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-MalPK4'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_bebfd/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_bebfd.dir/build.make CMakeFiles/cmTC_bebfd.dir/build
+        Building C object CMakeFiles/cmTC_bebfd.dir/CheckSymbolExists.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_bebfd.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_bebfd.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_bebfd.dir/CheckSymbolExists.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-MalPK4/CheckSymbolExists.c
+        /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-MalPK4/CheckSymbolExists.c:8:19: warning: 'aligned_alloc' is only available on macOS 10.15 or newer [-Wunguarded-availability-new]
+          return ((int*)(&aligned_alloc))[argc];
+                          ^~~~~~~~~~~~~
+        /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include/malloc/_malloc.h:65:7: note: 'aligned_alloc' has been marked as being introduced in macOS 10.15 here, but the deployment target is macOS 10.13.0
+        void *aligned_alloc(size_t __alignment, size_t __size) __result_use_check __alloc_align(1) __alloc_size(2) _MALLOC_TYPED(malloc_type_aligned_alloc, 2) __OSX_AVAILABLE(10.15) __IOS_AVAILABLE(13.0) __TVOS_AVAILABLE(13.0) __WATCHOS_AVAILABLE(6.0);
+              ^
+        /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-MalPK4/CheckSymbolExists.c:8:19: note: enclose 'aligned_alloc' in a __builtin_available check to silence this warning
+          return ((int*)(&aligned_alloc))[argc];
+                          ^~~~~~~~~~~~~
+        1 warning generated.
+        Linking C executable cmTC_bebfd
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_bebfd.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_bebfd.dir/CheckSymbolExists.c.o -o cmTC_bebfd 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:140 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSymbolExists.cmake:66 (__CHECK_SYMBOL_EXISTS_IMPL)"
+      - "CMakeLists.txt:145 (check_symbol_exists)"
+    checks:
+      - "Looking for _aligned_malloc"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-R707dm"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-R707dm"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE__ALIGNED_MALLOC"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-R707dm'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_2f37d/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_2f37d.dir/build.make CMakeFiles/cmTC_2f37d.dir/build
+        Building C object CMakeFiles/cmTC_2f37d.dir/CheckSymbolExists.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_2f37d.dir/CheckSymbolExists.c.o -MF CMakeFiles/cmTC_2f37d.dir/CheckSymbolExists.c.o.d -o CMakeFiles/cmTC_2f37d.dir/CheckSymbolExists.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-R707dm/CheckSymbolExists.c
+        /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-R707dm/CheckSymbolExists.c:8:19: error: use of undeclared identifier '_aligned_malloc'; did you mean 'aligned_alloc'?
+          return ((int*)(&_aligned_malloc))[argc];
+                          ^~~~~~~~~~~~~~~
+                          aligned_alloc
+        /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include/malloc/_malloc.h:65:7: note: 'aligned_alloc' declared here
+        void *aligned_alloc(size_t __alignment, size_t __size) __result_use_check __alloc_align(1) __alloc_size(2) _MALLOC_TYPED(malloc_type_aligned_alloc, 2) __OSX_AVAILABLE(10.15) __IOS_AVAILABLE(13.0) __TVOS_AVAILABLE(13.0) __WATCHOS_AVAILABLE(6.0);
+              ^
+        /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-R707dm/CheckSymbolExists.c:8:19: warning: 'aligned_alloc' is only available on macOS 10.15 or newer [-Wunguarded-availability-new]
+          return ((int*)(&_aligned_malloc))[argc];
+                          ^~~~~~~~~~~~~~~
+        /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include/malloc/_malloc.h:65:7: note: 'aligned_alloc' has been marked as being introduced in macOS 10.15 here, but the deployment target is macOS 10.13.0
+        void *aligned_alloc(size_t __alignment, size_t __size) __result_use_check __alloc_align(1) __alloc_size(2) _MALLOC_TYPED(malloc_type_aligned_alloc, 2) __OSX_AVAILABLE(10.15) __IOS_AVAILABLE(13.0) __TVOS_AVAILABLE(13.0) __WATCHOS_AVAILABLE(6.0);
+              ^
+        /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-R707dm/CheckSymbolExists.c:8:19: note: enclose 'aligned_alloc' in a __builtin_available check to silence this warning
+          return ((int*)(&_aligned_malloc))[argc];
+                          ^~~~~~~~~~~~~~~
+        1 warning and 1 error generated.
+        make[1]: *** [CMakeFiles/cmTC_2f37d.dir/CheckSymbolExists.c.o] Error 1
+        make: *** [cmTC_2f37d/fast] Error 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSourceCompiles.cmake:77 (cmake_check_source_compiles)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckStructHasMember.cmake:77 (CHECK_SOURCE_COMPILES)"
+      - "CMakeLists.txt:151 (check_struct_has_member)"
+    checks:
+      - "Performing Test HAVE_STRUCT_STAT_ST_ATIMESPEC"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-fyCiKC"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-fyCiKC"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_STRUCT_STAT_ST_ATIMESPEC"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-fyCiKC'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_4e41f/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_4e41f.dir/build.make CMakeFiles/cmTC_4e41f.dir/build
+        Building C object CMakeFiles/cmTC_4e41f.dir/src.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc -DHAVE_STRUCT_STAT_ST_ATIMESPEC  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_4e41f.dir/src.c.o -MF CMakeFiles/cmTC_4e41f.dir/src.c.o.d -o CMakeFiles/cmTC_4e41f.dir/src.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-fyCiKC/src.c
+        Linking C executable cmTC_4e41f
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4e41f.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_4e41f.dir/src.c.o -o cmTC_4e41f 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSourceCompiles.cmake:77 (cmake_check_source_compiles)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckStructHasMember.cmake:77 (CHECK_SOURCE_COMPILES)"
+      - "CMakeLists.txt:153 (check_struct_has_member)"
+    checks:
+      - "Performing Test HAVE_STRUCT_STAT_ST_MTIMESPEC"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-hhZAdO"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-hhZAdO"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_STRUCT_STAT_ST_MTIMESPEC"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-hhZAdO'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_45a4c/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_45a4c.dir/build.make CMakeFiles/cmTC_45a4c.dir/build
+        Building C object CMakeFiles/cmTC_45a4c.dir/src.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc -DHAVE_STRUCT_STAT_ST_MTIMESPEC  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_45a4c.dir/src.c.o -MF CMakeFiles/cmTC_45a4c.dir/src.c.o.d -o CMakeFiles/cmTC_45a4c.dir/src.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-hhZAdO/src.c
+        Linking C executable cmTC_45a4c
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_45a4c.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_45a4c.dir/src.c.o -o cmTC_45a4c 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckSourceCompiles.cmake:77 (cmake_check_source_compiles)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckStructHasMember.cmake:77 (CHECK_SOURCE_COMPILES)"
+      - "CMakeLists.txt:156 (check_struct_has_member)"
+    checks:
+      - "Performing Test HAVE_STRUCT_DIRENT_D_NAMELEN"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-eOE637"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-eOE637"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_STRUCT_DIRENT_D_NAMELEN"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-eOE637'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_11b5e/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_11b5e.dir/build.make CMakeFiles/cmTC_11b5e.dir/build
+        Building C object CMakeFiles/cmTC_11b5e.dir/src.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc -DHAVE_STRUCT_DIRENT_D_NAMELEN  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_11b5e.dir/src.c.o -MF CMakeFiles/cmTC_11b5e.dir/src.c.o.d -o CMakeFiles/cmTC_11b5e.dir/src.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-eOE637/src.c
+        /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-eOE637/src.c:6:38: error: no member named 'd_namelen' in 'struct dirent'; did you mean 'd_namlen'?
+          (void)sizeof(((struct dirent *)0)->d_namelen);
+                                             ^~~~~~~~~
+                                             d_namlen
+        /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include/sys/dirent.h:112:15: note: 'd_namlen' declared here
+        struct dirent __DARWIN_STRUCT_DIRENTRY;
+                      ^
+        /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk/usr/include/sys/dirent.h:106:14: note: expanded from macro '__DARWIN_STRUCT_DIRENTRY'
+                __uint16_t  d_namlen;   /* length of string in d_name */ \\
+                            ^
+        1 error generated.
+        make[1]: *** [CMakeFiles/cmTC_11b5e.dir/src.c.o] Error 1
+        make: *** [cmTC_11b5e/fast] Error 2
+        
+      exitCode: 2
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/Internal/CheckCompilerFlag.cmake:18 (cmake_check_source_compiles)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckCCompilerFlag.cmake:51 (cmake_check_compiler_flag)"
+      - "CMakeLists.txt:181 (CHECK_C_COMPILER_FLAG)"
+    checks:
+      - "Performing Test WARN_FALLTRHOUGH_AVAILABLE"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-rieyCf"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-rieyCf"
+    cmakeVariables:
+      CMAKE_C_FLAGS: " -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security -g -O0 -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers"
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "WARN_FALLTRHOUGH_AVAILABLE"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-rieyCf'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_c28c1/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_c28c1.dir/build.make CMakeFiles/cmTC_c28c1.dir/build
+        Building C object CMakeFiles/cmTC_c28c1.dir/src.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc -DWARN_FALLTRHOUGH_AVAILABLE  -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security -g -O0 -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13   -Wimplicit-fallthrough=2 -MD -MT CMakeFiles/cmTC_c28c1.dir/src.c.o -MF CMakeFiles/cmTC_c28c1.dir/src.c.o.d -o CMakeFiles/cmTC_c28c1.dir/src.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-rieyCf/src.c
+        warning: unknown warning option '-Wimplicit-fallthrough=2'; did you mean '-Wimplicit-fallthrough'? [-Wunknown-warning-option]
+        1 warning generated.
+        Linking C executable cmTC_c28c1
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c28c1.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security -g -O0 -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_c28c1.dir/src.c.o -o cmTC_c28c1 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/Internal/CheckCompilerFlag.cmake:18 (cmake_check_source_compiles)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckCCompilerFlag.cmake:51 (cmake_check_compiler_flag)"
+      - "CMakeLists.txt:186 (CHECK_C_COMPILER_FLAG)"
+    checks:
+      - "Performing Test WARN_SHADOW_LOCAL_AVAILABLE"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-Cpl8gO"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-Cpl8gO"
+    cmakeVariables:
+      CMAKE_C_FLAGS: " -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security -g -O0 -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers"
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "WARN_SHADOW_LOCAL_AVAILABLE"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-Cpl8gO'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_4fcec/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_4fcec.dir/build.make CMakeFiles/cmTC_4fcec.dir/build
+        Building C object CMakeFiles/cmTC_4fcec.dir/src.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc -DWARN_SHADOW_LOCAL_AVAILABLE  -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security -g -O0 -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13   -Wshadow=local -MD -MT CMakeFiles/cmTC_4fcec.dir/src.c.o -MF CMakeFiles/cmTC_4fcec.dir/src.c.o.d -o CMakeFiles/cmTC_4fcec.dir/src.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-Cpl8gO/src.c
+        warning: unknown warning option '-Wshadow=local' [-Wunknown-warning-option]
+        1 warning generated.
+        Linking C executable cmTC_4fcec
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4fcec.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security -g -O0 -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_4fcec.dir/src.c.o -o cmTC_4fcec 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/Internal/CheckCompilerFlag.cmake:18 (cmake_check_source_compiles)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckCCompilerFlag.cmake:51 (cmake_check_compiler_flag)"
+      - "CMakeLists.txt:191 (CHECK_C_COMPILER_FLAG)"
+    checks:
+      - "Performing Test WARN_VARIABLE_LENGTH_ARRAY_AVAILABLE"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-lK74L0"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-lK74L0"
+    cmakeVariables:
+      CMAKE_C_FLAGS: " -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security -g -O0 -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers"
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "WARN_VARIABLE_LENGTH_ARRAY_AVAILABLE"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-lK74L0'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_05bba/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_05bba.dir/build.make CMakeFiles/cmTC_05bba.dir/build
+        Building C object CMakeFiles/cmTC_05bba.dir/src.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc -DWARN_VARIABLE_LENGTH_ARRAY_AVAILABLE  -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security -g -O0 -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13   -Wvla -MD -MT CMakeFiles/cmTC_05bba.dir/src.c.o -MF CMakeFiles/cmTC_05bba.dir/src.c.o.d -o CMakeFiles/cmTC_05bba.dir/src.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-lK74L0/src.c
+        Linking C executable cmTC_05bba
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_05bba.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security -g -O0 -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_05bba.dir/src.c.o -o cmTC_05bba 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/Internal/CheckCompilerFlag.cmake:18 (cmake_check_source_compiles)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckCXXCompilerFlag.cmake:34 (cmake_check_compiler_flag)"
+      - "CMakeLists.txt:211 (CHECK_CXX_COMPILER_FLAG)"
+    checks:
+      - "Performing Test WARN_CXX_FALLTRHOUGH_AVAILABLE"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-oaVouY"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-oaVouY"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "-Wall -Wextra -Wpointer-bool-conversion -Wtautological-compare -Wno-unused-parameter  -Wall -Wextra -Wtautological-compare -Wno-unused-parameter -Wno-sign-compare -Wno-conversion -Wno-unused"
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "WARN_CXX_FALLTRHOUGH_AVAILABLE"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-oaVouY'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_e812c/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_e812c.dir/build.make CMakeFiles/cmTC_e812c.dir/build
+        Building CXX object CMakeFiles/cmTC_e812c.dir/src.cxx.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ -DWARN_CXX_FALLTRHOUGH_AVAILABLE  -Wall -Wextra -Wpointer-bool-conversion -Wtautological-compare -Wno-unused-parameter  -Wall -Wextra -Wtautological-compare -Wno-unused-parameter -Wno-sign-compare -Wno-conversion -Wno-unused  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13   -Wimplicit-fallthrough=0 -MD -MT CMakeFiles/cmTC_e812c.dir/src.cxx.o -MF CMakeFiles/cmTC_e812c.dir/src.cxx.o.d -o CMakeFiles/cmTC_e812c.dir/src.cxx.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-oaVouY/src.cxx
+        warning: unknown warning option '-Wimplicit-fallthrough=0'; did you mean '-Wimplicit-fallthrough'? [-Wunknown-warning-option]
+        1 warning generated.
+        Linking CXX executable cmTC_e812c
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e812c.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ -Wall -Wextra -Wpointer-bool-conversion -Wtautological-compare -Wno-unused-parameter  -Wall -Wextra -Wtautological-compare -Wno-unused-parameter -Wno-sign-compare -Wno-conversion -Wno-unused  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_e812c.dir/src.cxx.o -o cmTC_e812c 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/Internal/CheckCompilerFlag.cmake:18 (cmake_check_source_compiles)"
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckCCompilerFlag.cmake:51 (cmake_check_compiler_flag)"
+      - "src/cpu/CMakeLists.txt:62 (check_c_compiler_flag)"
+    checks:
+      - "Performing Test HAS_WUNUSED_BUT_SET_VAR"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-C9MfuC"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-C9MfuC"
+    cmakeVariables:
+      CMAKE_C_FLAGS: " -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security -g -O0 -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers -Wvla"
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAS_WUNUSED_BUT_SET_VAR"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-C9MfuC'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_071ec/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_071ec.dir/build.make CMakeFiles/cmTC_071ec.dir/build
+        Building C object CMakeFiles/cmTC_071ec.dir/src.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc -DHAS_WUNUSED_BUT_SET_VAR  -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security -g -O0 -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers -Wvla  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13   -Wunused-but-set-variable -MD -MT CMakeFiles/cmTC_071ec.dir/src.c.o -MF CMakeFiles/cmTC_071ec.dir/src.c.o.d -o CMakeFiles/cmTC_071ec.dir/src.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-C9MfuC/src.c
+        Linking C executable cmTC_071ec
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_071ec.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security -g -O0 -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers -Wvla  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_071ec.dir/src.c.o -o cmTC_071ec 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckIncludeFiles.cmake:132 (try_compile)"
+      - "src/slirp/CMakeLists.txt:1 (check_include_files)"
+    checks:
+      - "Looking for include file sys/filio.h"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-vTwXlM"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-vTwXlM"
+    cmakeVariables:
+      CMAKE_C_FLAGS: " -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security -g -O0 -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers -Wvla"
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_SYS_FILIO_H"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-vTwXlM'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_6246c/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_6246c.dir/build.make CMakeFiles/cmTC_6246c.dir/build
+        Building C object CMakeFiles/cmTC_6246c.dir/HAVE_SYS_FILIO_H.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security -g -O0 -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers -Wvla  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_6246c.dir/HAVE_SYS_FILIO_H.c.o -MF CMakeFiles/cmTC_6246c.dir/HAVE_SYS_FILIO_H.c.o.d -o CMakeFiles/cmTC_6246c.dir/HAVE_SYS_FILIO_H.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-vTwXlM/HAVE_SYS_FILIO_H.c
+        Linking C executable cmTC_6246c
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6246c.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security -g -O0 -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers -Wvla  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_6246c.dir/HAVE_SYS_FILIO_H.c.o -o cmTC_6246c 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckIncludeFiles.cmake:132 (try_compile)"
+      - "src/slirp/CMakeLists.txt:6 (check_include_files)"
+    checks:
+      - "Looking for include file sys/ioctl.h"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-vb7RpS"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-vb7RpS"
+    cmakeVariables:
+      CMAKE_C_FLAGS: " -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security -g -O0 -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers -Wvla"
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_SYS_IOCTL_H"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-vb7RpS'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_c5e74/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_c5e74.dir/build.make CMakeFiles/cmTC_c5e74.dir/build
+        Building C object CMakeFiles/cmTC_c5e74.dir/HAVE_SYS_IOCTL_H.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security -g -O0 -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers -Wvla  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_c5e74.dir/HAVE_SYS_IOCTL_H.c.o -MF CMakeFiles/cmTC_c5e74.dir/HAVE_SYS_IOCTL_H.c.o.d -o CMakeFiles/cmTC_c5e74.dir/HAVE_SYS_IOCTL_H.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-vb7RpS/HAVE_SYS_IOCTL_H.c
+        Linking C executable cmTC_c5e74
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c5e74.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security -g -O0 -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers -Wvla  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_c5e74.dir/HAVE_SYS_IOCTL_H.c.o -o cmTC_c5e74 
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/Cellar/cmake/3.27.2/share/cmake/Modules/CheckIncludeFiles.cmake:132 (try_compile)"
+      - "src/slirp/CMakeLists.txt:11 (check_include_files)"
+    checks:
+      - "Looking for include file unistd.h"
+    directories:
+      source: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-ff2JCv"
+      binary: "/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-ff2JCv"
+    cmakeVariables:
+      CMAKE_C_FLAGS: " -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security -g -O0 -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers -Wvla"
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/Users/wjk/Code/Previous-tweaks/previous-code/cmake"
+      CMAKE_OSX_ARCHITECTURES: "arm64"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "10.13"
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "HAVE_UNISTD_H"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-ff2JCv'
+        
+        Run Build Command(s): /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_d0130/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_d0130.dir/build.make CMakeFiles/cmTC_d0130.dir/build
+        Building C object CMakeFiles/cmTC_d0130.dir/HAVE_UNISTD_H.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security -g -O0 -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers -Wvla  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -MD -MT CMakeFiles/cmTC_d0130.dir/HAVE_UNISTD_H.c.o -MF CMakeFiles/cmTC_d0130.dir/HAVE_UNISTD_H.c.o.d -o CMakeFiles/cmTC_d0130.dir/HAVE_UNISTD_H.c.o -c /Users/wjk/Code/Previous-tweaks/previous-code/build/CMakeFiles/CMakeScratch/TryCompile-ff2JCv/HAVE_UNISTD_H.c
+        Linking C executable cmTC_d0130
+        /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d0130.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security -g -O0 -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers -Wvla  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -mmacosx-version-min=10.13 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_d0130.dir/HAVE_UNISTD_H.c.o -o cmTC_d0130 
+        
+      exitCode: 0
+...

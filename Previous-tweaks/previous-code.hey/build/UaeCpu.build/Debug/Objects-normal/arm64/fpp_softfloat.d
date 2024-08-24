@@ -1,0 +1,22 @@
+dependencies: \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/fpp_softfloat.c \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/sysconfig.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/sysdeps.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/compat.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/uae/string.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/uae/types.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/includes/main.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/config.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/hatari-glue.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/options_cpu.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/memory.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/maccess.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/newcpu.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/readcpu.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/machdep/m68k.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/events.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/machdep/rpt.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/uae/time.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/softfloat/softfloat.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/custom.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/fpp.h

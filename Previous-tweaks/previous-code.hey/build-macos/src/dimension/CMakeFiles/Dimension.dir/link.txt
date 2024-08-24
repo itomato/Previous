@@ -1,0 +1,2 @@
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc libDimension.a CMakeFiles/Dimension.dir/dimension.cpp.o CMakeFiles/Dimension.dir/nd_mem.cpp.o CMakeFiles/Dimension.dir/nd_nbic.cpp.o CMakeFiles/Dimension.dir/nd_devs.cpp.o CMakeFiles/Dimension.dir/nd_vio.cpp.o CMakeFiles/Dimension.dir/nd_rom.cpp.o CMakeFiles/Dimension.dir/i860.cpp.o CMakeFiles/Dimension.dir/i860dis.cpp.o CMakeFiles/Dimension.dir/nd_sdl.cpp.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib libDimension.a

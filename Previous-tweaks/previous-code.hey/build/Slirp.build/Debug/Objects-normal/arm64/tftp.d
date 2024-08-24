@@ -1,0 +1,28 @@
+dependencies: \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/tftp.c \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/slirp.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/config.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/slirp_config.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/slirpdebug.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/ip.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/tcp.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/tcp_var.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/tcpip.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/tcp_timer.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/udp.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/icmp_var.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/mbuf.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/sbuf.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/socket.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/if.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/slirpmain.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/misc.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/ctl.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/bootp.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/ntp.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/tftp.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/rip.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/libslirp.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/includes/configuration.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/nfs/nfsd.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/nfs/RPCProg.h

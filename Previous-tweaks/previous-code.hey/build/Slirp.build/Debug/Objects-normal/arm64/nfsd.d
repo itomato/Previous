@@ -1,0 +1,25 @@
+dependencies: \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/nfs/nfsd.cpp \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/nfs/nfsd.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/ctl.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/nfs/RPCProg.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/nfs/XDRStream.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/nfs/RPCServer.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/nfs/SocketListener.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/nfs/CSocket.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/includes/host.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/slirpmain.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/nfs/TCPServerSocket.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/nfs/UDPServerSocket.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/nfs/PortmapProg.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/nfs/NFSProg.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/nfs/NFS2Prog.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/nfs/MountProg.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/nfs/BootparamProg.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/includes/configuration.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/nfs/VDNS.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/mbuf.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/nfs/NetInfoBindProg.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/nfs/NetInfoProg.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/nfs/FileTableNFSD.h \
+  /Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/nfs/../../ditool/VirtualFS.h

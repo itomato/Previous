@@ -1,0 +1,18 @@
+{
+  "" : {
+    "diagnostics" : "/Users/wjk/Code/Previous-tweaks/previous-code/build/Previous.build/Debug-iphoneos/PreviOSTests.build/Objects-normal/arm64/PreviOSTests-master.dia",
+    "emit-module-dependencies" : "/Users/wjk/Code/Previous-tweaks/previous-code/build/Previous.build/Debug-iphoneos/PreviOSTests.build/Objects-normal/arm64/PreviOSTests-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/wjk/Code/Previous-tweaks/previous-code/build/Previous.build/Debug-iphoneos/PreviOSTests.build/Objects-normal/arm64/PreviOSTests-master-emit-module.dia",
+    "swift-dependencies" : "/Users/wjk/Code/Previous-tweaks/previous-code/build/Previous.build/Debug-iphoneos/PreviOSTests.build/Objects-normal/arm64/PreviOSTests-master.swiftdeps"
+  },
+  "/Users/wjk/Code/Previous-tweaks/previous-code/PreviOSTests/PreviOSTests.swift" : {
+    "const-values" : "/Users/wjk/Code/Previous-tweaks/previous-code/build/Previous.build/Debug-iphoneos/PreviOSTests.build/Objects-normal/arm64/PreviOSTests.swiftconstvalues",
+    "dependencies" : "/Users/wjk/Code/Previous-tweaks/previous-code/build/Previous.build/Debug-iphoneos/PreviOSTests.build/Objects-normal/arm64/PreviOSTests.d",
+    "diagnostics" : "/Users/wjk/Code/Previous-tweaks/previous-code/build/Previous.build/Debug-iphoneos/PreviOSTests.build/Objects-normal/arm64/PreviOSTests.dia",
+    "index-unit-output-path" : "/Previous.build/Debug-iphoneos/PreviOSTests.build/Objects-normal/arm64/PreviOSTests.o",
+    "llvm-bc" : "/Users/wjk/Code/Previous-tweaks/previous-code/build/Previous.build/Debug-iphoneos/PreviOSTests.build/Objects-normal/arm64/PreviOSTests.bc",
+    "object" : "/Users/wjk/Code/Previous-tweaks/previous-code/build/Previous.build/Debug-iphoneos/PreviOSTests.build/Objects-normal/arm64/PreviOSTests.o",
+    "swift-dependencies" : "/Users/wjk/Code/Previous-tweaks/previous-code/build/Previous.build/Debug-iphoneos/PreviOSTests.build/Objects-normal/arm64/PreviOSTests.swiftdeps",
+    "swiftmodule" : "/Users/wjk/Code/Previous-tweaks/previous-code/build/Previous.build/Debug-iphoneos/PreviOSTests.build/Objects-normal/arm64/PreviOSTests~partial.swiftmodule"
+  }
+}

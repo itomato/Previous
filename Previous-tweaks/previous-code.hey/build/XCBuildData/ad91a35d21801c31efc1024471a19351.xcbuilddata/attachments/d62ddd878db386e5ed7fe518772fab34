@@ -1,0 +1,131 @@
+#!/bin/sh
+set -e
+if test "$CONFIGURATION" = "Debug"; then :
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  rm -f config.h
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  rm -f install_manifest.txt
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  rm -f src/*cpu/cpudefs.c
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  rm -f src/*cpu/cpuemu*.c
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  rm -f src/*cpu/cpustbl.c
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  rm -f src/*cpu/cputbl.h
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name CMakeFiles | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name CMakeCache.txt | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name cmake_install.cmake | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name CTestTestfile.cmake | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name Makefile | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name Testing | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name '*.a' | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name '*.1.gz' | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name '*.pyc' | xargs rm -rf
+fi
+if test "$CONFIGURATION" = "Release"; then :
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  rm -f config.h
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  rm -f install_manifest.txt
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  rm -f src/*cpu/cpudefs.c
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  rm -f src/*cpu/cpuemu*.c
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  rm -f src/*cpu/cpustbl.c
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  rm -f src/*cpu/cputbl.h
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name CMakeFiles | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name CMakeCache.txt | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name cmake_install.cmake | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name CTestTestfile.cmake | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name Makefile | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name Testing | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name '*.a' | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name '*.1.gz' | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name '*.pyc' | xargs rm -rf
+fi
+if test "$CONFIGURATION" = "MinSizeRel"; then :
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  rm -f config.h
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  rm -f install_manifest.txt
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  rm -f src/*cpu/cpudefs.c
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  rm -f src/*cpu/cpuemu*.c
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  rm -f src/*cpu/cpustbl.c
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  rm -f src/*cpu/cputbl.h
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name CMakeFiles | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name CMakeCache.txt | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name cmake_install.cmake | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name CTestTestfile.cmake | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name Makefile | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name Testing | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name '*.a' | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name '*.1.gz' | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name '*.pyc' | xargs rm -rf
+fi
+if test "$CONFIGURATION" = "RelWithDebInfo"; then :
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  rm -f config.h
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  rm -f install_manifest.txt
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  rm -f src/*cpu/cpudefs.c
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  rm -f src/*cpu/cpuemu*.c
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  rm -f src/*cpu/cpustbl.c
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  rm -f src/*cpu/cputbl.h
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name CMakeFiles | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name CMakeCache.txt | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name cmake_install.cmake | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name CTestTestfile.cmake | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name Makefile | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name Testing | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name '*.a' | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name '*.1.gz' | xargs rm -rf
+  cd /Users/wjk/Code/Previous-tweaks/previous-code
+  find . -depth -name '*.pyc' | xargs rm -rf
+fi
+

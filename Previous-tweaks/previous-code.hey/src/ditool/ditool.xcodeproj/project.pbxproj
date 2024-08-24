@@ -1,0 +1,935 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXAggregateTarget section */
+		75769BC49D0248EBB21E7CE1 /* ALL_BUILD */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = FB1F315AB1644CA0BC77E182 /* Build configuration list for PBXAggregateTarget "ALL_BUILD" */;
+			buildPhases = (
+				9B346B9253BCBC8A361003D5 /* Generate CMakeFiles/ALL_BUILD */,
+			);
+			dependencies = (
+				1DE390000A2043D69E61273C /* PBXTargetDependency */,
+				0CCE00AC57854317B96FF4DC /* PBXTargetDependency */,
+			);
+			name = ALL_BUILD;
+			productName = ALL_BUILD;
+		};
+		782D4D9837CF455591E09439 /* ZERO_CHECK */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 0B2F54B00DB5421D85266D39 /* Build configuration list for PBXAggregateTarget "ZERO_CHECK" */;
+			buildPhases = (
+				C50E932B5ED999B38F3027D2 /* Generate CMakeFiles/ZERO_CHECK */,
+			);
+			dependencies = (
+			);
+			name = ZERO_CHECK;
+			productName = ZERO_CHECK;
+		};
+		955B92F638EC4D28A693D012 /* install */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 1FDC8953AD804E45BFFDD3EC /* Build configuration list for PBXAggregateTarget "install" */;
+			buildPhases = (
+				93426DA6A4AC2C2AC9CE883C /* CMake PostBuild Rules */,
+			);
+			dependencies = (
+				C9CC944D8EE543BAB8484282 /* PBXTargetDependency */,
+			);
+			name = install;
+			productName = install;
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXBuildFile section */
+		531AA7050C5C45BB9B95FC03 /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/UFS.cpp */ = {isa = PBXBuildFile; fileRef = 133B4437AA5F46E9BB69315B /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/UFS.cpp */; };
+		6720AD9F677C44DCB650C998 /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/VirtualFS.cpp */ = {isa = PBXBuildFile; fileRef = 23FF7C83F1FA4F1380F9A1B5 /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/VirtualFS.cpp */; };
+		6F9CC4352B4A4E4BBB6F0CBD /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/CMakeLists.txt */ = {isa = PBXBuildFile; fileRef = A8556F45590141FC9CE37EA3 /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/CMakeLists.txt */; };
+		83337FD674A547A0B175C5AB /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/Partition.cpp */ = {isa = PBXBuildFile; fileRef = 29286776D9B148AAA35767C8 /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/Partition.cpp */; };
+		CD8FFBE7AED84EF494EEF9D1 /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/ditool.cpp */ = {isa = PBXBuildFile; fileRef = 38C454EF2A624583BD67823A /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/ditool.cpp */; };
+		EAD8C086D0494E18B00B1E5F /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/DiskImage.cpp */ = {isa = PBXBuildFile; fileRef = 88ECF0D237374B638372CBBC /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/DiskImage.cpp */; };
+		ED48486CDEAC40F885C1BD07 /* /Users/wjk/Code/Previous-tweaks/previous-code/src/rs.c */ = {isa = PBXBuildFile; fileRef = F6AE49B816884FB8847BF9E8 /* /Users/wjk/Code/Previous-tweaks/previous-code/src/rs.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXBuildStyle section */
+		6E44ACADB0F74F03AD24AE45 /* RelWithDebInfo */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = RelWithDebInfo;
+		};
+		8BBE2FE6A1044473A0820FBC /* Debug */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = Debug;
+		};
+		CBAA6765A63F4069B54E6520 /* MinSizeRel */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = MinSizeRel;
+		};
+		F06E95DB377D47C792F0F734 /* Release */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = Release;
+		};
+/* End PBXBuildStyle section */
+
+/* Begin PBXContainerItemProxy section */
+		477E175F50044BA498390A07 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4E227BC676314AA08110102E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1A1B830B5D43487887634F32;
+			remoteInfo = ditool;
+		};
+		541A571B08794906A0857E5E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4E227BC676314AA08110102E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 782D4D9837CF455591E09439;
+			remoteInfo = ZERO_CHECK;
+		};
+		697119E80E6E4345BF874F7D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4E227BC676314AA08110102E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 782D4D9837CF455591E09439;
+			remoteInfo = ZERO_CHECK;
+		};
+		80C2CFB18F8C4999938F927D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4E227BC676314AA08110102E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 75769BC49D0248EBB21E7CE1;
+			remoteInfo = ALL_BUILD;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		133B4437AA5F46E9BB69315B /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/UFS.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = UFS.cpp; path = UFS.cpp; sourceTree = SOURCE_ROOT; };
+		23FF7C83F1FA4F1380F9A1B5 /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/VirtualFS.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = VirtualFS.cpp; path = VirtualFS.cpp; sourceTree = SOURCE_ROOT; };
+		29286776D9B148AAA35767C8 /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/Partition.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = Partition.cpp; path = Partition.cpp; sourceTree = SOURCE_ROOT; };
+		38C454EF2A624583BD67823A /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/ditool.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = ditool.cpp; path = ditool.cpp; sourceTree = SOURCE_ROOT; };
+		72EE579D3B674C038B79CC77 /* ditool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; path = ditool; sourceTree = BUILT_PRODUCTS_DIR; };
+		88ECF0D237374B638372CBBC /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/DiskImage.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = DiskImage.cpp; path = DiskImage.cpp; sourceTree = SOURCE_ROOT; };
+		A8556F45590141FC9CE37EA3 /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = sourcecode.text; fileEncoding = 4; name = CMakeLists.txt; path = CMakeLists.txt; sourceTree = SOURCE_ROOT; };
+		F477A69275114B3DBA68C21A /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = sourcecode.text; fileEncoding = 4; name = CMakeLists.txt; path = CMakeLists.txt; sourceTree = SOURCE_ROOT; };
+		F6AE49B816884FB8847BF9E8 /* /Users/wjk/Code/Previous-tweaks/previous-code/src/rs.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = rs.c; path = "/Users/wjk/Code/Previous-tweaks/previous-code/src/rs.c"; sourceTree = "<absolute>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		63BCE4CCBE704E38BF28D9AB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		09C97FDBEE8144DEB1C702B1 /* Source Files */ = {
+			isa = PBXGroup;
+			children = (
+				88ECF0D237374B638372CBBC /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/DiskImage.cpp */,
+				29286776D9B148AAA35767C8 /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/Partition.cpp */,
+				133B4437AA5F46E9BB69315B /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/UFS.cpp */,
+				23FF7C83F1FA4F1380F9A1B5 /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/VirtualFS.cpp */,
+				38C454EF2A624583BD67823A /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/ditool.cpp */,
+				F6AE49B816884FB8847BF9E8 /* /Users/wjk/Code/Previous-tweaks/previous-code/src/rs.c */,
+			);
+			name = "Source Files";
+			sourceTree = "<group>";
+		};
+		24764A692CF7425295A0434B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				72EE579D3B674C038B79CC77 /* ditool */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		501037AD02F9488BAF080F0D /* CMake Rules */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "CMake Rules";
+			sourceTree = "<group>";
+		};
+		55BB78353F2844A0B35F9C91 /* ditool */ = {
+			isa = PBXGroup;
+			children = (
+				09C97FDBEE8144DEB1C702B1 /* Source Files */,
+				A8556F45590141FC9CE37EA3 /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/CMakeLists.txt */,
+			);
+			name = ditool;
+			sourceTree = "<group>";
+		};
+		7361A9A8BF384838BBE74B8E /* ALL_BUILD */ = {
+			isa = PBXGroup;
+			children = (
+				501037AD02F9488BAF080F0D /* CMake Rules */,
+				F477A69275114B3DBA68C21A /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/CMakeLists.txt */,
+			);
+			name = ALL_BUILD;
+			sourceTree = "<group>";
+		};
+		B4690E5EBC7E4D3C8735EA07 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		BD66C3C561AE469792FEB7FF = {
+			isa = PBXGroup;
+			children = (
+				55BB78353F2844A0B35F9C91 /* ditool */,
+				7361A9A8BF384838BBE74B8E /* ALL_BUILD */,
+				24764A692CF7425295A0434B /* Products */,
+				B4690E5EBC7E4D3C8735EA07 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1A1B830B5D43487887634F32 /* ditool */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 69A5ACC9D642465D97E32663 /* Build configuration list for PBXNativeTarget "ditool" */;
+			buildPhases = (
+				5E6635E493464D4B9ECFE5BD /* Sources */,
+				63BCE4CCBE704E38BF28D9AB /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6F76FF84EEF54AA1A118AA56 /* PBXTargetDependency */,
+			);
+			name = ditool;
+			productName = ditool;
+			productReference = 72EE579D3B674C038B79CC77 /* ditool */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4E227BC676314AA08110102E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1540;
+			};
+			buildConfigurationList = E8482FE543994EAE8D9209B7 /* Build configuration list for PBXProject "ditool" */;
+			buildSettings = {
+			};
+			buildStyles = (
+				8BBE2FE6A1044473A0820FBC /* Debug */,
+				F06E95DB377D47C792F0F734 /* Release */,
+				CBAA6765A63F4069B54E6520 /* MinSizeRel */,
+				6E44ACADB0F74F03AD24AE45 /* RelWithDebInfo */,
+			);
+			compatibilityVersion = "Xcode 3.2";
+			hasScannedForEncodings = 0;
+			mainGroup = BD66C3C561AE469792FEB7FF;
+			projectDirPath = .;
+			projectRoot = "";
+			targets = (
+				75769BC49D0248EBB21E7CE1 /* ALL_BUILD */,
+				782D4D9837CF455591E09439 /* ZERO_CHECK */,
+				1A1B830B5D43487887634F32 /* ditool */,
+				955B92F638EC4D28A693D012 /* install */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		3C0110FC8322DE7E50886E21 = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# shell script goes here
+exit 0";
+			showEnvVarsInLog = 0;
+		};
+		87AF4882E018677E2624B544 = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# shell script goes here
+exit 0";
+			showEnvVarsInLog = 0;
+		};
+		93426DA6A4AC2C2AC9CE883C /* CMake PostBuild Rules */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			name = "CMake PostBuild Rules";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e
+if test \"$CONFIGURATION\" = \"Debug\"; then :
+  cd /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool
+  /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -DBUILD_TYPE=$CONFIGURATION$EFFECTIVE_PLATFORM_NAME -P cmake_install.cmake
+fi
+if test \"$CONFIGURATION\" = \"Release\"; then :
+  cd /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool
+  /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -DBUILD_TYPE=$CONFIGURATION$EFFECTIVE_PLATFORM_NAME -P cmake_install.cmake
+fi
+if test \"$CONFIGURATION\" = \"MinSizeRel\"; then :
+  cd /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool
+  /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -DBUILD_TYPE=$CONFIGURATION$EFFECTIVE_PLATFORM_NAME -P cmake_install.cmake
+fi
+if test \"$CONFIGURATION\" = \"RelWithDebInfo\"; then :
+  cd /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool
+  /opt/homebrew/Cellar/cmake/3.27.2/bin/cmake -DBUILD_TYPE=$CONFIGURATION$EFFECTIVE_PLATFORM_NAME -P cmake_install.cmake
+fi
+";
+			showEnvVarsInLog = 0;
+		};
+		9B346B9253BCBC8A361003D5 /* Generate CMakeFiles/ALL_BUILD */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Generate CMakeFiles/ALL_BUILD";
+			outputPaths = (
+"/Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/CMakeFiles/ALL_BUILD"			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e
+if test \"$CONFIGURATION\" = \"Debug\"; then :
+  cd /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool
+  echo Build\\ all\\ projects
+fi
+if test \"$CONFIGURATION\" = \"Release\"; then :
+  cd /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool
+  echo Build\\ all\\ projects
+fi
+if test \"$CONFIGURATION\" = \"MinSizeRel\"; then :
+  cd /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool
+  echo Build\\ all\\ projects
+fi
+if test \"$CONFIGURATION\" = \"RelWithDebInfo\"; then :
+  cd /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool
+  echo Build\\ all\\ projects
+fi
+";
+			showEnvVarsInLog = 0;
+		};
+		9B50530E35CC49C82C2FACCF = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# shell script goes here
+exit 0";
+			showEnvVarsInLog = 0;
+		};
+		C50E932B5ED999B38F3027D2 /* Generate CMakeFiles/ZERO_CHECK */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Generate CMakeFiles/ZERO_CHECK";
+			outputPaths = (
+"/Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/CMakeFiles/ZERO_CHECK"			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e
+if test \"$CONFIGURATION\" = \"Debug\"; then :
+  cd /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool
+  make -f /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/CMakeScripts/ReRunCMake.make
+fi
+if test \"$CONFIGURATION\" = \"Release\"; then :
+  cd /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool
+  make -f /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/CMakeScripts/ReRunCMake.make
+fi
+if test \"$CONFIGURATION\" = \"MinSizeRel\"; then :
+  cd /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool
+  make -f /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/CMakeScripts/ReRunCMake.make
+fi
+if test \"$CONFIGURATION\" = \"RelWithDebInfo\"; then :
+  cd /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool
+  make -f /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/CMakeScripts/ReRunCMake.make
+fi
+";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		5E6635E493464D4B9ECFE5BD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EAD8C086D0494E18B00B1E5F /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/DiskImage.cpp */,
+				83337FD674A547A0B175C5AB /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/Partition.cpp */,
+				531AA7050C5C45BB9B95FC03 /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/UFS.cpp */,
+				6720AD9F677C44DCB650C998 /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/VirtualFS.cpp */,
+				CD8FFBE7AED84EF494EEF9D1 /* /Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/ditool.cpp */,
+				ED48486CDEAC40F885C1BD07 /* /Users/wjk/Code/Previous-tweaks/previous-code/src/rs.c */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		0CCE00AC57854317B96FF4DC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 782D4D9837CF455591E09439 /* ZERO_CHECK */;
+			targetProxy = 697119E80E6E4345BF874F7D /* PBXContainerItemProxy */;
+		};
+		1DE390000A2043D69E61273C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1A1B830B5D43487887634F32 /* ditool */;
+			targetProxy = 477E175F50044BA498390A07 /* PBXContainerItemProxy */;
+		};
+		6F76FF84EEF54AA1A118AA56 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 782D4D9837CF455591E09439 /* ZERO_CHECK */;
+			targetProxy = 541A571B08794906A0857E5E /* PBXContainerItemProxy */;
+		};
+		C9CC944D8EE543BAB8484282 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 75769BC49D0248EBB21E7CE1 /* ALL_BUILD */;
+			targetProxy = 80C2CFB18F8C4999938F927D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		03F9F2E5EDE64B5983DCCADD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = ("","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Release;
+		};
+		0833C060F67841C6B228A271 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = ("","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = install;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Debug;
+		};
+		0BDD19A53BC54A13976BB859 /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = ("","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = RelWithDebInfo;
+		};
+		10014CAE2E20465CB8101BCB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (arm64,x86_64);
+				COMBINE_HIDPI_IMAGES = YES;
+				CONFIGURATION_BUILD_DIR = "/Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/Release";
+				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_SUFFIX = "";
+				FRAMEWORK_SEARCH_PATHS = (/Library/Frameworks,"$(inherited)");
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","'CONFDIR=\"../Resources\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = ("/Users/wjk/Code/Previous-tweaks/previous-code/src/includes","/Users/wjk/Code/Previous-tweaks/previous-code/src/debug","/Users/wjk/Code/Previous-tweaks/previous-code/src/dsp","/Users/wjk/Code/Previous-tweaks/previous-code/src/softfloat","/Users/wjk/Code/Previous-tweaks/previous-code/src/dimension","/Users/wjk/Code/Previous-tweaks/previous-code/src/slirp","/Users/wjk/Code/Previous-tweaks/previous-code",/Library/Frameworks/SDL2.framework/Headers,"/Users/wjk/Code/Previous-tweaks/previous-code/src/cpu",/opt/homebrew/include,"/Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/../includes","$(inherited)");
+				INSTALL_PATH = "";
+				LIBRARY_SEARCH_PATHS = ("/Users/wjk/Code/Previous-tweaks/previous-code/src/debug/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/debug","/Users/wjk/Code/Previous-tweaks/previous-code/src/softfloat/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/softfloat","/Users/wjk/Code/Previous-tweaks/previous-code/src/gui-sdl/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/gui-sdl","/Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/cpu","/Users/wjk/Code/Previous-tweaks/previous-code/src/dsp/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/dsp","/Users/wjk/Code/Previous-tweaks/previous-code/src/dimension/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/dimension","/Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/slirp","$(inherited)");
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = (" -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security        -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers -Wvla     -DNDEBUG -g ","$(inherited)");
+				OTHER_CPLUSPLUSFLAGS = "-Wall -Wextra -Wpointer-bool-conversion -Wtautological-compare -Wno-unused-parameter  -Wall -Wextra -Wtautological-compare -Wno-unused-parameter -Wno-sign-compare -Wno-conversion -Wno-unused     -DNDEBUG  ";
+				OTHER_LDFLAGS = (" -Wl,-search_paths_first -Wl,-headerpad_max_install_names","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ditool;
+				SECTORDER_FLAGS = "";
+				TARGET_TEMP_DIR = "/Users/wjk/Code/Previous-tweaks/previous-code/build/ditool.build/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Release;
+		};
+		16BACF11ECC2481594BC7CBA /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "arm64 x86_64";
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				SDKROOT = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SYMROOT = "/Users/wjk/Code/Previous-tweaks/previous-code/build";
+			};
+			name = MinSizeRel;
+		};
+		47440172A7904E40BFC28997 /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = ("","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = MinSizeRel;
+		};
+		475F0F983C2E40849A73D90E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = ("","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Debug;
+		};
+		4D4D102FF8404E14B6105CAF /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "arm64 x86_64";
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				SDKROOT = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SYMROOT = "/Users/wjk/Code/Previous-tweaks/previous-code/build";
+			};
+			name = RelWithDebInfo;
+		};
+		5D7E9DC2125046CDA148DED5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (arm64,x86_64);
+				COMBINE_HIDPI_IMAGES = YES;
+				CONFIGURATION_BUILD_DIR = "/Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/Debug";
+				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_SUFFIX = "";
+				FRAMEWORK_SEARCH_PATHS = (/Library/Frameworks,"$(inherited)");
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","'CONFDIR=\"../Resources\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = ("/Users/wjk/Code/Previous-tweaks/previous-code/src/includes","/Users/wjk/Code/Previous-tweaks/previous-code/src/debug","/Users/wjk/Code/Previous-tweaks/previous-code/src/dsp","/Users/wjk/Code/Previous-tweaks/previous-code/src/softfloat","/Users/wjk/Code/Previous-tweaks/previous-code/src/dimension","/Users/wjk/Code/Previous-tweaks/previous-code/src/slirp","/Users/wjk/Code/Previous-tweaks/previous-code",/Library/Frameworks/SDL2.framework/Headers,"/Users/wjk/Code/Previous-tweaks/previous-code/src/cpu",/opt/homebrew/include,"/Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/../includes","$(inherited)");
+				INSTALL_PATH = "";
+				LIBRARY_SEARCH_PATHS = ("/Users/wjk/Code/Previous-tweaks/previous-code/src/debug/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/debug","/Users/wjk/Code/Previous-tweaks/previous-code/src/softfloat/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/softfloat","/Users/wjk/Code/Previous-tweaks/previous-code/src/gui-sdl/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/gui-sdl","/Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/cpu","/Users/wjk/Code/Previous-tweaks/previous-code/src/dsp/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/dsp","/Users/wjk/Code/Previous-tweaks/previous-code/src/dimension/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/dimension","/Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/slirp","$(inherited)");
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = (" -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security        -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers -Wvla    ","$(inherited)");
+				OTHER_CPLUSPLUSFLAGS = "-Wall -Wextra -Wpointer-bool-conversion -Wtautological-compare -Wno-unused-parameter  -Wall -Wextra -Wtautological-compare -Wno-unused-parameter -Wno-sign-compare -Wno-conversion -Wno-unused    ";
+				OTHER_LDFLAGS = (" -Wl,-search_paths_first -Wl,-headerpad_max_install_names","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ditool;
+				SECTORDER_FLAGS = "";
+				TARGET_TEMP_DIR = "/Users/wjk/Code/Previous-tweaks/previous-code/build/ditool.build/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Debug;
+		};
+		67474B5F33D34CA99FCAF5FF /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = ("","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = MinSizeRel;
+		};
+		829548C5453D465883DB9DC1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "arm64 x86_64";
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				SDKROOT = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk;
+				SYMROOT = "/Users/wjk/Code/Previous-tweaks/previous-code/build";
+			};
+			name = Debug;
+		};
+		848B90DABE7C4BB89FCA2E3B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = ("","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Debug;
+		};
+		91BCEBE561D34A239529D5B6 /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = ("","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = RelWithDebInfo;
+		};
+		93D5E2714DA144FDBD588E0C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = ("","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Release;
+		};
+		A8EA1332623C47A287A4C6B8 /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (arm64,x86_64);
+				COMBINE_HIDPI_IMAGES = YES;
+				CONFIGURATION_BUILD_DIR = "/Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/RelWithDebInfo";
+				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_SUFFIX = "";
+				FRAMEWORK_SEARCH_PATHS = (/Library/Frameworks,"$(inherited)");
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 2;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","'CONFDIR=\"../Resources\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = ("/Users/wjk/Code/Previous-tweaks/previous-code/src/includes","/Users/wjk/Code/Previous-tweaks/previous-code/src/debug","/Users/wjk/Code/Previous-tweaks/previous-code/src/dsp","/Users/wjk/Code/Previous-tweaks/previous-code/src/softfloat","/Users/wjk/Code/Previous-tweaks/previous-code/src/dimension","/Users/wjk/Code/Previous-tweaks/previous-code/src/slirp","/Users/wjk/Code/Previous-tweaks/previous-code",/Library/Frameworks/SDL2.framework/Headers,"/Users/wjk/Code/Previous-tweaks/previous-code/src/cpu",/opt/homebrew/include,"/Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/../includes","$(inherited)");
+				INSTALL_PATH = "";
+				LIBRARY_SEARCH_PATHS = ("/Users/wjk/Code/Previous-tweaks/previous-code/src/debug/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/debug","/Users/wjk/Code/Previous-tweaks/previous-code/src/softfloat/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/softfloat","/Users/wjk/Code/Previous-tweaks/previous-code/src/gui-sdl/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/gui-sdl","/Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/cpu","/Users/wjk/Code/Previous-tweaks/previous-code/src/dsp/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/dsp","/Users/wjk/Code/Previous-tweaks/previous-code/src/dimension/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/dimension","/Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/slirp","$(inherited)");
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = (" -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security        -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers -Wvla        -DNDEBUG ","$(inherited)");
+				OTHER_CPLUSPLUSFLAGS = "-Wall -Wextra -Wpointer-bool-conversion -Wtautological-compare -Wno-unused-parameter  -Wall -Wextra -Wtautological-compare -Wno-unused-parameter -Wno-sign-compare -Wno-conversion -Wno-unused        -DNDEBUG ";
+				OTHER_LDFLAGS = (" -Wl,-search_paths_first -Wl,-headerpad_max_install_names","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ditool;
+				SECTORDER_FLAGS = "";
+				TARGET_TEMP_DIR = "/Users/wjk/Code/Previous-tweaks/previous-code/build/ditool.build/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = RelWithDebInfo;
+		};
+		C1AFCF2D5E2E41CEAE3676A4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = ("","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = install;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Release;
+		};
+		C3FE7C9CC3A744F28825A005 /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = ("","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = install;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = MinSizeRel;
+		};
+		D139E273F4864E468CDA8C69 /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (arm64,x86_64);
+				COMBINE_HIDPI_IMAGES = YES;
+				CONFIGURATION_BUILD_DIR = "/Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/MinSizeRel";
+				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_SUFFIX = "";
+				FRAMEWORK_SEARCH_PATHS = (/Library/Frameworks,"$(inherited)");
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","'CONFDIR=\"../Resources\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = ("/Users/wjk/Code/Previous-tweaks/previous-code/src/includes","/Users/wjk/Code/Previous-tweaks/previous-code/src/debug","/Users/wjk/Code/Previous-tweaks/previous-code/src/dsp","/Users/wjk/Code/Previous-tweaks/previous-code/src/softfloat","/Users/wjk/Code/Previous-tweaks/previous-code/src/dimension","/Users/wjk/Code/Previous-tweaks/previous-code/src/slirp","/Users/wjk/Code/Previous-tweaks/previous-code",/Library/Frameworks/SDL2.framework/Headers,"/Users/wjk/Code/Previous-tweaks/previous-code/src/cpu",/opt/homebrew/include,"/Users/wjk/Code/Previous-tweaks/previous-code/src/ditool/../includes","$(inherited)");
+				INSTALL_PATH = "";
+				LIBRARY_SEARCH_PATHS = ("/Users/wjk/Code/Previous-tweaks/previous-code/src/debug/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/debug","/Users/wjk/Code/Previous-tweaks/previous-code/src/softfloat/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/softfloat","/Users/wjk/Code/Previous-tweaks/previous-code/src/gui-sdl/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/gui-sdl","/Users/wjk/Code/Previous-tweaks/previous-code/src/cpu/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/cpu","/Users/wjk/Code/Previous-tweaks/previous-code/src/dsp/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/dsp","/Users/wjk/Code/Previous-tweaks/previous-code/src/dimension/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/dimension","/Users/wjk/Code/Previous-tweaks/previous-code/src/slirp/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)","/Users/wjk/Code/Previous-tweaks/previous-code/src/slirp","$(inherited)");
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = (" -std=gnu99 -Wcast-qual -Wbad-function-cast -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes -Wall -Wwrite-strings -Wsign-compare -Wformat-security        -D__USE_MINGW_ANSI_STDIO=1 -Wno-conversion -Wno-unused -Wno-sign-compare -Wno-missing-field-initializers -Wvla     -DNDEBUG -g ","$(inherited)");
+				OTHER_CPLUSPLUSFLAGS = "-Wall -Wextra -Wpointer-bool-conversion -Wtautological-compare -Wno-unused-parameter  -Wall -Wextra -Wtautological-compare -Wno-unused-parameter -Wno-sign-compare -Wno-conversion -Wno-unused     -DNDEBUG  ";
+				OTHER_LDFLAGS = (" -Wl,-search_paths_first -Wl,-headerpad_max_install_names","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ditool;
+				SECTORDER_FLAGS = "";
+				TARGET_TEMP_DIR = "/Users/wjk/Code/Previous-tweaks/previous-code/build/ditool.build/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = MinSizeRel;
+		};
+		F0608CD3513D43078E5503E3 /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'","$(inherited)");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = ("","$(inherited)");
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = install;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = RelWithDebInfo;
+		};
+		F8DDCDC2CEFF41DF84903568 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "arm64 x86_64";
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				SDKROOT = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SYMROOT = "/Users/wjk/Code/Previous-tweaks/previous-code/build";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0B2F54B00DB5421D85266D39 /* Build configuration list for PBXAggregateTarget "ZERO_CHECK" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				848B90DABE7C4BB89FCA2E3B /* Debug */,
+				03F9F2E5EDE64B5983DCCADD /* Release */,
+				47440172A7904E40BFC28997 /* MinSizeRel */,
+				0BDD19A53BC54A13976BB859 /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		1FDC8953AD804E45BFFDD3EC /* Build configuration list for PBXAggregateTarget "install" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0833C060F67841C6B228A271 /* Debug */,
+				C1AFCF2D5E2E41CEAE3676A4 /* Release */,
+				C3FE7C9CC3A744F28825A005 /* MinSizeRel */,
+				F0608CD3513D43078E5503E3 /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		69A5ACC9D642465D97E32663 /* Build configuration list for PBXNativeTarget "ditool" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5D7E9DC2125046CDA148DED5 /* Debug */,
+				10014CAE2E20465CB8101BCB /* Release */,
+				D139E273F4864E468CDA8C69 /* MinSizeRel */,
+				A8EA1332623C47A287A4C6B8 /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E8482FE543994EAE8D9209B7 /* Build configuration list for PBXProject "ditool" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				829548C5453D465883DB9DC1 /* Debug */,
+				F8DDCDC2CEFF41DF84903568 /* Release */,
+				16BACF11ECC2481594BC7CBA /* MinSizeRel */,
+				4D4D102FF8404E14B6105CAF /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FB1F315AB1644CA0BC77E182 /* Build configuration list for PBXAggregateTarget "ALL_BUILD" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				475F0F983C2E40849A73D90E /* Debug */,
+				93D5E2714DA144FDBD588E0C /* Release */,
+				67474B5F33D34CA99FCAF5FF /* MinSizeRel */,
+				91BCEBE561D34A239529D5B6 /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4E227BC676314AA08110102E /* Project object */;
+}
