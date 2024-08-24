@@ -19,6 +19,9 @@ jobs:
         
       - name: Install SDL2 Library
         run: sudo apt-get install -y libsdl2-dev
+
+  - name: Remove previous working directory
+    run: rm -rf /home/runner/work/Previous/Previous/previous-code/
         
       - name: Pull Changes from SVN
         run: |
