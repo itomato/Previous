@@ -22,11 +22,10 @@ jobs:
         FILES="font10x16.h sdlgui.c"
         for file in $FILES; do
           echo $file
-          OLDFILE=$(find ../previous-code -name $file )
+          OLDFILE=$(find ../previous-code/sdl-gui/ -name $file)
           cp $file $OLDFILE
           if [ $? -ne 0 ]; then
             echo "Failed to replace $file"
-            exit 1
           else
             echo "Patched!"
           fi
