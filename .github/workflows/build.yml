@@ -6,7 +6,7 @@ on:
       - main
     tags:
       - 'v*.*.*'  # Trigger on version tags like v1.0.0
-
+  workflow_dispatch:  # Enable manual trigger
 jobs:
   # Job for Linux build
   build-linux:
