@@ -1,13 +1,9 @@
-# This is a basic workflow that is manually triggered
-
 name: Build and Release Previous Emulator
 
-# Controls when the action will run. Workflow runs when manually triggered using the UI
-# or API.
 on:
-  workflow_dispatch:
-    
   push:
+    branches:
+      - main
     tags:
       - 'v*.*.*'  # Trigger on version tags like v1.0.0
 
@@ -19,6 +15,23 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+
+    - name: Fetch Previous-tweaks repo and apply patches
+      run: |
+        git clone https://github.com/itomato/Previous-tweaks.git
+        cd Previous-tweaks
+        FILES="font10x16.h font10x16.xbm sdlgui.c"
+        for file in $FILES; do
+          echo $file
+          OLDFILE=$(find ../ -name $file )
+          cp $file $OLDFILE
+          if [ $? -ne 0 ]; then
+            echo "Failed to replace $file"
+            exit 1
+          else
+            echo "Patched!"
+          fi
+        done
 
     - name: Install Linux dependencies
       run: |
@@ -32,13 +45,14 @@ jobs:
 
     - name: Configure CMake for Linux
       run: |
-        cmake -S . -B build/linux -DCMAKE_BUILD_TYPE=Release
+        cmake -S . -B build/linux -DCMAKE_BUILD_TYPE=Release \
+              -DSDL2_INCLUDE_DIR=/usr/include/SDL2 \
+              -DSDL2_LIBRARY=/usr/lib/x86_64-linux-gnu/libSDL2.so
 
     - name: Build Previous Emulator on Linux
       run: |
-        #cmake --build build/linux --config Release
-        cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DSDL2_INCLUDE_DIR=/usr/include/SDL2 -DSDL2_LIBRARY=/usr/lib/x86_64-linux-gnu/libSDL2.so
-    
+        cmake --build build/linux --config Release
+
     - name: Package the Linux build
       run: |
         mkdir -p output
@@ -59,10 +73,36 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Fetch Previous-tweaks repo and apply patches
+      run: |
+        git clone https://github.com/itomato/Previous-tweaks.git
+        cd Previous-tweaks
+        FILES="font10x16.h font10x16.xbm sdlgui.c"
+        for file in $FILES; do
+          echo $file
+          OLDFILE=$(find ../ -name $file )
+          cp $file $OLDFILE
+          if [ $? -ne 0 ]; then
+            echo "Failed to replace $file"
+            exit 1
+          else
+            echo "Patched!"
+          fi
+        done
+
+    - name: Fetch Previous-Xcode and Previous-DMG repos
+      run: |
+        git clone https://github.com/itomato/Previous-Xcode.git
+        git clone https://github.com/itomato/Previous-DMG.git
+        # Move or copy the required Xcode project files to the correct location
+        cp -r Previous-Xcode/* .
+        cp -r Previous-DMG/* .
+
     - name: Install macOS dependencies
       run: |
         brew update
-        brew install sdl2 libpng libpcap cmake
+        brew install libpng libpcap cmake
+        # SDL2.framework will be handled by the fetched macOS-specific repos
 
     - name: Configure CMake for macOS
       run: |
@@ -87,22 +127,22 @@ jobs:
 
   # Job to create the release
   release:
-    needs: [build-linux]
+    needs: [build-linux, build-macos]
     runs-on: ubuntu-latest
 
     steps:
-
     - name: Check if Release Exists
-    id: check_release
-    run: |
-      if gh release view ${{ github.ref_name }}; then
-        echo "Release already exists."
-        echo "release_exists=true" >> $GITHUB_ENV
-      else
-        echo "release_exists=false" >> $GITHUB_ENV
-      fi
+      id: check_release
+      run: |
+        if gh release view ${{ github.ref_name }}; then
+          echo "Release already exists."
+          echo "release_exists=true" >> $GITHUB_ENV
+        else
+          echo "release_exists=false" >> $GITHUB_ENV
+        fi
 
     - name: Create GitHub Release
+      if: env.release_exists == 'false'
       id: create_release
       uses: actions/create-release@v1
       env:
