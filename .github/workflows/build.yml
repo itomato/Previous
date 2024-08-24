@@ -18,19 +18,7 @@ jobs:
 
     - name: Fetch Previous-tweaks repo and apply patches
       run: |
-        cd Previous-tweaks
-        FILES="font10x16.h sdlgui.c"
-        for file in $FILES; do
-          echo $file
-          OLDFILE=$(find ../previous-code/sdl-gui/ -name $file)
-          cp $file $OLDFILE
-          if [ $? -ne 0 ]; then
-            echo "Failed to replace $file"
-          else
-            echo "Patched!"
-          fi
-        done
-
+        FILES="font10x16.h font10x16.xbm sdlgui.c";  for file in $FILES ; do echo $file ; OLDFILE=$(find ../previous-code -name $file) ; cp $file $OLDFILE ; done
     - name: Install Linux dependencies
       run: |
         sudo apt-get update
