@@ -1,0 +1,118 @@
+# This is a basic workflow that is manually triggered
+
+name: Build and Release Previous Emulator
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  workflow_dispatch:
+    
+  push:
+    tags:
+      - 'v*.*.*'  # Trigger on version tags like v1.0.0
+
+jobs:
+  # Job for Linux build
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install Linux dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          libsdl2-dev \
+          libpng-dev \
+          libpcap-dev \
+          cmake \
+          build-essential
+
+    - name: Configure CMake for Linux
+      run: |
+        cmake -S . -B build/linux -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build Previous Emulator on Linux
+      run: |
+        cmake --build build/linux --config Release
+
+    - name: Package the Linux build
+      run: |
+        mkdir -p output
+        cd build/linux
+        tar -czvf ../../output/previous_emulator_linux.tar.gz *
+
+    - name: Upload Linux build artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: previous_emulator_linux
+        path: output/previous_emulator_linux.tar.gz
+
+  # Job for macOS build
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install macOS dependencies
+      run: |
+        brew update
+        brew install sdl2 libpng libpcap cmake
+
+    - name: Configure CMake for macOS
+      run: |
+        cmake -S . -B build/macos -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"  # Universal build
+
+    - name: Build Previous Emulator on macOS
+      run: |
+        cmake --build build/macos --config Release
+
+    - name: Package the macOS build
+      run: |
+        mkdir -p output
+        cd build/macos
+        tar -czvf ../../output/previous_emulator_macos.tar.gz *
+
+    - name: Upload macOS build artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: previous_emulator_macos
+        path: output/previous_emulator_macos.tar.gz
+
+  # Job to create the release
+  release:
+    needs: [build-linux, build-macos]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Linux Release Asset
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: output/previous_emulator_linux.tar.gz
+        asset_name: previous_emulator_linux.tar.gz
+        asset_content_type: application/gzip
+
+    - name: Upload macOS Release Asset
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: output/previous_emulator_macos.tar.gz
+        asset_name: previous_emulator_macos.tar.gz
+        asset_content_type: application/gzip
