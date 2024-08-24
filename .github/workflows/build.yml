@@ -35,8 +35,8 @@ jobs:
 
     - name: Fetch Previous-tweaks repo and apply patches
       run: |
-        FILES="font10x16.h sdlgui.c" \
         cd Previous-tweaks \
+        FILES="font10x16.h sdlgui.c" \
         for file in $FILES \
         do echo $file \
         OLDFILE=$(find ../previous-code -name $file) \
