@@ -4,9 +4,9 @@ on:
   workflow_dispatch: # Allow manual triggering
   schedule:
     - cron: '0 2 * * MON' # Run every Monday at 2:00 AM
-
+    
 jobs:
-  sync-and-build:
+  sync:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,8 +20,8 @@ jobs:
       - name: Install SDL2 Library
         run: sudo apt-get install -y libsdl2-dev
 
-  - name: Remove previous working directory
-    run: rm -rf /home/runner/work/Previous/Previous/previous-code/
+      - name: Remove previous working directory
+        run: rm -rf /home/runner/work/Previous/Previous/previous-code/
         
       - name: Pull Changes from SVN
         run: |
