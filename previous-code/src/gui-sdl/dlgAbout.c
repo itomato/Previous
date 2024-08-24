@@ -12,6 +12,7 @@ const char DlgAbout_fileid[] = "Previous dlgAbout.c";
 #include "dialog.h"
 #include "sdlgui.h"
 
+static char aboutstr[] = PROG_NAME;
 
 /* The "About"-dialog: */
 static SGOBJ aboutdlg[] =
@@ -41,8 +42,15 @@ static SGOBJ aboutdlg[] =
  */
 void Dialog_AboutDlg(void)
 {
-	/* Center PROG_NAME title string */
-	aboutdlg[1].x = (aboutdlg[0].w - strlen(PROG_NAME)) / 2;
+	if ((int)strlen(aboutstr) > aboutdlg[0].w)
+	{
+		/* Shorten the name if it is too long */
+		char *p = strrchr(aboutstr, '(');
+		if (p)
+			*(p-1) = 0;
+	}
+	/* Center the program name title string */
+	aboutdlg[1].x = (aboutdlg[0].w - strlen(aboutstr)) / 2;
 
 	SDLGui_CenterDlg(aboutdlg);
 	SDLGui_DoDialog(aboutdlg);

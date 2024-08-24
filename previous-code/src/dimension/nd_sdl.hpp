@@ -1,3 +1,10 @@
+/*
+  Previous - nd_sdl.hpp
+
+  This file is distributed under the GNU General Public License, version 2
+  or at your option any later version. Read the file gpl.txt for details.
+*/
+
 #pragma once
 
 #ifndef __ND_SDL_H__
@@ -25,9 +32,7 @@ class NDSDL {
 #endif
 public:
     NDSDL(int slot, uint32_t* vram);
-#ifndef ENABLE_RENDERING_THREAD
     void    repaint(void);
-#endif
     void    init(void);
     void    uninit(void);
     void    destroy(void);
@@ -36,7 +41,7 @@ public:
 };
 
 extern "C" {
-#endif
+#endif /* __cplusplus */
 #ifndef ENABLE_RENDERING_THREAD
     void nd_sdl_repaint(void);
 #endif

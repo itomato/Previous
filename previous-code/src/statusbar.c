@@ -40,9 +40,6 @@ const char Statusbar_fileid[] = "Hatari statusbar.c";
 #include "dimension.hpp"
 #include "str.h"
 
-#include <SDL.h>
-
-
 #define DEBUG 0
 #if DEBUG
 # include <execinfo.h>
@@ -208,10 +205,10 @@ static void Statusbar_OverlayInit(const SDL_Surface *surf)
 	OverlayLedRect.x = surf->w - 5*h/2;
 	OverlayLedRect.y = h/2;
 	/* free previous restore surface if it's incompatible */
-	if (OverlayUnderside &&
-	    OverlayUnderside->w == OverlayLedRect.w &&
-	    OverlayUnderside->h == OverlayLedRect.h &&
-	    OverlayUnderside->format->BitsPerPixel == surf->format->BitsPerPixel)
+	if (OverlayUnderside && (
+	    OverlayUnderside->w != OverlayLedRect.w ||
+	    OverlayUnderside->h != OverlayLedRect.h ||
+	    OverlayUnderside->format->BitsPerPixel != surf->format->BitsPerPixel))
 	{
 		SDL_FreeSurface(OverlayUnderside);
 		OverlayUnderside = NULL;
@@ -401,10 +398,10 @@ void Statusbar_AddMessage(const char *msg, uint32_t msecs)
  */
 static char *Statusbar_AddString(char *buffer, const char *more)
 {
+	if (!more)
+		return buffer;
 	while (*more)
-	{
 		*buffer++ = *more++;
-	}
 	return buffer;
 }
 

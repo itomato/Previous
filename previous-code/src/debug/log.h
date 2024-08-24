@@ -19,23 +19,24 @@ extern "C" {
  */
 
 /* CPU exception flags
- * is catching needed also for: traps 0, 3-12, 15? (MonST catches them)
  */
-#define	EXCEPT_BUS	 (1<<0)
-#define	EXCEPT_ADDRESS 	 (1<<1)
-#define	EXCEPT_ILLEGAL	 (1<<2)
-#define	EXCEPT_ZERODIV	 (1<<3)
-#define	EXCEPT_CHK	 (1<<4)
-#define	EXCEPT_TRAPV	 (1<<5)
-#define	EXCEPT_PRIVILEGE (1<<6)
-#define	EXCEPT_TRACE     (1<<7)
-#define	EXCEPT_NOHANDLER (1<<8)
+#define	EXCEPT_NOHANDLER (1<<0)
+#define	EXCEPT_BUS	 (1<<1)
+#define	EXCEPT_ADDRESS 	 (1<<2)
+#define	EXCEPT_ILLEGAL	 (1<<3)
+#define	EXCEPT_ZERODIV	 (1<<4)
+#define	EXCEPT_CHK	 (1<<5)
+#define	EXCEPT_TRAPV	 (1<<6)
+#define	EXCEPT_PRIVILEGE (1<<7)
+#define	EXCEPT_TRACE     (1<<8)
+#define	EXCEPT_LINEA     (1<<9)
+#define	EXCEPT_LINEF     (1<<10)
 
 /* DSP exception flags */
-#define EXCEPT_DSP	 (1<<9)
+#define EXCEPT_DSP	 (1<<30)
 
 /* whether to enable exception debugging on autostart */
-#define EXCEPT_AUTOSTART (1<<10)
+#define EXCEPT_AUTOSTART (1<<31)
 
 /* general flags */
 #define	EXCEPT_NONE	 (0)
@@ -182,11 +183,19 @@ extern uint64_t LogTraceFlags;
 #define	LOG_TRACE(level, ...) \
 	if (LOG_TRACE_LEVEL(level))	{ Log_Trace(__VA_ARGS__); }
 
+#define LOG_TRACE_VAR
+
 #else		/* ENABLE_TRACING */
 
 #define LOG_TRACE(level, ...)	{}
 
 #define LOG_TRACE_LEVEL( level )	(0)
+
+#ifdef __GNUC__
+#define LOG_TRACE_VAR __attribute__((unused))
+#else
+#define LOG_TRACE_VAR
+#endif
 
 #endif		/* ENABLE_TRACING */
 

@@ -1,5 +1,12 @@
-/* Floppy drive emulation */
+/*
+  Previous - floppy.c
 
+  This file is distributed under the GNU General Public License, version 2
+  or at your option any later version. Read the file gpl.txt for details.
+
+  This file contains a simulation of the Intel 82077AA Floppy controller.
+*/
+const char Floppy_fileid[] = "Previous floppy.c";
 
 #include "ioMem.h"
 #include "ioMemTables.h"
@@ -12,11 +19,9 @@
 #include "file.h"
 #include "statusbar.h"
 
-
 #define LOG_FLP_REG_LEVEL   LOG_DEBUG
 #define LOG_FLP_CMD_LEVEL   LOG_DEBUG
 
-#define IO_SEG_MASK	0x1FFFF
 
 FloppyBuffer flp_buffer;
 
@@ -131,33 +136,33 @@ uint8_t floppy_stat_read(void);
 
 
 void FLP_StatA_Read(void) { // 0x02014100
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = floppy_sra_read();
-    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Status A read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, floppy_sra_read());
+    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Status A read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void FLP_StatB_Read(void) { // 0x02014101
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = flp.srb|SRB_ALL1;
-    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Status B read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, flp.srb|SRB_ALL1);
+    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Status B read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void FLP_DataOut_Read(void) { // 0x02014102
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = floppy_dor_read();
-    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Data out read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, floppy_dor_read());
+    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Data out read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void FLP_DataOut_Write(void) {
-    floppy_dor_write(IoMem[IoAccessCurrentAddress & IO_SEG_MASK]);
-    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Data out write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    floppy_dor_write(IoMem_ReadByte(IoAccessCurrentAddress));
+    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Data out write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void FLP_MainStatus_Read(void) { // 0x02014104
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = flp.msr;
-    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Main status read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, flp.msr);
+    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Main status read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void FLP_DataRate_Write(void) {
-    flp.dsr = IoMem[IoAccessCurrentAddress & IO_SEG_MASK];
-    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Data rate write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    flp.dsr = IoMem_ReadByte(IoAccessCurrentAddress);
+    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Data rate write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
     
     if (flp.dsr&DSR_RESET) {
         Log_Printf(LOG_WARN,"[Floppy] Entering and leaving reset state.");
@@ -168,35 +173,35 @@ void FLP_DataRate_Write(void) {
 }
 
 void FLP_FIFO_Read(void) { // 0x02014105
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = floppy_fifo_read();
-    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] FIFO read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, floppy_fifo_read());
+    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] FIFO read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void FLP_FIFO_Write(void) {
-    uint8_t val = IoMem[IoAccessCurrentAddress & IO_SEG_MASK];
-    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] FIFO write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    uint8_t val = IoMem_ReadByte(IoAccessCurrentAddress);
+    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] FIFO write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
     
     floppy_fifo_write(val);
 }
 
 void FLP_DataIn_Read(void) { // 0x02014107
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = flp.din;
-    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Data in read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, flp.din);
+    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Data in read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void FLP_Configuration_Write(void) {
-    flp.ccr = IoMem[IoAccessCurrentAddress & IO_SEG_MASK];
-    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Configuration write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    flp.ccr = IoMem_ReadByte(IoAccessCurrentAddress);
+    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Configuration write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void FLP_Status_Read(void) { // 0x02014108
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = floppy_stat_read();
-    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Control read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, floppy_stat_read());
+    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Control read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void FLP_Control_Write(void) {
-    uint8_t val = IoMem[IoAccessCurrentAddress & IO_SEG_MASK];
-    Log_Printf(LOG_DEBUG,"[Floppy] Select write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    uint8_t val = IoMem_ReadByte(IoAccessCurrentAddress);
+    Log_Printf(LOG_DEBUG,"[Floppy] Select write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
     
     floppy_ctrl_write(val);
 }
@@ -273,10 +278,11 @@ void floppy_stop(void) {
     flp.sra &= ~SRA_INT;
     set_interrupt(INT_PHONE, RELEASE_INT);
     flp_io_state = FLP_STATE_DONE;
+    CycInt_RemovePendingInterrupt(INTERRUPT_FLP_IO);
 }
 
 void floppy_reset(void) {
-    Log_Printf(LOG_WARN,"[Floppy] Reset.");
+    Log_Printf(LOG_WARN,"[Floppy] Reset");
     
     flp.dor = flp.sel = 0;
     
@@ -1199,19 +1205,18 @@ static void Floppy_Init(void) {
     int i;
     
     for (i=0; i<FLP_MAX_DRIVES; i++) {
-        flpdrv[i].spinning=false;
+        flpdrv[i].spinning = false;
         /* Check if files exist. */
         if (ConfigureParams.Floppy.drive[i].bDriveConnected) {
-            flpdrv[i].connected=true;
-            if (ConfigureParams.Floppy.drive[i].bDiskInserted &&
-                File_Exists(ConfigureParams.Floppy.drive[i].szImageName)) {
+            flpdrv[i].connected = true;
+            if (ConfigureParams.Floppy.drive[i].bDiskInserted) {
                 Floppy_Insert(i);
             } else {
-                flpdrv[i].dsk = NULL;
-                flpdrv[i].inserted=false;
+                flpdrv[i].dsk = File_Close(flpdrv[i].dsk);
+                flpdrv[i].inserted = false;
             }
         } else {
-            flpdrv[i].connected=false;
+            flpdrv[i].connected = false;
         }
     }
     
@@ -1219,12 +1224,9 @@ static void Floppy_Init(void) {
 }
 
 static void Floppy_Uninit(void) {
-    if (flpdrv[0].dsk)
-        File_Close(flpdrv[0].dsk);
-    if (flpdrv[1].dsk) {
-        File_Close(flpdrv[1].dsk);
-    }
-    flpdrv[0].dsk = flpdrv[1].dsk = NULL;
+    flpdrv[0].dsk = File_Close(flpdrv[0].dsk);
+    flpdrv[1].dsk = File_Close(flpdrv[1].dsk);
+    
     flpdrv[0].inserted = flpdrv[1].inserted = false;
 }
 
@@ -1238,88 +1240,60 @@ static uint32_t Floppy_CheckSize(int drive) {
             return size;
             
         default:
-            Log_Printf(LOG_WARN, "Floppy Disk%i: Invalid size (%i byte)\n",drive,size);
+            Log_Printf(LOG_WARN, "Floppy disk %i: Invalid size (%i byte)\n",drive,size);
             return 0;
     }
 }
 
 int Floppy_Insert(int drive) {
-    uint32_t size;
+    flpdrv[drive].floppysize = Floppy_CheckSize(drive);
     
-    /* Check floppy size. */
-    size = Floppy_CheckSize(drive);
-    if (size) {
-        flpdrv[drive].floppysize = size;
-        flpdrv[drive].blocksize = 2; /* 512 byte */
-        flpdrv[drive].cyl = flpdrv[drive].head = flpdrv[drive].sector = 0;
-        flpdrv[drive].seekoffset = 0;
-    } else {
-        flpdrv[drive].dsk = NULL;
-        flpdrv[drive].inserted=false;
-        flpdrv[drive].floppysize = 0;
-        return 1; /* bad size, do not insert */
-    }
+    Log_Printf(LOG_WARN, "Floppy disk %i: Insert %s, %iK", drive,
+               ConfigureParams.Floppy.drive[drive].szImageName, flpdrv[drive].floppysize/1024);
     
-    if (ConfigureParams.Floppy.drive[drive].bWriteProtected) {
-        flpdrv[drive].dsk = File_Open(ConfigureParams.Floppy.drive[drive].szImageName, "rb");
-        if (flpdrv[drive].dsk == NULL) {
-            Log_Printf(LOG_WARN, "Floppy Disk%i: Cannot open image file %s\n",
-                       drive, ConfigureParams.Floppy.drive[drive].szImageName);
-            flpdrv[drive].inserted=false;
-            flpdrv[drive].spinning=false;
-            Statusbar_AddMessage("Cannot insert floppy disk", 0);
-            return 1;
-        }
-        flpdrv[drive].protected=true;
-    } else {
+    if (!ConfigureParams.Floppy.drive[drive].bWriteProtected) {
         flpdrv[drive].dsk = File_Open(ConfigureParams.Floppy.drive[drive].szImageName, "rb+");
-        flpdrv[drive].protected=false;
-        if (flpdrv[drive].dsk == NULL) {
-            flpdrv[drive].dsk = File_Open(ConfigureParams.Floppy.drive[drive].szImageName, "rb");
-            if (flpdrv[drive].dsk == NULL) {
-                Log_Printf(LOG_WARN, "Floppy Disk%i: Cannot open image file %s\n",
-                           drive, ConfigureParams.Floppy.drive[drive].szImageName);
-                flpdrv[drive].inserted=false;
-                flpdrv[drive].spinning=false;
-                Statusbar_AddMessage("Cannot insert floppy disk", 0);
-                return 1;
-            }
-            flpdrv[drive].protected=true;
-            Log_Printf(LOG_WARN, "Floppy Disk%i: Image file is not writable. Enabling write protection.\n",
-                       drive);
-        }
+        flpdrv[drive].protected = false;
+    }
+    if (ConfigureParams.Floppy.drive[drive].bWriteProtected || flpdrv[drive].dsk == NULL) {
+        flpdrv[drive].dsk = File_Open(ConfigureParams.Floppy.drive[drive].szImageName, "rb");
+        flpdrv[drive].protected = true;
+    }
+    if (flpdrv[drive].dsk == NULL || flpdrv[drive].floppysize == 0) {
+        Log_Printf(LOG_WARN, "Floppy disk %i: Cannot open image file %s", drive,
+                   ConfigureParams.Floppy.drive[drive].szImageName);
+        flpdrv[drive].inserted = false;
+        flpdrv[drive].protected = false;
+        Statusbar_AddMessage("Cannot insert floppy disk", 0);
+        return 1;
     }
     
-    flpdrv[drive].inserted=true;
-    flpdrv[drive].spinning=false;
-
-    Log_Printf(LOG_WARN, "Floppy Disk%i: %s, %iK\n",drive,
-               ConfigureParams.Floppy.drive[drive].szImageName,flpdrv[drive].floppysize/1024);
-    
-    Statusbar_AddMessage("Inserting floppy disk.", 0);
-    
+    flpdrv[drive].inserted = true;
+    flpdrv[drive].spinning = false;
+    flpdrv[drive].blocksize = 2; /* 512 byte */
+    flpdrv[drive].cyl = flpdrv[drive].head = flpdrv[drive].sector = 0;
+    flpdrv[drive].seekoffset = 0;
+    Statusbar_AddMessage("Inserting floppy disk", 0);
     return 0;
 }
 
 void Floppy_Eject(int drive) {
-    if (drive<0) { /* Called from emulator, else called from GUI */
-        drive=flp.sel;
+    if (drive < 0) { /* Called from emulator, else called from GUI */
+        drive = flp.sel;
         
-        Statusbar_AddMessage("Ejecting floppy disk.", 0);
+        Statusbar_AddMessage("Ejecting floppy disk", 0);
     }
     
-    Log_Printf(LOG_WARN, "Unloading floppy disk %i",drive);
     Log_Printf(LOG_WARN, "Floppy disk %i: Eject",drive);
     
-    File_Close(flpdrv[drive].dsk);
+    flpdrv[drive].dsk = File_Close(flpdrv[drive].dsk);
     flpdrv[drive].floppysize = 0;
     flpdrv[drive].blocksize = 0;
-    flpdrv[drive].dsk=NULL;
-    flpdrv[drive].inserted=false;
-    flpdrv[drive].spinning=false;
+    flpdrv[drive].inserted = false;
+    flpdrv[drive].spinning = false;
     
-    ConfigureParams.Floppy.drive[drive].bDiskInserted=false;
-    ConfigureParams.Floppy.drive[drive].szImageName[0]='\0';
+    ConfigureParams.Floppy.drive[drive].bDiskInserted = false;
+    ConfigureParams.Floppy.drive[drive].szImageName[0] = '\0';
 }
 
 void Floppy_Reset(void) {

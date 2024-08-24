@@ -27,18 +27,16 @@
 # include "dsp_core.h"
 #endif
 
-#define DSP_FREQ	(CPU_FREQ*4)
-
 extern bool bDspEnabled;
-extern bool bDspHostInterruptPending;
 
 /* Dsp commands */
-extern bool DSP_ProcessIRQ(void);
 extern void DSP_Init(void);
 extern void DSP_UnInit(void);
 extern void DSP_Reset(void);
 extern void DSP_Start(uint8_t mode);
 extern void DSP_Run(int nHostCycles);
+extern void DSP_EnableMemory(void);
+extern void DSP_DisableMemory(void);
 
 /* Save Dsp state to snapshot */
 extern void DSP_MemorySnapShot_Capture(bool bSave);
@@ -74,7 +72,6 @@ extern void DSP_HandleTXD(int set);
 /* Dsp Host interface commands */
 extern void DSP_HandleReadAccess(void);
 extern void DSP_HandleWriteAccess(void);
-extern uint16_t DSP_Get_HREQ(void);
 
 extern void DSP_ICR_Read(void);
 extern void DSP_ICR_Write(void);
@@ -94,8 +91,6 @@ extern void DSP_Data2_Write(void);
 extern void DSP_Data3_Read(void);
 extern void DSP_Data3_Write(void);
 
-extern uint8_t dsp_intr_at_block_end;
-extern uint8_t dsp_dma_unpacked;
 extern void DSP_SetIRQB(void);
 
 /* See statusbar.c */

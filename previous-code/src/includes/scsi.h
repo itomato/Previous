@@ -1,4 +1,12 @@
-/* SCSI Bus and Disk emulation */
+/*
+  Previous - scsi.h
+
+  This file is distributed under the GNU General Public License, version 2
+  or at your option any later version. Read the file gpl.txt for details.
+*/
+
+#ifndef PREV_SCSI_H
+#define PREV_SCSI_H
 
 /* SCSI phase */
 #define PHASE_DO      0x00 /* data out */
@@ -19,11 +27,14 @@ extern SCSIBusStatus SCSIbus;
 /* Command Descriptor Block */
 #define SCSI_CDB_MAX_SIZE 12
 
+/* Block size */
+#define SCSI_BLOCKSIZE 512
+#define SCSI_MAX_BLOCK 1024
 
 /* This buffer temporarily stores data to be written to memory or disk */
 
 typedef struct {
-    uint8_t data[512]; /* FIXME: BLOCKSIZE */
+    uint8_t data[SCSI_MAX_BLOCK];
     int limit;
     int size;
     bool disk;
@@ -32,18 +43,17 @@ typedef struct {
 
 extern SCSIBuffer scsi_buffer;
 
+extern void SCSI_Reset(void);
+extern void SCSI_Insert(uint8_t target);
+extern void SCSI_Eject(uint8_t target);
 
-void SCSI_Init(void);
-void SCSI_Uninit(void);
-void SCSI_Reset(void);
-void SCSI_Insert(uint8_t target);
-void SCSI_Eject(uint8_t target);
+extern uint8_t SCSIdisk_Send_Status(void);
+extern uint8_t SCSIdisk_Send_Message(void);
+extern uint8_t SCSIdisk_Send_Data(void);
+extern void SCSIdisk_Receive_Data(uint8_t val);
+extern bool SCSIdisk_Select(uint8_t target);
+extern void SCSIdisk_Receive_Command(uint8_t *commandbuf, uint8_t identify);
 
-uint8_t SCSIdisk_Send_Status(void);
-uint8_t SCSIdisk_Send_Message(void);
-uint8_t SCSIdisk_Send_Data(void);
-void SCSIdisk_Receive_Data(uint8_t val);
-bool SCSIdisk_Select(uint8_t target);
-void SCSIdisk_Receive_Command(uint8_t *commandbuf, uint8_t identify);
+extern int64_t SCSIdisk_Time(void);
 
-int64_t SCSIdisk_Time(void);
+#endif /* PREV_SCSI_H */

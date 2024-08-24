@@ -33,18 +33,20 @@ const char DlgAdvanced_fileid[] = "Previous dlgAdvanced.c";
 
 #define DLGADV_DSPNONE    26
 #define DLGADV_DSP56001   27
-#define DLGADV_DSPMEM24   29
-#define DLGADV_DSPMEM96   30
+#define DLGADV_DSPROM     28
+#define DLGADV_DSPMEM24   30
+#define DLGADV_DSPMEM96   31
 
-#define DLGADV_NBIC       33
+#define DLGADV_SCSI_OLD   34
+#define DLGADV_SCSI_NEW   35
 
-#define DLGADV_SCSI_OLD   36
-#define DLGADV_SCSI_NEW   37
+#define DLGADV_RTC_OLD    38
+#define DLGADV_RTC_NEW    39
 
-#define DLGADV_RTC_OLD    40
-#define DLGADV_RTC_NEW    41
+#define DLGADV_NBIC       42
+#define DLGADV_ADB        43
 
-#define DLGADV_EXIT       42
+#define DLGADV_EXIT       44
 
 char custom_memory[16] = "Customize";
 
@@ -85,23 +87,25 @@ static SGOBJ advanceddlg[] =
 	{ SGTEXT, 0, 0, 48,4, 12,1, "DSP type" },
 	{ SGRADIOBUT, 0, 0, 49,6, 6,1, "none" },
 	{ SGRADIOBUT, 0, 0, 49,8, 7,1, "56001" },
-	{ SGTEXT, 0, 0, 48,10, 8,1, "DSP memory" },
-	{ SGRADIOBUT, 0, 0, 49,12, 7,1, "24 kB" },
-	{ SGRADIOBUT, 0, 0, 49,14, 7,1, "96 kB" },
+	{ SGCHECKBOX, 0, 0, 49,10, 9,1, "Use ROM" },
+	{ SGTEXT, 0, 0, 48,12, 8,1, "DSP memory" },
+	{ SGRADIOBUT, 0, 0, 49,14, 7,1, "24 kB" },
+	{ SGRADIOBUT, 0, 0, 49,16, 7,1, "96 kB" },
 
 	{ SGBOX, 0, 0, 2,19, 19,7, NULL },
-	{ SGTEXT, 0, 0, 3,20, 14,1, "NBIC" },
-	{ SGCHECKBOX, 0, 0, 4,22, 10,1, "present" },
+	{ SGTEXT, 0, 0, 3,20, 14,1, "SCSI chip" },
+	{ SGRADIOBUT, 0, 0, 4,22, 10,1, "NCR53C90" },
+	{ SGRADIOBUT, 0, 0, 4,24, 11,1, "NCR53C90A" },
 
 	{ SGBOX, 0, 0, 22,19, 19,7, NULL },
-	{ SGTEXT, 0, 0, 23,20, 14,1, "SCSI chip" },
-	{ SGRADIOBUT, 0, 0, 24,22, 10,1, "NCR53C90" },
-	{ SGRADIOBUT, 0, 0, 24,24, 11,1, "NCR53C90A" },
+	{ SGTEXT, 0, 0, 23,20, 14,1, "RTC chip" },
+	{ SGRADIOBUT, 0, 0, 24,22, 12,1, "MC68HC68T1" },
+	{ SGRADIOBUT, 0, 0, 24,24, 10,1, "MCCS1850" },
 
 	{ SGBOX, 0, 0, 42,19, 19,7, NULL },
-	{ SGTEXT, 0, 0, 43,20, 14,1, "RTC chip" },
-	{ SGRADIOBUT, 0, 0, 44,22, 12,1, "MC68HC68T1" },
-	{ SGRADIOBUT, 0, 0, 44,24, 10,1, "MCCS1850" },
+	{ SGTEXT, 0, 0, 43,20, 14,1, "Other" },
+	{ SGCHECKBOX, 0, 0, 44,22, 14,1, "NBIC present" },
+	{ SGCHECKBOX, 0, 0, 44,24, 13,1, "ADB devices" },
 
 	{ SGBUTTON, SG_DEFAULT, 0, 20,28, 23,1, "Back to system menu" },
 	{ SGSTOP, 0, 0, 0,0, 0,0, NULL }
@@ -296,11 +300,13 @@ void Dialog_AdvancedDlg(void) {
 
 	advanceddlg[DLGADV_DSPNONE].state &= ~SG_SELECTED;
 	advanceddlg[DLGADV_DSP56001].state &= ~SG_SELECTED;
+	advanceddlg[DLGADV_DSPROM].state &= ~SG_SELECTED;
 	switch (ConfigureParams.System.nDSPType) {
 		case DSP_TYPE_NONE:
-		case DSP_TYPE_DUMMY:
 			advanceddlg[DLGADV_DSPNONE].state |= SG_SELECTED;
 			break;
+		case DSP_TYPE_ACCURATE:
+			advanceddlg[DLGADV_DSPROM].state |= SG_SELECTED;
 		case DSP_TYPE_EMU:
 			advanceddlg[DLGADV_DSP56001].state |= SG_SELECTED;
 			break;
@@ -319,6 +325,11 @@ void Dialog_AdvancedDlg(void) {
 	advanceddlg[DLGADV_NBIC].state &= ~SG_SELECTED;
 	if (ConfigureParams.System.bNBIC) {
 		advanceddlg[DLGADV_NBIC].state |= SG_SELECTED;
+	}
+	
+	advanceddlg[DLGADV_ADB].state &= ~SG_SELECTED;
+	if (ConfigureParams.System.bADB) {
+		advanceddlg[DLGADV_ADB].state |= SG_SELECTED;
 	}
 
 	for (i = DLGADV_SCSI_OLD; i <= DLGADV_SCSI_NEW; i++)
@@ -410,6 +421,17 @@ void Dialog_AdvancedDlg(void) {
 				Dialog_MemAdvancedDlg(ConfigureParams.Memory.nMemoryBankSize);
 				Dialog_AdvancedDlg_MemDraw();
 				break;
+			case DLGADV_DSPNONE:
+				if (advanceddlg[DLGADV_DSPNONE].state & SG_SELECTED) {
+					advanceddlg[DLGADV_DSPROM].state &= ~SG_SELECTED;
+				}
+				break;
+			case DLGADV_DSPROM:
+				if (advanceddlg[DLGADV_DSPROM].state & SG_SELECTED) {
+					advanceddlg[DLGADV_DSPNONE].state &= ~SG_SELECTED;
+					advanceddlg[DLGADV_DSP56001].state |= SG_SELECTED;
+				}
+				break;
 
 			default:
 				break;
@@ -447,7 +469,10 @@ void Dialog_AdvancedDlg(void) {
 		ConfigureParams.Memory.nMemorySpeed = MEMORY_60NS;
 
 	if (advanceddlg[DLGADV_DSP56001].state & SG_SELECTED)
-		ConfigureParams.System.nDSPType = DSP_TYPE_EMU;
+		if (advanceddlg[DLGADV_DSPROM].state & SG_SELECTED)
+			ConfigureParams.System.nDSPType = DSP_TYPE_ACCURATE;
+		else
+			ConfigureParams.System.nDSPType = DSP_TYPE_EMU;
 	else
 		ConfigureParams.System.nDSPType = DSP_TYPE_NONE;
 
@@ -460,6 +485,11 @@ void Dialog_AdvancedDlg(void) {
 		ConfigureParams.System.bNBIC = true;
 	else
 		ConfigureParams.System.bNBIC = false;
+	
+	if (advanceddlg[DLGADV_ADB].state & SG_SELECTED)
+		ConfigureParams.System.bADB = true;
+	else
+		ConfigureParams.System.bADB = false;
 
 	if (advanceddlg[DLGADV_SCSI_OLD].state & SG_SELECTED)
 		ConfigureParams.System.nSCSI = NCR53C90;
@@ -470,4 +500,6 @@ void Dialog_AdvancedDlg(void) {
 		ConfigureParams.System.nRTC = MC68HC68T1;
 	else
 		ConfigureParams.System.nRTC = MCCS1850;
+	
+	Configuration_CheckPeripheralSettings();
 }

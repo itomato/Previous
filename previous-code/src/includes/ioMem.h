@@ -1,20 +1,17 @@
 /*
-  Hatari - ioMem.h
+  Previous - ioMem.h
 
   This file is distributed under the GNU General Public License, version 2
   or at your option any later version. Read the file gpl.txt for details.
 */
 
-#ifndef HATARI_IOMEM_H
-#define HATARI_IOMEM_H
+#ifndef PREV_IOMEM_H
+#define PREV_IOMEM_H
 
 #include "config.h"
 #include "memory.h"
 
-#define IoMem NEXTIo
-
-extern int nIoMemAccessSize;
-extern uint32_t IoAccessBaseAddress;
+extern uint32_t IoAccessMask;
 extern uint32_t IoAccessCurrentAddress;
 
 /**
@@ -23,8 +20,9 @@ extern uint32_t IoAccessCurrentAddress;
  */
 static inline uint32_t IoMem_ReadLong(uint32_t Address)
 {
-	Address &= 0x01ffff;
-	return do_get_mem_long(&IoMem[Address]);
+	Address &= IoAccessMask;
+	Address &= ~3;
+	return do_get_mem_long(&NEXTIo[Address]);
 }
 
 
@@ -34,8 +32,9 @@ static inline uint32_t IoMem_ReadLong(uint32_t Address)
  */
 static inline uint16_t IoMem_ReadWord(uint32_t Address)
 {
-	Address &= 0x01ffff;
-	return do_get_mem_word(&IoMem[Address]);
+	Address &= IoAccessMask;
+	Address &= ~1;
+	return do_get_mem_word(&NEXTIo[Address]);
 }
 
 
@@ -44,8 +43,8 @@ static inline uint16_t IoMem_ReadWord(uint32_t Address)
  */
 static inline uint8_t IoMem_ReadByte(uint32_t Address)
 {
-	Address &= 0x01ffff;
- 	return IoMem[Address];
+	Address &= IoAccessMask;
+ 	return NEXTIo[Address];
 }
 
 
@@ -55,8 +54,9 @@ static inline uint8_t IoMem_ReadByte(uint32_t Address)
  */
 static inline void IoMem_WriteLong(uint32_t Address, uint32_t Var)
 {
-	Address &= 0x01ffff;
-	do_put_mem_long(&IoMem[Address], Var);
+	Address &= IoAccessMask;
+	Address &= ~3;
+	do_put_mem_long(&NEXTIo[Address], Var);
 }
 
 
@@ -66,8 +66,9 @@ static inline void IoMem_WriteLong(uint32_t Address, uint32_t Var)
  */
 static inline void IoMem_WriteWord(uint32_t Address, uint16_t Var)
 {
-	Address &= 0x01ffff;
-	do_put_mem_word(&IoMem[Address], Var);
+	Address &= IoAccessMask;
+	Address &= ~1;
+	do_put_mem_word(&NEXTIo[Address], Var);
 }
 
 
@@ -76,13 +77,16 @@ static inline void IoMem_WriteWord(uint32_t Address, uint16_t Var)
  */
 static inline void IoMem_WriteByte(uint32_t Address, uint8_t Var)
 {
-	Address &= 0x01ffff;
-	IoMem[Address] = Var;
+	Address &= IoAccessMask;
+	NEXTIo[Address] = Var;
 }
 
+extern void IoMem_Intercept ( uint32_t addr , void (*read_f)(void) , void (*write_f)(void) );
 
 extern void IoMem_Init(void);
 extern void IoMem_UnInit(void);
+
+extern uint8_t IoMem_ReadBytePort(void);
 
 extern uae_u32 IoMem_bget(uaecptr addr);
 extern uae_u32 IoMem_wget(uaecptr addr);
@@ -104,4 +108,4 @@ extern void IoMem_ReadWithoutInterception(void);
 extern void IoMem_WriteWithoutInterceptionButTrace(void);
 extern void IoMem_ReadWithoutInterceptionButTrace(void);
 
-#endif
+#endif /* PREV_IOMEM_H */

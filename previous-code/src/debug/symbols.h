@@ -9,11 +9,14 @@
 #define HATARI_SYMBOLS_H
 
 typedef enum {
-	SYMTYPE_TEXT = 1,  /* Needs to be smallest number for sorting! */
-	SYMTYPE_DATA = 2,
-	SYMTYPE_BSS  = 4,
-	SYMTYPE_ABS  = 8,
-	SYMTYPE_ALL  = SYMTYPE_TEXT|SYMTYPE_DATA|SYMTYPE_BSS|SYMTYPE_ABS
+	SYMTYPE_TEXT = 1,
+	SYMTYPE_WEAK = 2,
+	SYMTYPE_CODE = (SYMTYPE_TEXT|SYMTYPE_WEAK),
+	/* other types get sorted after code types */
+	SYMTYPE_DATA = 4,
+	SYMTYPE_BSS  = 8,
+	SYMTYPE_ABS  = 16,
+	SYMTYPE_ALL  = 32-1
 } symtype_t;
 
 typedef struct {
@@ -39,10 +42,11 @@ extern bool Symbols_GetDspAddress(symtype_t symtype, const char *name, uint32_t 
 /* symbol address -> name search */
 extern const char* Symbols_GetByCpuAddress(uint32_t addr, symtype_t symtype);
 extern const char* Symbols_GetByDspAddress(uint32_t addr, symtype_t symtype);
+/* handlers for automatic program symbol loading */
+extern void Symbols_LoadCurrentProgram(void);
+extern void Symbols_FreeAll(void);
 /* symbols/dspsymbols command parsing */
+extern char *Symbols_MatchCommand(const char *text, int state);
 extern int Symbols_Command(int nArgc, char *psArgs[]);
-/* how many symbols are loaded */
-extern unsigned int Symbols_CpuCount(void);
-extern unsigned int Symbols_DspCount(void);
 
 #endif

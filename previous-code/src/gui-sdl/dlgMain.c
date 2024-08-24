@@ -3,6 +3,8 @@
 
   This file is distributed under the GNU General Public License, version 2
   or at your option any later version. Read the file gpl.txt for details.
+
+  The main dialog.
 */
 const char DlgMain_fileid[] = "Previous dlgMain.c";
 
@@ -80,8 +82,7 @@ int Dialog_MainDlg(bool *bReset, bool *bLoadedSnapshot)
 	if (SDLGui_SetScreen(sdlscrn))
 		return false;
 
-	bOldMouseVisibility = SDL_ShowCursor(SDL_QUERY);
-	SDL_ShowCursor(SDL_ENABLE);
+	bOldMouseVisibility = Main_ShowCursor(true);
 
 	SDLGui_CenterDlg(maindlg);
 
@@ -138,7 +139,7 @@ int Dialog_MainDlg(bool *bReset, bool *bLoadedSnapshot)
 			DlgSound_Main();
 			break;
 		 case MAINDLG_LOADCFG:
-			psNewCfg = SDLGui_FileSelect("Choose a file", sConfigFileName, NULL, NULL, false);
+			psNewCfg = SDLGui_FileSelect("Load configuration:", sConfigFileName, NULL, NULL, false);
 			if (psNewCfg)
 			{
 				strcpy(sConfigFileName, psNewCfg);
@@ -147,7 +148,7 @@ int Dialog_MainDlg(bool *bReset, bool *bLoadedSnapshot)
 			}
 			break;
 		 case MAINDLG_SAVECFG:
-			psNewCfg = SDLGui_FileSelect("Choose a file", sConfigFileName, NULL, NULL, true);
+			psNewCfg = SDLGui_FileSelect("Save configuration:", sConfigFileName, NULL, NULL, true);
 			if (psNewCfg)
 			{
 				strcpy(sConfigFileName, psNewCfg);
@@ -167,14 +168,14 @@ int Dialog_MainDlg(bool *bReset, bool *bLoadedSnapshot)
 		}
 	}
 	while (retbut != MAINDLG_OK && retbut != MAINDLG_CANCEL && retbut != SDLGUI_QUIT
-			&& retbut != SDLGUI_ERROR && !bQuitProgram);
+	        && retbut != SDLGUI_ERROR && !bQuitProgram);
 
 
 	if (maindlg[MAINDLG_RESET].state & SG_SELECTED)
 		*bReset = true;
 
 	Screen_UpdateRect(sdlscrn, 0, 0, 0, 0);
-	SDL_ShowCursor(bOldMouseVisibility);
+	Main_ShowCursor(bOldMouseVisibility);
 
 	return (retbut == MAINDLG_OK);
 }

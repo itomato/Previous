@@ -1,12 +1,12 @@
 /*
-  Hatari - main.c
+  Previous - main.c
 
   This file is distributed under the GNU General Public License, version 2
   or at your option any later version. Read the file gpl.txt for details.
 
   Main initialization and event handling routines.
 */
-const char Main_fileid[] = "Hatari main.c";
+const char Main_fileid[] = "Previous main.c";
 
 #include <time.h>
 #include <errno.h>
@@ -41,8 +41,8 @@ const char Main_fileid[] = "Hatari main.c";
 #include "hatari-glue.h"
 #include "NextBus.hpp"
 
-#if HAVE_GETTIMEOFDAY
-#include <sys/time.h>
+#ifdef WIN32
+#include "gui-win/opencon.h"
 #endif
 
 volatile bool bQuitProgram = false;            /* Flag to quit program cleanly */
@@ -141,7 +141,7 @@ bool Main_PauseEmulation(bool visualize) {
 	}
 
 	/* Show mouse pointer and set it to the middle of the screen */
-	SDL_ShowCursor(SDL_ENABLE);
+	Main_ShowCursor(true);
 	Main_WarpMouse(sdlscrn->w/2, sdlscrn->h/2);
 
 	return true;
@@ -164,12 +164,13 @@ bool Main_UnPauseEmulation(void) {
 
 	/* Set mouse pointer to the middle of the screen and hide it */
 	Main_WarpMouse(sdlscrn->w/2, sdlscrn->h/2);
-	SDL_ShowCursor(SDL_DISABLE);
+	Main_ShowCursor(false);
 
 	Main_ResetKeys();
-	Main_SetMouseGrab(bGrabMouse);
 
 	bEmulationActive = true;
+
+	Main_SetMouseGrab(bGrabMouse);
 
 	return true;
 }
@@ -182,10 +183,6 @@ bool Main_UnPauseEmulation(void) {
 static void Main_HaltDialog(void) {
 	Main_PauseEmulation(true);
 	Log_Printf(LOG_WARN, "Fatal error: CPU halted!");
-	/* flush key up events to avoid unintendedly exiting the alert dialog */
-	SDL_ResetKeyboard();
-	SDL_PumpEvents();
-	SDL_FlushEvent(SDL_KEYUP);
 	if (!DlgAlert_Query("Fatal error: CPU halted!\n\nPress OK to restart CPU or cancel to quit.")) {
 		Main_RequestQuit(false);
 	}
@@ -261,6 +258,25 @@ void Main_WarpMouse(int x, int y) {
 
 /* ----------------------------------------------------------------------- */
 /**
+ * Set mouse cursor visibility and return if it was visible before.
+ */
+bool Main_ShowCursor(bool show) {
+	bool bOldVisibility;
+
+	bOldVisibility = SDL_ShowCursor(SDL_QUERY) == SDL_ENABLE;
+	if (bOldVisibility != show) {
+		if (show) {
+			SDL_ShowCursor(SDL_ENABLE);
+		} else {
+			SDL_ShowCursor(SDL_DISABLE);
+		}
+	}
+	return bOldVisibility;
+}
+
+
+/* ----------------------------------------------------------------------- */
+/**
  * Set mouse grab.
  */
 void Main_SetMouseGrab(bool grab) {
@@ -270,7 +286,7 @@ void Main_SetMouseGrab(bool grab) {
 			Main_WarpMouse(sdlscrn->w/2, sdlscrn->h/2); /* Cursor must be inside window */
 			SDL_SetRelativeMouseMode(SDL_TRUE);
 			SDL_SetWindowGrab(sdlWindow, SDL_TRUE);
-			Main_SetTitle(MOUSE_LOCK_MSG);
+			Main_SetTitle("Mouse is locked. Ctrl-click to release.");
 		}
 	} else {
 		SDL_SetRelativeMouseMode(SDL_FALSE);
@@ -363,11 +379,11 @@ void Main_SendSpecialEvent(int type) {
 static void Main_HandleMouseMotion(SDL_Event *pEvent) {
 	static SDL_Event mouse_event[100];
 
-	int nEvents;
+	int i, nEvents;
 
 	static float fSavedDeltaX = 0.0;
 	static float fSavedDeltaY = 0.0;
-	
+
 	float fDeltaX;
 	float fDeltaY;
 	int   nDeltaX;
@@ -387,14 +403,14 @@ static void Main_HandleMouseMotion(SDL_Event *pEvent) {
 	/* Get all mouse event to clean the queue and sum them */
 	nEvents = SDL_PeepEvents(mouse_event, 100, SDL_GETEVENT, SDL_MOUSEMOTION, SDL_MOUSEMOTION);
 
-	for (int i = 0; i < nEvents; i++) {
+	for (i = 0; i < nEvents; i++) {
 		nDeltaX += mouse_event[i].motion.xrel;
 		nDeltaY += mouse_event[i].motion.yrel;
 	}
 
 	if (nDeltaX || nDeltaY) {
 		/* Adjust values only if necessary */
-		if ((fExp != 1.0) || (fLin != 0)) {
+		if ((fExp != 1.0) || (fLin != 0.0)) {
 			/* Initialize float values from integers */
 			fDeltaX = (float)nDeltaX;
 			fDeltaY = (float)nDeltaY;
@@ -451,10 +467,25 @@ void Main_ResetKeys(void) {
 
 	SDL_ResetKeyboard();
 
-	/* Send at least one keyup event */
+	/* Send magic key sequence to avoid stuck keys */
+	event.type                = SDL_KEYDOWN;
+	event.key.keysym.scancode = SDL_SCANCODE_LCTRL;
+	event.key.keysym.sym      = SDLK_LCTRL;
+	event.key.keysym.mod      = KMOD_LCTRL;
+	SDL_PushEvent(&event);
+
+	if (ConfigureParams.System.bADB) {
+		event.type                = SDL_KEYUP;
+		event.key.keysym.scancode = SDL_SCANCODE_LCTRL;
+		event.key.keysym.sym      = SDLK_LCTRL;
+		event.key.keysym.mod      = KMOD_LCTRL;
+		SDL_PushEvent(&event);
+	}
+	
 	event.type                = SDL_KEYUP;
 	event.key.keysym.scancode = SDL_SCANCODE_Q;
 	event.key.keysym.sym      = SDLK_q;
+	event.key.keysym.mod      = KMOD_NONE;
 	SDL_PushEvent(&event);
 }
 
@@ -768,11 +799,7 @@ static void Main_Loop(void) {
  * Call this on emulated machine VBL.
  */
 void Main_CheckStatusbarUpdate(void) {
-	static int i = 0;
-	if (++i > 9) {
-		Statusbar_Update(sdlscrn);
-		i = 0;
-	}
+	Statusbar_Update(sdlscrn);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -838,8 +865,7 @@ static bool Main_Init(void) {
 	/* Call menu at startup */
 	if (Main_StartMenu()) {
 		/* Reset emulated machine */
-		Reset_Cold();
-		return true;
+		return !Reset_Cold();
 	}
 	return false;
 }
@@ -897,7 +923,7 @@ static void Main_LoadInitialConfig(void) {
 
 /*-----------------------------------------------------------------------*/
 /**
- * Set TOS etc information and initial help message
+ * Set system information and initial help message
  */
 static void Main_StatusbarSetup(void) {
 	const char *name = NULL;
@@ -921,10 +947,6 @@ static void Main_StatusbarSetup(void) {
 	/* update information loaded by Main_Init() */
 	Statusbar_UpdateInfo();
 }
-
-#ifdef WIN32
-	extern void Win_OpenCon(void);
-#endif
 
 /*-----------------------------------------------------------------------*/
 /**

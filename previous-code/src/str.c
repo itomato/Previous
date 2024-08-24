@@ -13,6 +13,7 @@ const char Str_fileid[] = "Hatari str.c";
 #include <errno.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <assert.h>
 #include "configuration.h"
 #include "str.h"
 
@@ -160,4 +161,80 @@ long Str_Copy(char *pDest, const char *pSrc, long nBufLen)
 		pDest[nCount - 1] = '\0';
 
 	return -E2BIG;
+}
+
+/**
+ * truncate string at first unprintable char (e.g. newline).
+ */
+#if 0
+char *Str_Trunc(char *pString)
+{
+	int i = 0;
+	char *str = pString;
+	while (str[i] != '\0')
+	{
+		if (!isprint((unsigned)str[i]))
+		{
+			str[i] = '\0';
+			break;
+		}
+		i++;
+	}
+	return pString;
+}
+#endif
+
+/**
+ * check if string is valid hex number.
+ */
+#if 0
+bool Str_IsHex(const char *str)
+{
+	int i = 0;
+	while (str[i] != '\0' && str[i] != ' ')
+	{
+		if (!isxdigit((unsigned)str[i]))
+			return false;
+		i++;
+	}
+	return true;
+}
+#endif
+
+/**
+ * Convert \e, \n, \t, \\ backslash escapes in given string to
+ * corresponding byte values, anything else as left as-is.
+ */
+void Str_UnEscape(char *s1)
+{
+	char *s2 = s1;
+	for (; *s1; s1++)
+	{
+		if (*s1 != '\\')
+		{
+			*s2++ = *s1;
+			continue;
+		}
+		s1++;
+		switch(*s1)
+		{
+		case 'e':
+			*s2++ = '\e';
+			break;
+		case 'n':
+			*s2++ = '\n';
+			break;
+		case 't':
+			*s2++ = '\t';
+			break;
+		case '\\':
+			*s2++ = '\\';
+			break;
+		default:
+			s1--;
+			*s2++ = '\\';
+		}
+	}
+	assert(s2 < s1);
+	*s2 = '\0';
 }

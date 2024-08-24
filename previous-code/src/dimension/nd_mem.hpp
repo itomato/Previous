@@ -1,3 +1,10 @@
+/*
+  Previous - nd_mem.hpp
+
+  This file is distributed under the GNU General Public License, version 2
+  or at your option any later version. Read the file gpl.txt for details.
+*/
+
 #pragma once
 
 #ifndef __ND_MEM_H__
@@ -11,8 +18,8 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* NeXTdimension board and slot memory */
-#define ND_BOARD_SIZE    0x10000000
-#define ND_BOARD_MASK    0x0FFFFFFF
+#define ND_BOARD_SIZE   0x10000000
+#define ND_BOARD_MASK   0x0FFFFFFF
 #define ND_BOARD_BITS   0xF0000000
     
 #define ND_SLOT_SIZE    0x01000000

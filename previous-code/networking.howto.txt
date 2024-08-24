@@ -194,3 +194,32 @@ NOWTO: Setup networking on Mac OS:
       Subnet Mask: 255.255.255.0
       Gateway/Router Address: 10.0.2.2
       Domain Name Server Information: Domain home, IP Address 10.0.2.3
+
+
+NOWTO: Accessing the guest system from the host machine through TCP/IP:
+
+   When using SLiRP, the guest system is not directly visible or accessible
+   through its own IP address 10.0.2.2. Instead, Previous provides a number of
+   port redirects that allow you to access certain ports on the guest system:
+
+      Host Port              Internal Port          Service
+      ---------              -------------          -------
+      42320                  20                     FTP data
+      42321                  21                     FTP control
+      42322                  22                     SSH
+      42323                  23                     Telnet
+      42380                  80                     HTTP
+
+   If you want to telnet into the guest system, you can do so by running the 
+   following command on your host system:
+      telnet localhost 42323
+
+   In order to connect through SSH (if installed on the NeXT side), do
+      ssh me@localhost -p 42322
+
+   You can ftp into your emulated NeXT machine with
+      ncftp -P 42321 ftp://me@localhost
+
+NOTE: The guest system has to have these services running in order to actually 
+      connect to them. By default, NeXTstep and OPENSTEP do not include servers 
+      for SSH or HTTP.

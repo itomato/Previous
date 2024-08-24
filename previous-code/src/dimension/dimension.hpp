@@ -1,3 +1,10 @@
+/*
+  Previous - dimension.hpp
+
+  This file is distributed under the GNU General Public License, version 2
+  or at your option any later version. Read the file gpl.txt for details.
+*/
+
 #pragma once
 
 #ifndef __DIMENSION_H__
@@ -22,6 +29,7 @@ extern "C" {
     extern void        nd_display_vbl_handler(void);
     extern void        nd_display_repaint(void);
     extern void        nd_video_vbl_handler(void);
+    extern bool        nd_video_enabled(int slot);
     extern uint32_t*   nd_vram_for_slot(int slot);
     extern void        nd_start_debugger(void);
     extern const char* nd_reports(uint64_t realTime, uint64_t hostTime);
@@ -198,6 +206,7 @@ public:
     void    send_msg(int msg);
 
     void    set_blank_state(int src, bool state);
+    bool    unblanked(void);
     void    video_dev_write(uint8_t addr, uint32_t step, uint8_t data);
 
     bool    dbg_cmd(const char* buf);

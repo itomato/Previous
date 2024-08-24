@@ -131,6 +131,7 @@
 #define WITH_X86
 #define WITH_THREADED_CPU
 #endif /* ! WINUAE_FOR_HATARI */
+#define WITH_SOFTFLOAT
 
 #else
 
@@ -523,7 +524,7 @@ typedef long uae_atomic;
 /* #undef HAVE_DEVICES_AHI_H */
 
 /* Define if you have the <dirent.h> header file.  */
-/* #define HAVE_DIRENT_H 1 */
+#define HAVE_DIRENT_H 1
 
 /* Define if you have the <fcntl.h> header file.  */
 #ifndef _WIN32_WCE

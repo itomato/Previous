@@ -1,12 +1,10 @@
 /*
-  Hatari - m68000.c
+  Previous - m68000.c
 
   This file is distributed under the GNU General Public License, version 2
   or at your option any later version. Read the file gpl.txt for details.
-
 */
-
-const char M68000_fileid[] = "Hatari m68000.c";
+const char M68000_fileid[] = "Previous m68000.c";
 
 #include "main.h"
 #include "configuration.h"
@@ -28,16 +26,11 @@ void M68000_Init(void)
 
 /*-----------------------------------------------------------------------*/
 /**
- * Reset CPU 68000 variables
+ * Reset 680x0 emualtion
  */
-void M68000_Reset(bool bCold)
+void M68000_Reset(void)
 {
-	if (bCold) 
-	{		
-		/* Now reset the WINUAE CPU core */
-		m68k_reset();
-		M68000_SetSpecial(SPCFLAG_MODE_CHANGE);		/* exit m68k_run_xxx() loop and check for cpu changes / reset / quit */
-	}
+	M68000_SetSpecial(SPCFLAG_MODE_CHANGE);
 }
 
 
@@ -58,6 +51,16 @@ void M68000_Stop(void)
 void M68000_Start(void)
 {
 	m68k_go(true);
+}
+
+
+/*-----------------------------------------------------------------------*/
+/**
+ * Set interrupt flag to indicate a change of the interrupt level
+ */
+void M68000_CheckInterrupt(void)
+{
+	M68000_SetSpecial(SPCFLAG_INT);
 }
 
 

@@ -38,7 +38,7 @@
 dsp_core_t dsp_core;
 
 /*--- Memory size ---*/
-uint32_t DSP_RAMSIZE = DSP_RAMSIZE_24kB;
+uint32_t DSP_RAMSIZE = 0;
 
 /*--- Functions prototypes ---*/
 static void dsp_core_dsp2host(void);
@@ -568,6 +568,42 @@ static uint32_t const y_rom[0x100] = {
 	/* S_FF */ 0xfcdbd5  /* -0.0245412588 */
 };
 
+/* bootstrap program */
+static uint32_t const p_rom[0x20] = {
+	/* P_00 */ 0x62f400, /* MOVE  #$FFE9,R2       */
+	/* P_01 */ 0x00ffe9, /*                       */
+	/* P_02 */ 0x61f400, /* MOVE  #$c000,R1       */
+	/* P_03 */ 0x00c000, /*                       */
+	/* P_04 */ 0x300000, /* MOVE  #0,R0           */
+	/* P_05 */ 0x07e18c, /* MOVE  P:(R1),A1       */
+	/* P_06 */ 0x200037, /* ROL   A               */
+	/* P_07 */ 0x0e0009, /* JCC   P_09            */
+	/* P_08 */ 0x0040f9, /* ORI   #$40,CCR        */
+	/* P_09 */ 0x060082, /* DO    #512,P_1B       */
+	/* P_0A */ 0x00001b, /*                       */
+	/* P_0B */ 0x0e6012, /* JLC   P_12            */
+	/* P_0C */ 0x060380, /* DO    #3,P_10         */
+	/* P_0D */ 0x000010, /*                       */
+	/* P_0E */ 0x07d98a, /* MOVE  P:(R1)+,A2      */
+	/* P_0F */ 0x0608a0, /* REP   #8              */
+	/* P_10 */ 0x200022, /* ASR   A               */
+	/* P_11 */ 0x0c001b, /* JMP   P_1B            */
+	/* P_12 */ 0x0aa020, /* BSET  #0,X:$FFE0      */
+	/* P_13 */ 0x0aa983, /* JCLR  #3,X:$FFE9,P_17 */
+	/* P_14 */ 0x000017, /*                       */
+	/* P_15 */ 0x00008c, /* ENDDO                 */
+	/* P_16 */ 0x0c001c, /* JMP   P_1C            */
+	/* P_17 */ 0x0a6280, /* JCLR  #0,X:(R2),P_13  */
+	/* P_18 */ 0x000013, /*                       */
+	/* P_19 */ 0x54f000, /* MOVE  X:$FFEB,A1      */
+	/* P_1A */ 0x00ffeb, /*                       */
+	/* P_1B */ 0x07588c, /* MOVE  A1,P:(R0)+      */
+	/* P_1C */ 0x0502ba, /* MOVEC #2,OMR          */
+	/* P_1D */ 0x0000b9, /* ANDI  #0,CCR          */
+	/* P_1E */ 0x0c0000, /* JMP   $0              */
+	/* P_1F */ 0x000000, /*                       */
+};
+
 
 /* Init DSP emulation */
 void dsp_core_init(void (*host_interrupt)(int))
@@ -578,18 +614,40 @@ void dsp_core_init(void (*host_interrupt)(int))
 	memset(&dsp_core, 0, sizeof(dsp_core_t));
 	memcpy(&dsp_core.rom[DSP_SPACE_X][0x100], x_rom, sizeof(x_rom));
 	memcpy(&dsp_core.rom[DSP_SPACE_Y][0x100], y_rom, sizeof(y_rom));
+	memcpy(&dsp_core.rom[DSP_SPACE_P][0x000], p_rom, sizeof(p_rom));
 }
 
 /* Start DSP emulation */
-void dsp_core_start(uint8_t mode)
+void dsp_core_start(uint8_t mode, int bootstrap)
 {
-	dsp_core.registers[DSP_REG_OMR] = mode;
+	dsp_core.registers[DSP_REG_OMR] = dsp_core.mode = mode;
 	if (mode==2) {
 		dsp_core.pc = 0xe000;
 	} else {
 		dsp_core.pc = 0x0000;
 	}
+	dsp_core.mode_wait = 0;
+
+	/* Start using bootstrap ROM */
+	if (bootstrap) {
+		Statusbar_SetDspLed(true);
+		dsp_core.running = 1;
+	}
+
 	LOG_TRACE(TRACE_DSP_STATE, "Dsp: core start in mode %i\n",mode);
+}
+
+/* Configure external DSP memory */
+void dsp_core_config_ramext(uint32_t* mem, uint32_t size)
+{
+	if (mem && size) {
+		DSP_RAMSIZE = size;
+		dsp_core.ramext = mem;
+		memset(dsp_core.ramext, 0, DSP_RAMSIZE * sizeof(uint32_t));
+	} else {
+		DSP_RAMSIZE = 0;
+		dsp_core.ramext = NULL;
+	}
 }
 
 /* Shutdown DSP emulation */
@@ -617,6 +675,8 @@ void dsp_core_reset(void)
 	dsp_core.bootstrap_pos = 0;
 
 	/* Registers */
+	dsp_core.pc = 0x0000;
+	dsp_core.registers[DSP_REG_OMR] = dsp_core.mode = 0;
 	for (i=0;i<8;i++) {
 		dsp_core.registers[DSP_REG_M0+i]=0x00ffff;
 	}
@@ -643,12 +703,12 @@ void dsp_core_reset(void)
 	dsp_core.hostport[CPU_HOST_ISR] = (1<<CPU_HOST_ISR_TRDY)|(1<<CPU_HOST_ISR_TXDE);
 	dsp_core.hostport[CPU_HOST_IVR] = 0x0f;
 	dsp_core.hostport[CPU_HOST_RX0] = 0x0;
-	
+
 	/* host port init, dma */
 	dsp_core.dma_mode = 0;
 	dsp_core.dma_direction = 0;
 	dsp_core.dma_address_counter = 0;
-	
+
 	/* host port init, hreq */
 	dsp_core.dma_request = 0;
 	dsp_host_interrupt(0);
@@ -666,6 +726,12 @@ void dsp_core_reset(void)
 	/* Other hardware registers */
 	dsp_core.periph[DSP_SPACE_X][DSP_IPR]=0;
 	dsp_core.periph[DSP_SPACE_X][DSP_BCR]=0xffff;
+
+	/* AGU pipeline reset */
+	for (i=0; i<2; i++) {
+		dsp_core.agu_pipeline_reg[i] = 0;
+		dsp_core.agu_pipeline_val[i] = 0;
+	}
 
 	/* Misc */
 	dsp_core.loop_rep = 0;
@@ -692,7 +758,6 @@ void dsp_core_setPortCDataRegister(uint32_t value)
 		}
 	}
 
-	
 	/* if DSP Record is in handshake mode with DMA Play */
 	if ((dsp_core.periph[DSP_SPACE_X][DSP_PCDDR] & 0x10) == 0x10) {
 		if ((value & 0x10) == 0x10) {
@@ -1120,11 +1185,11 @@ void dsp_core_write_host(int addr, uint8_t value)
 				dsp_core.hostport[CPU_HOST_ICR] &= ~(1<<CPU_HOST_ICR_INIT);
 			}
 			/* This stops the bootstrap loader and starts normal execution */
-			if (!dsp_core.running && (dsp_core.hostport[CPU_HOST_ICR] & (1<<CPU_HOST_ICR_HF0))) {
+			if (!dsp_core.running && dsp_core.mode == 1 && (dsp_core.hostport[CPU_HOST_ICR] & (1<<CPU_HOST_ICR_HF0))) {
 				LOG_TRACE(TRACE_DSP_STATE, "Dsp: stop waiting bootstrap\n");
 				Statusbar_SetDspLed(true);
 				dsp_core.registers[DSP_REG_R0] = dsp_core.bootstrap_pos;
-				dsp_core.registers[DSP_REG_OMR] = 0x02;
+				dsp_core.registers[DSP_REG_OMR] = dsp_core.mode = 0x02;
 				dsp_core.running = 1;
 			}
 			dsp_core_hostport_update_hreq();
@@ -1161,7 +1226,7 @@ void dsp_core_write_host(int addr, uint8_t value)
 		case CPU_HOST_TRXL:
 			dsp_core.hostport[CPU_HOST_TXL]=value;
 
-			if (!dsp_core.running) {
+			if (!dsp_core.running && dsp_core.mode == 1) {
 				dsp_core.ramint[DSP_SPACE_P][dsp_core.bootstrap_pos] =
 					(dsp_core.hostport[CPU_HOST_TXH]<<16) |
 					(dsp_core.hostport[CPU_HOST_TXM]<<8) |
@@ -1175,7 +1240,7 @@ void dsp_core_write_host(int addr, uint8_t value)
 					LOG_TRACE(TRACE_DSP_STATE, "Dsp: wait bootstrap done\n");
 					Statusbar_SetDspLed(true);
 					dsp_core.registers[DSP_REG_R0] = dsp_core.bootstrap_pos;
-					dsp_core.registers[DSP_REG_OMR] = 0x02;
+					dsp_core.registers[DSP_REG_OMR] = dsp_core.mode = 0x02;
 					dsp_core.running = 1;
 				}
 			} else {

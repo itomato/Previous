@@ -1,11 +1,14 @@
-/* NeXT DMA Emulation 
- * Contains informations from QEMU-NeXT
- * NeXT Integrated Channel Processor (ISP) consists of 12 channel processors
- * with 128 bytes internal buffer for each channel.
- * 12 channels:
- * SCSI, Sound in, Sound out, Optical disk, Printer, SCC, DSP, 
- * Ethernet transmit, Ethernet receive, Video, Memory to register, Register to memory
- */
+/*
+  Previous - dma.c
+
+  This file is distributed under the GNU General Public License, version 2
+  or at your option any later version. Read the file gpl.txt for details.
+
+  This file contains a simulation of the Fujitsu MB610313 Integrated
+  Channel Processor (ISP) for direct memory access. The ISP controls
+  twelve DMA channels with 128 byte internal buffers.
+*/
+const char Dma_fileid[] = "Previous dma.c";
 
 #include "main.h"
 #include "ioMem.h"
@@ -27,17 +30,23 @@
 
 #define LOG_DMA_LEVEL LOG_DEBUG
 
-#define IO_SEG_MASK	0x1FFFF
-
-
-int get_channel(uint32_t address);
-int get_interrupt_type(int channel);
-void dma_interrupt(int channel);
-void dma_initialize_buffer(int channel, uint8_t offset);
-
+typedef enum {
+    CHANNEL_SCSI,       // 0x00000010
+    CHANNEL_SOUNDOUT,   // 0x00000040
+    CHANNEL_DISK,       // 0x00000050
+    CHANNEL_SOUNDIN,    // 0x00000080
+    CHANNEL_PRINTER,    // 0x00000090
+    CHANNEL_SCC,        // 0x000000c0
+    CHANNEL_DSP,        // 0x000000d0
+    CHANNEL_EN_TX,      // 0x00000110
+    CHANNEL_EN_RX,      // 0x00000150
+    CHANNEL_VIDEO,      // 0x00000180
+    CHANNEL_M2R,        // 0x000001d0
+    CHANNEL_R2M         // 0x000001c0
+} DMA_CHANNEL;
 
 struct {
-    uint8_t  csr;
+    uint32_t csr;
     uint32_t saved_next;
     uint32_t saved_limit;
     uint32_t saved_start;
@@ -47,7 +56,7 @@ struct {
     uint32_t start;
     uint32_t stop;
     
-    uint8_t  direction;
+    uint32_t direction;
 } dma[12];
 
 
@@ -62,44 +71,25 @@ int     modma_buf_limit = 0;
 uint8_t modma_buf[DMA_BURST_SIZE];
 
 
-/* Read and write CSR bits for 68030 based NeXT Computer. */
+/* Read and write CSR bits */
 
 /* read CSR bits */
-#define DMA_ENABLE      0x01   /* enable dma transfer */
-#define DMA_SUPDATE     0x02   /* single update */
-#define DMA_COMPLETE    0x08   /* current dma has completed */
-#define DMA_BUSEXC      0x10   /* bus exception occurred */
+#define DMA_ENABLE      0x01000000   /* enable dma transfer */
+#define DMA_SUPDATE     0x02000000   /* single update */
+#define DMA_COMPLETE    0x08000000   /* current dma has completed */
+#define DMA_BUSEXC      0x10000000   /* bus exception occurred */
 /* write CSR bits */
-#define DMA_SETENABLE   0x01   /* set enable */
-#define DMA_SETSUPDATE  0x02   /* set single update */
-#define DMA_M2DEV       0x00   /* dma from mem to dev */
-#define DMA_DEV2M       0x04   /* dma from dev to mem */
-#define DMA_CLRCOMPLETE 0x08   /* clear complete conditional */
-#define DMA_RESET       0x10   /* clr cmplt, sup, enable */
-#define DMA_INITBUF     0x20   /* initialize DMA buffers */
+#define DMA_SETENABLE   0x00010000   /* set enable */
+#define DMA_SETSUPDATE  0x00020000   /* set single update */
+#define DMA_M2DEV       0x00000000   /* dma from mem to dev */
+#define DMA_DEV2M       0x00040000   /* dma from dev to mem */
+#define DMA_CLRCOMPLETE 0x00080000   /* clear complete conditional */
+#define DMA_RESET       0x00100000   /* clr cmplt, sup, enable */
+#define DMA_INITBUF     0x00200000   /* initialize DMA buffers */
 
 /* CSR masks */
 #define DMA_CMD_MASK    (DMA_SETENABLE|DMA_SETSUPDATE|DMA_CLRCOMPLETE|DMA_RESET|DMA_INITBUF)
 #define DMA_STAT_MASK   (DMA_ENABLE|DMA_SUPDATE|DMA_COMPLETE|DMA_BUSEXC)
-
-
-/* Read and write CSR bits for 68040 based Machines.
- * We convert these to 68030 values before using in functions.
- * read CSR bits *
- #define DMA_ENABLE      0x01000000
- #define DMA_SUPDATE     0x02000000
- #define DMA_COMPLETE    0x08000000
- #define DMA_BUSEXC      0x10000000
- * write CSR bits *
- #define DMA_SETENABLE   0x00010000
- #define DMA_SETSUPDATE  0x00020000
- #define DMA_M2DEV       0x00000000
- #define DMA_DEV2M       0x00040000
- #define DMA_CLRCOMPLETE 0x00080000
- #define DMA_RESET       0x00100000
- #define DMA_INITBUF     0x00200000
- */
-
 
 
 static inline uint32_t dma_getlong(uint8_t *buf, uint32_t pos) {
@@ -114,65 +104,85 @@ static inline void dma_putlong(uint32_t val, uint8_t *buf, uint32_t pos) {
 }
 
 
-int get_channel(uint32_t address) {
-    int channel = address&IO_SEG_MASK;
+static int get_channel(uint32_t address) {
+    int channel = address & 0x0001ffff;
 
     switch (channel) {
-        case 0x010: Log_Printf(LOG_DMA_LEVEL,"channel SCSI:"); return CHANNEL_SCSI; break;
-        case 0x040: Log_Printf(LOG_DMA_LEVEL,"channel Sound Out:"); return CHANNEL_SOUNDOUT; break;
-        case 0x050: Log_Printf(LOG_DMA_LEVEL,"channel MO Disk:"); return CHANNEL_DISK; break;
-        case 0x080: Log_Printf(LOG_DMA_LEVEL,"channel Sound in:"); return CHANNEL_SOUNDIN; break;
-        case 0x090: Log_Printf(LOG_DMA_LEVEL,"channel Printer:"); return CHANNEL_PRINTER; break;
-        case 0x0c0: Log_Printf(LOG_DMA_LEVEL,"channel SCC:"); return CHANNEL_SCC; break;
-        case 0x0d0: Log_Printf(LOG_DMA_LEVEL,"channel DSP:"); return CHANNEL_DSP; break;
-        case 0x110: Log_Printf(LOG_DMA_LEVEL,"channel Ethernet Tx:"); return CHANNEL_EN_TX; break;
-        case 0x150: Log_Printf(LOG_DMA_LEVEL,"channel Ethernet Rx:"); return CHANNEL_EN_RX; break;
-        case 0x180: Log_Printf(LOG_DMA_LEVEL,"channel Video:"); return CHANNEL_VIDEO; break;
-        case 0x1d0: Log_Printf(LOG_DMA_LEVEL,"channel M2R:"); return CHANNEL_M2R; break;
-        case 0x1c0: Log_Printf(LOG_DMA_LEVEL,"channel R2M:"); return CHANNEL_R2M; break;
-            
+        case 0x010: Log_Printf(LOG_DMA_LEVEL,"channel SCSI:");        return CHANNEL_SCSI;
+        case 0x040: Log_Printf(LOG_DMA_LEVEL,"channel Sound Out:");   return CHANNEL_SOUNDOUT;
+        case 0x050: Log_Printf(LOG_DMA_LEVEL,"channel MO Disk:");     return CHANNEL_DISK;
+        case 0x080: Log_Printf(LOG_DMA_LEVEL,"channel Sound in:");    return CHANNEL_SOUNDIN;
+        case 0x090: Log_Printf(LOG_DMA_LEVEL,"channel Printer:");     return CHANNEL_PRINTER;
+        case 0x0c0: Log_Printf(LOG_DMA_LEVEL,"channel SCC:");         return CHANNEL_SCC;
+        case 0x0d0: Log_Printf(LOG_DMA_LEVEL,"channel DSP:");         return CHANNEL_DSP;
+        case 0x110: Log_Printf(LOG_DMA_LEVEL,"channel Ethernet Tx:"); return CHANNEL_EN_TX;
+        case 0x150: Log_Printf(LOG_DMA_LEVEL,"channel Ethernet Rx:"); return CHANNEL_EN_RX;
+        case 0x180: Log_Printf(LOG_DMA_LEVEL,"channel Video:");       return CHANNEL_VIDEO;
+        case 0x1d0: Log_Printf(LOG_DMA_LEVEL,"channel M2R:");         return CHANNEL_M2R;
+        case 0x1c0: Log_Printf(LOG_DMA_LEVEL,"channel R2M:");         return CHANNEL_R2M;
+
         default:
             Log_Printf(LOG_WARN, "Unknown DMA channel!\n");
-            return -1;
-            break;
+            abort();
     }
 }
 
-int get_interrupt_type(int channel) {
+static int get_interrupt_type(int channel) {
     switch (channel) {
-        case CHANNEL_SCSI: return INT_SCSI_DMA; break;
-        case CHANNEL_SOUNDOUT: return INT_SND_OUT_DMA; break;
-        case CHANNEL_DISK: return INT_DISK_DMA; break;
-        case CHANNEL_SOUNDIN: return INT_SND_IN_DMA; break;
-        case CHANNEL_PRINTER: return INT_PRINTER_DMA; break;
-        case CHANNEL_SCC: return INT_SCC_DMA; break;
-        case CHANNEL_DSP: return INT_DSP_DMA; break;
-        case CHANNEL_EN_TX: return INT_EN_TX_DMA; break;
-        case CHANNEL_EN_RX: return INT_EN_RX_DMA; break;
-        case CHANNEL_VIDEO: return INT_VIDEO; break;
-        case CHANNEL_M2R: return INT_M2R_DMA; break;
-        case CHANNEL_R2M: return INT_R2M_DMA; break;
-                        
+        case CHANNEL_SCSI:     return INT_SCSI_DMA;
+        case CHANNEL_SOUNDOUT: return INT_SND_OUT_DMA;
+        case CHANNEL_DISK:     return INT_DISK_DMA;
+        case CHANNEL_SOUNDIN:  return INT_SND_IN_DMA;
+        case CHANNEL_PRINTER:  return INT_PRINTER_DMA;
+        case CHANNEL_SCC:      return INT_SCC_DMA;
+        case CHANNEL_DSP:      return INT_DSP_DMA;
+        case CHANNEL_EN_TX:    return INT_EN_TX_DMA;
+        case CHANNEL_EN_RX:    return INT_EN_RX_DMA;
+        case CHANNEL_VIDEO:    return INT_VIDEO;
+        case CHANNEL_M2R:      return INT_M2R_DMA;
+        case CHANNEL_R2M:      return INT_R2M_DMA;
+
         default:
             Log_Printf(LOG_WARN, "Unknown DMA interrupt!\n");
-            return 0;
+            abort();
+    }
+}
+
+
+static void dma_initialize_buffer(int channel, uint8_t offset) {
+    if (offset>0) {
+        Log_Printf(LOG_WARN, "DMA Initializing buffer with offset %i", offset);
+    }
+    switch (channel) {
+        case CHANNEL_SCSI:
+            esp_dma.status   = 0; /* just a guess */
+            espdma_buf_size  = 0;
+            espdma_buf_limit = offset;
+            break;
+        case CHANNEL_DISK:
+            modma_buf_size   = 0;
+            modma_buf_limit  = offset;
+            break;
+        default:
             break;
     }
 }
 
-void DMA_CSR_Read(void) { // 0x02000010, length of register is byte on 68030 based NeXT Computer
+
+/* DMA register access functions */
+
+void DMA_CSR_Read(void) { // 0x02000010
     int channel = get_channel(IoAccessCurrentAddress);
-    
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = dma[channel].csr;
-    IoMem[(IoAccessCurrentAddress+1) & IO_SEG_MASK] = IoMem[(IoAccessCurrentAddress+2) & IO_SEG_MASK] = IoMem[(IoAccessCurrentAddress+3) & IO_SEG_MASK] = 0x00; // just to be sure
+    IoMem_WriteLong(IoAccessCurrentAddress, dma[channel].csr);
     Log_Printf(LOG_DMA_LEVEL,"DMA CSR read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].csr, m68k_getpc());
 }
 
 void DMA_CSR_Write(void) {
     int channel = get_channel(IoAccessCurrentAddress);
     int interrupt = get_interrupt_type(channel);
-    uint8_t writecsr = IoMem[IoAccessCurrentAddress & IO_SEG_MASK]|IoMem[(IoAccessCurrentAddress+1) & IO_SEG_MASK]|IoMem[(IoAccessCurrentAddress+2) & IO_SEG_MASK]|IoMem[(IoAccessCurrentAddress+3) & IO_SEG_MASK];
-
+    
+    uint32_t writecsr = IoMem_ReadLong(IoAccessCurrentAddress);
+    
     Log_Printf(LOG_DMA_LEVEL,"DMA CSR write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, writecsr, m68k_getpc());
     
     /* For debugging */
@@ -238,137 +248,117 @@ void DMA_CSR_Write(void) {
 
 void DMA_Saved_Next_Read(void) { // 0x02004000
     int channel = get_channel(IoAccessCurrentAddress-0x3FF0);
-    IoMem_WriteLong(IoAccessCurrentAddress & IO_SEG_MASK, dma[channel].saved_next);
+    IoMem_WriteLong(IoAccessCurrentAddress, dma[channel].saved_next);
     Log_Printf(LOG_DMA_LEVEL,"DMA SNext read at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].saved_next, m68k_getpc());
 }
 
 void DMA_Saved_Next_Write(void) {
     int channel = get_channel(IoAccessCurrentAddress-0x3FF0);
-    dma[channel].saved_next = IoMem_ReadLong(IoAccessCurrentAddress & IO_SEG_MASK);
+    dma[channel].saved_next = IoMem_ReadLong(IoAccessCurrentAddress);
     Log_Printf(LOG_DMA_LEVEL,"DMA SNext write at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].saved_next, m68k_getpc());
 }
 
 void DMA_Saved_Limit_Read(void) { // 0x02004004
     int channel = get_channel(IoAccessCurrentAddress-0x3FF4);
-    IoMem_WriteLong(IoAccessCurrentAddress & IO_SEG_MASK, dma[channel].saved_limit);
+    IoMem_WriteLong(IoAccessCurrentAddress, dma[channel].saved_limit);
     Log_Printf(LOG_DMA_LEVEL,"DMA SLimit read at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].saved_limit, m68k_getpc());
 }
 
 void DMA_Saved_Limit_Write(void) {
     int channel = get_channel(IoAccessCurrentAddress-0x3FF4);
-    dma[channel].saved_limit = IoMem_ReadLong(IoAccessCurrentAddress & IO_SEG_MASK);
+    dma[channel].saved_limit = IoMem_ReadLong(IoAccessCurrentAddress);
     Log_Printf(LOG_DMA_LEVEL,"DMA SLimit write at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].saved_limit, m68k_getpc());
 }
 
 void DMA_Saved_Start_Read(void) { // 0x02004008
     int channel = get_channel(IoAccessCurrentAddress-0x3FF8);
-    IoMem_WriteLong(IoAccessCurrentAddress & IO_SEG_MASK, dma[channel].saved_start);
+    IoMem_WriteLong(IoAccessCurrentAddress, dma[channel].saved_start);
     Log_Printf(LOG_DMA_LEVEL,"DMA SStart read at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].saved_start, m68k_getpc());
 }
 
 void DMA_Saved_Start_Write(void) {
     int channel = get_channel(IoAccessCurrentAddress-0x3FF8);
-    dma[channel].saved_start = IoMem_ReadLong(IoAccessCurrentAddress & IO_SEG_MASK);
+    dma[channel].saved_start = IoMem_ReadLong(IoAccessCurrentAddress);
     Log_Printf(LOG_DMA_LEVEL,"DMA SStart write at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].saved_start, m68k_getpc());
 }
 
 void DMA_Saved_Stop_Read(void) { // 0x0200400c
     int channel = get_channel(IoAccessCurrentAddress-0x3FFC);
-    IoMem_WriteLong(IoAccessCurrentAddress & IO_SEG_MASK, dma[channel].saved_stop);
+    IoMem_WriteLong(IoAccessCurrentAddress, dma[channel].saved_stop);
     Log_Printf(LOG_DMA_LEVEL,"DMA SStop read at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].saved_stop, m68k_getpc());
 }
 
 void DMA_Saved_Stop_Write(void) {
     int channel = get_channel(IoAccessCurrentAddress-0x3FFC);
-    dma[channel].saved_stop = IoMem_ReadLong(IoAccessCurrentAddress & IO_SEG_MASK);
+    dma[channel].saved_stop = IoMem_ReadLong(IoAccessCurrentAddress);
     Log_Printf(LOG_DMA_LEVEL,"DMA SStop write at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].saved_stop, m68k_getpc());
 }
 
 void DMA_Next_Read(void) { // 0x02004010
     int channel = get_channel(IoAccessCurrentAddress-0x4000);
-    IoMem_WriteLong(IoAccessCurrentAddress & IO_SEG_MASK, dma[channel].next);
+    IoMem_WriteLong(IoAccessCurrentAddress, dma[channel].next);
     Log_Printf(LOG_DMA_LEVEL,"DMA Next read at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].next, m68k_getpc());
 }
 
 void DMA_Next_Write(void) {
     int channel = get_channel(IoAccessCurrentAddress-0x4000);
-    dma[channel].next = IoMem_ReadLong(IoAccessCurrentAddress & IO_SEG_MASK);
+    dma[channel].next = IoMem_ReadLong(IoAccessCurrentAddress);
     Log_Printf(LOG_DMA_LEVEL,"DMA Next write at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].next, m68k_getpc());
 }
 
 void DMA_Limit_Read(void) { // 0x02004014
     int channel = get_channel(IoAccessCurrentAddress-0x4004);
-    IoMem_WriteLong(IoAccessCurrentAddress & IO_SEG_MASK, dma[channel].limit);
+    IoMem_WriteLong(IoAccessCurrentAddress, dma[channel].limit);
     Log_Printf(LOG_DMA_LEVEL,"DMA Limit read at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].limit, m68k_getpc());
 }
 
 void DMA_Limit_Write(void) {
     int channel = get_channel(IoAccessCurrentAddress-0x4004);
-    dma[channel].limit = IoMem_ReadLong(IoAccessCurrentAddress & IO_SEG_MASK);
+    dma[channel].limit = IoMem_ReadLong(IoAccessCurrentAddress);
     Log_Printf(LOG_DMA_LEVEL,"DMA Limit write at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].limit, m68k_getpc());
 }
 
 void DMA_Start_Read(void) { // 0x02004018
     int channel = get_channel(IoAccessCurrentAddress-0x4008);
-    IoMem_WriteLong(IoAccessCurrentAddress & IO_SEG_MASK, dma[channel].start);
+    IoMem_WriteLong(IoAccessCurrentAddress, dma[channel].start);
     Log_Printf(LOG_DMA_LEVEL,"DMA Start read at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].start, m68k_getpc());
 }
 
 void DMA_Start_Write(void) {
     int channel = get_channel(IoAccessCurrentAddress-0x4008);
-    dma[channel].start = IoMem_ReadLong(IoAccessCurrentAddress & IO_SEG_MASK);
+    dma[channel].start = IoMem_ReadLong(IoAccessCurrentAddress);
     Log_Printf(LOG_DMA_LEVEL,"DMA Start write at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].start, m68k_getpc());
 }
 
 void DMA_Stop_Read(void) { // 0x0200401c
     int channel = get_channel(IoAccessCurrentAddress-0x400C);
-    IoMem_WriteLong(IoAccessCurrentAddress & IO_SEG_MASK, dma[channel].stop);
+    IoMem_WriteLong(IoAccessCurrentAddress, dma[channel].stop);
     Log_Printf(LOG_DMA_LEVEL,"DMA Stop read at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].stop, m68k_getpc());
 }
 
 void DMA_Stop_Write(void) {
     int channel = get_channel(IoAccessCurrentAddress-0x400C);
-    dma[channel].stop = IoMem_ReadLong(IoAccessCurrentAddress & IO_SEG_MASK);
+    dma[channel].stop = IoMem_ReadLong(IoAccessCurrentAddress);
     Log_Printf(LOG_DMA_LEVEL,"DMA Stop write at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].stop, m68k_getpc());
 }
 
 void DMA_Init_Read(void) { // 0x02004210
     int channel = get_channel(IoAccessCurrentAddress-0x4200);
-    IoMem_WriteLong(IoAccessCurrentAddress & IO_SEG_MASK, dma[channel].next);
+    IoMem_WriteLong(IoAccessCurrentAddress, dma[channel].next);
     Log_Printf(LOG_DMA_LEVEL,"DMA Init read at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].next, m68k_getpc());
 }
 
 void DMA_Init_Write(void) {
     int channel = get_channel(IoAccessCurrentAddress-0x4200);
-    dma[channel].next = IoMem_ReadLong(IoAccessCurrentAddress & IO_SEG_MASK);
+    dma[channel].next = IoMem_ReadLong(IoAccessCurrentAddress);
     dma_initialize_buffer(channel, dma[channel].next&0xF);
     Log_Printf(LOG_DMA_LEVEL,"DMA Init write at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].next, m68k_getpc());
 }
 
-/* Initialize DMA internal buffer */
-
-void dma_initialize_buffer(int channel, uint8_t offset) {
-    if (offset>0) {
-        Log_Printf(LOG_WARN, "DMA Initializing buffer with offset %i", offset);
-    }
-    switch (channel) {
-        case CHANNEL_SCSI:
-            esp_dma.status = 0x00; /* just a guess */
-            espdma_buf_size = 0;
-            espdma_buf_limit = offset;
-            break;
-        case CHANNEL_DISK:
-            modma_buf_size = 0;
-            modma_buf_limit = offset;
-            break;
-        default:
-            break;
-    }
-}
 
 /* DMA interrupt functions */
 
-void dma_interrupt(int channel) {
+static void dma_interrupt(int channel) {
     int interrupt = get_interrupt_type(channel);
 
     /* If we have reached limit, generate an interrupt and set the flags */
@@ -702,8 +692,6 @@ void dma_mo_read_memory(void) {
 
 
 void dma_sndout_read_memory(void) {
-    int i;
-    
     if (dma[CHANNEL_SOUNDOUT].csr&DMA_ENABLE) {
         
         Log_Printf(LOG_DMA_LEVEL, "[DMA] Channel Sound Out: Read from memory at $%08x, %i bytes",
@@ -717,10 +705,11 @@ void dma_sndout_read_memory(void) {
         }
         
         TRY(prb) {
-            snd_buffer_len = dma[CHANNEL_SOUNDOUT].limit - dma[CHANNEL_SOUNDOUT].next;
-            snd_buffer = malloc(snd_buffer_len * 2);
-            for (i = 0; dma[CHANNEL_SOUNDOUT].next<dma[CHANNEL_SOUNDOUT].limit; dma[CHANNEL_SOUNDOUT].next++, i++)
-                snd_buffer[i] = get_byte(dma[CHANNEL_SOUNDOUT].next);
+            while (dma[CHANNEL_SOUNDOUT].next<dma[CHANNEL_SOUNDOUT].limit && snd_buffer_len<SND_BUFFER_LIMIT) {
+                snd_buffer[snd_buffer_len] = get_byte(dma[CHANNEL_SOUNDOUT].next);
+                dma[CHANNEL_SOUNDOUT].next++;
+                snd_buffer_len++;
+            }
         } CATCH(prb) {
             Log_Printf(LOG_WARN, "[DMA] Channel Sound Out: Bus error reading from %08x",dma[CHANNEL_SOUNDOUT].next);
             dma[CHANNEL_SOUNDOUT].csr &= ~DMA_ENABLE;
@@ -730,8 +719,6 @@ void dma_sndout_read_memory(void) {
 }
 
 void dma_sndout_intr(void) {
-    free(snd_buffer);
-    snd_buffer = NULL;
     snd_buffer_len = 0;
 
     if (dma[CHANNEL_SOUNDOUT].csr&DMA_ENABLE) {
@@ -1110,34 +1097,24 @@ bool dma_scc_ready(void) {
 /* DMA CSR on Turbo systems */
 
 /* CSR read bits */
-#define TDMA_BYTECOUNT_MASK 0x00000007
-#define TDMA_WRITEPTR_MASK  0x00000018
-#define TDMA_READPTR_MASK   0x00000060
-#define TDMA_DIRTY_MASK     0x00000180
-#define TDMA_BUFSEL         0x00000200
-
-#define TDMA_ENABLE         0x01000000
-#define TDMA_SUPDATE        0x02000000
-#define TDMA_COMPLETE       0x08000000
-#define TDMA_BUSEXC         0x10000000
+#define DMA_BYTECOUNT_MASK 0x00000007
+#define DMA_WRITEPTR_MASK  0x00000018
+#define DMA_READPTR_MASK   0x00000060
+#define DMA_DIRTY_MASK     0x00000180
+#define DMA_BUFSEL         0x00000200
 
 /* CSR write bits */
-#define TDMA_SETENABLE      0x00010000
-#define TDMA_SETSUPDATE     0x00020000
-#define TDMA_DEV2M          0x00040000
-#define TDMA_CLRCOMPLETE    0x00080000
-#define TDMA_RESET          0x00100000
-#define TDMA_SETCOMPLETE    0x00200000
-#define TDMA_FLUSH          0x00400000
-#define TDMA_BUFRESET       0x00800000
+#define DMA_SETCOMPLETE    0x00200000
+#define DMA_FLUSH          0x00400000
+#define DMA_BUFRESET       0x00800000
 
 /* CSR masks */
-#define TDMA_CMD_MASK       0x00FB0000
+#define DMA_CMD_MASK_T     0x00FB0000
 
-void TDMA_CSR_Read(void) { // 0x02000010, length of register is byte on 68030 based NeXT Computer
+void TDMA_CSR_Read(void) { // 0x02000010
     int channel = get_channel(IoAccessCurrentAddress);
     
-    IoMem_WriteLong(IoAccessCurrentAddress & IO_SEG_MASK, dma[channel].csr<<24);
+    IoMem_WriteLong(IoAccessCurrentAddress, dma[channel].csr);
 
     Log_Printf(LOG_DMA_LEVEL,"DMA CSR read at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].csr<<24, m68k_getpc());
 }
@@ -1145,33 +1122,33 @@ void TDMA_CSR_Read(void) { // 0x02000010, length of register is byte on 68030 ba
 void TDMA_CSR_Write(void) {
     int channel = get_channel(IoAccessCurrentAddress);
     int interrupt = get_interrupt_type(channel);
-    uint32_t writecsr = IoMem_ReadLong(IoAccessCurrentAddress & IO_SEG_MASK);
+    uint32_t writecsr = IoMem_ReadLong(IoAccessCurrentAddress);
 
     Log_Printf(LOG_DMA_LEVEL,"DMA CSR write at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, writecsr, m68k_getpc());
     
     /* For debugging */
-    if(writecsr&TDMA_DEV2M)
+    if(writecsr&DMA_DEV2M)
         Log_Printf(LOG_DMA_LEVEL,"DMA from dev to mem");
     else
         Log_Printf(LOG_DMA_LEVEL,"DMA from mem to dev");
     
-    switch (writecsr&TDMA_CMD_MASK) {
-        case TDMA_RESET:
-        case (TDMA_RESET | TDMA_CLRCOMPLETE):
+    switch (writecsr&DMA_CMD_MASK_T) {
+        case DMA_RESET:
+        case (DMA_RESET | DMA_CLRCOMPLETE):
             Log_Printf(LOG_DMA_LEVEL,"DMA reset"); break;
-        case TDMA_BUFRESET:
+        case DMA_BUFRESET:
             Log_Printf(LOG_DMA_LEVEL,"DMA initialize buffers"); break;
-        case (TDMA_RESET | TDMA_BUFRESET):
-        case (TDMA_RESET | TDMA_BUFRESET | TDMA_CLRCOMPLETE):
+        case (DMA_RESET | DMA_BUFRESET):
+        case (DMA_RESET | DMA_BUFRESET | DMA_CLRCOMPLETE):
             Log_Printf(LOG_DMA_LEVEL,"DMA reset and initialize buffers"); break;
-        case TDMA_CLRCOMPLETE:
+        case DMA_CLRCOMPLETE:
             Log_Printf(LOG_DMA_LEVEL,"DMA end chaining"); break;
-        case (TDMA_SETSUPDATE | TDMA_CLRCOMPLETE):
+        case (DMA_SETSUPDATE | DMA_CLRCOMPLETE):
             Log_Printf(LOG_DMA_LEVEL,"DMA continue chaining"); break;
-        case TDMA_SETENABLE:
+        case DMA_SETENABLE:
             Log_Printf(LOG_DMA_LEVEL,"DMA start single transfer"); break;
-        case (TDMA_SETENABLE | TDMA_SETSUPDATE):
-        case (TDMA_SETENABLE | TDMA_SETSUPDATE | TDMA_CLRCOMPLETE):
+        case (DMA_SETENABLE | DMA_SETSUPDATE):
+        case (DMA_SETENABLE | DMA_SETSUPDATE | DMA_CLRCOMPLETE):
             Log_Printf(LOG_DMA_LEVEL,"DMA start chaining"); break;
         case 0:
             Log_Printf(LOG_DMA_LEVEL,"DMA no command"); break;
@@ -1180,21 +1157,21 @@ void TDMA_CSR_Write(void) {
     }
     
     /* Handle CSR bits */
-    dma[channel].direction = (writecsr>>16)&DMA_DEV2M;
+    dma[channel].direction = writecsr&DMA_DEV2M;
     
-    if (writecsr&TDMA_RESET) {
+    if (writecsr&DMA_RESET) {
         dma[channel].csr &= ~(DMA_COMPLETE | DMA_SUPDATE | DMA_ENABLE);
     }
-    if (writecsr&TDMA_BUFRESET) {
+    if (writecsr&DMA_BUFRESET) {
         dma_initialize_buffer(channel, 0);
     }
-    if (writecsr&TDMA_SETSUPDATE) {
+    if (writecsr&DMA_SETSUPDATE) {
         dma[channel].csr |= DMA_SUPDATE;
     }
-    if (writecsr&TDMA_SETENABLE) {
+    if (writecsr&DMA_SETENABLE) {
         dma[channel].csr |= DMA_ENABLE;
     }
-    if (writecsr&TDMA_CLRCOMPLETE) {
+    if (writecsr&DMA_CLRCOMPLETE) {
         dma[channel].csr &= ~DMA_COMPLETE;
     }
     if (!(dma[channel].csr&DMA_COMPLETE)) {
@@ -1203,13 +1180,13 @@ void TDMA_CSR_Write(void) {
 }
 
 void TDMA_Saved_Limit_Read(void) { // 0x02004050
-    IoMem_WriteLong(IoAccessCurrentAddress & IO_SEG_MASK, dma[CHANNEL_EN_RX].saved_limit);
+    IoMem_WriteLong(IoAccessCurrentAddress, dma[CHANNEL_EN_RX].saved_limit);
     Log_Printf(LOG_DMA_LEVEL,"TDMA SNext read at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[CHANNEL_EN_RX].saved_limit, m68k_getpc());
 }
 
 /* Flush DMA buffer */
 /* FIXME: Implement function for all buffered channels */
-void tdma_flush_buffer(int channel) {
+void tdma_esp_flush_buffer(void) {
     int i;
     
     if (!(dma[CHANNEL_SCSI].csr&DMA_ENABLE)) {
@@ -1246,4 +1223,16 @@ void tdma_flush_buffer(int channel) {
     } ENDTRY
     
     dma_interrupt(CHANNEL_SCSI);
+}
+
+void DMA_Reset(void) {
+    int i;
+    
+    Log_Printf(LOG_WARN, "[DMA] Reset");
+    
+    for (i = 0; i < 12; i++) {
+        dma[i].csr = 0;
+        dma_initialize_buffer(i, 0);
+    }
+    CycInt_RemovePendingInterrupt(INTERRUPT_M2M_IO);
 }

@@ -1,14 +1,14 @@
 /*
-  Hatari - cycInt.h
+  Previous - cycInt.h
 
   This file is distributed under the GNU General Public License, version 2
   or at your option any later version. Read the file gpl.txt for details.
- 
- (SC) Simon Schubiger - removed all MFP related code. NeXT does not have an MFP
 */
 
-#ifndef HATARI_CYCINT_H
-#define HATARI_CYCINT_H
+#pragma once
+
+#ifndef PREV_CYCINT_H
+#define PREV_CYCINT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,7 +50,7 @@ enum {
 
 typedef struct
 {
-    int    type;   /* Type of time (CPU Cycles, microseconds) or NONE for inactive */
+    int     type;   /* Type of time (CPU Cycles, microseconds) or NONE for inactive */
     int64_t time;   /* number of CPU cycles to go until interupt or absolute microsecond timeout until interrupt */
     void (*pFunction)(void);
 } INTERRUPTHANDLER;
@@ -76,4 +76,4 @@ extern bool CycInt_SetNewInterruptUs(void);
 }
 #endif
 
-#endif /* ifndef HATARI_CYCINT_H */
+#endif /* ifndef PREV_CYCINT_H */

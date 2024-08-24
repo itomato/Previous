@@ -1,13 +1,13 @@
-/*  Previous - scc.c
- 
- This file is distributed under the GNU Public License, version 2 or at
- your option any later version. Read the file gpl.txt for details.
- 
- Serial Communication Controller (AMD AM8530H) Emulation.
- 
- Incomplete.
- 
- */
+/*
+  Previous - scc.c
+
+  This file is distributed under the GNU General Public License, version 2
+  or at your option any later version. Read the file gpl.txt for details.
+
+  This file contains a simulation of the AMD AM8530H Serial Communication
+  Controller. Incomplete.
+*/
+const char Scc_fileid[] = "Previous scc.c";
 
 #include "ioMem.h"
 #include "ioMemTables.h"
@@ -16,8 +16,6 @@
 #include "scc.h"
 #include "sysReg.h"
 #include "dma.h"
-
-#define IO_SEG_MASK 0x1FFFF
 
 #define LOG_SCC_LEVEL     LOG_DEBUG
 #define LOG_SCC_IO_LEVEL  LOG_DEBUG
@@ -314,6 +312,7 @@ static void scc_hard_reset(void) {
     scc[1].wreg[14] = (scc[1].wreg[14]&~0x3F)|0x20;
 
     set_interrupt(INT_SCC, RELEASE_INT);
+    CycInt_RemovePendingInterrupt(INTERRUPT_SCC_IO);
 }
 
 
@@ -642,58 +641,52 @@ void SCC_Reset(void) {
 
 /* Registers */
 void SCC_ControlB_Read(void) { // 0x02018000
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = scc_control_read(1);
-    Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Channel B control read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, scc_control_read(1));
+    Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Channel B control read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void SCC_ControlB_Write(void) {
-    scc_control_write(1, IoMem[IoAccessCurrentAddress & IO_SEG_MASK]);
-    Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Channel B control write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    scc_control_write(1, IoMem_ReadByte(IoAccessCurrentAddress));
+    Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Channel B control write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void SCC_ControlA_Read(void) { // 0x02018001
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = scc_control_read(0);
-    Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Channel A control read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, scc_control_read(0));
+    Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Channel A control read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void SCC_ControlA_Write(void) {
-    scc_control_write(0, IoMem[IoAccessCurrentAddress & IO_SEG_MASK]);
-    Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Channel A control write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    scc_control_write(0, IoMem_ReadByte(IoAccessCurrentAddress));
+    Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Channel A control write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void SCC_DataB_Read(void) { // 0x02018002
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = scc_data_read(1);
-    Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Channel B data read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, scc_data_read(1));
+    Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Channel B data read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void SCC_DataB_Write(void) {
-    scc_data_write(1, IoMem[IoAccessCurrentAddress & IO_SEG_MASK]);
-    Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Channel B data write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    scc_data_write(1, IoMem_ReadByte(IoAccessCurrentAddress));
+    Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Channel B data write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void SCC_DataA_Read(void) { // 0x02018003
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = scc_data_read(0);
-    Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Channel A data read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, scc_data_read(0));
+    Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Channel A data read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void SCC_DataA_Write(void) {
-    scc_data_write(0, IoMem[IoAccessCurrentAddress & IO_SEG_MASK]);
-    Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Channel A data write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    scc_data_write(0, IoMem_ReadByte(IoAccessCurrentAddress));
+    Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Channel A data write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void SCC_Clock_Read(void) { // 0x02018004
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = scc_clock_read();
-    IoMem[(IoAccessCurrentAddress+1) & IO_SEG_MASK] = 0;
-    IoMem[(IoAccessCurrentAddress+2) & IO_SEG_MASK] = 0;
-    IoMem[(IoAccessCurrentAddress+3) & IO_SEG_MASK] = 0;
-    Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Clock select read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, scc_clock_read());
+    Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Clock select read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void SCC_Clock_Write(void) {
-    uint8_t val = IoMem[IoAccessCurrentAddress & IO_SEG_MASK];
-    val |= IoMem[(IoAccessCurrentAddress+1) & IO_SEG_MASK];
-    val |= IoMem[(IoAccessCurrentAddress+2) & IO_SEG_MASK];
-    val |= IoMem[(IoAccessCurrentAddress+3) & IO_SEG_MASK];
+    uint8_t val = IoMem_ReadBytePort();
     scc_clock_write(val);
-    Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Clock select write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, val, m68k_getpc());
+    Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Clock select write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }

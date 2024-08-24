@@ -28,10 +28,6 @@
 extern "C" {
 #endif
 
-#define DSP_RAMSIZE_MAX (3*64*1024)
-#define DSP_RAMSIZE_24kB 8192
-#define DSP_RAMSIZE_96kB 32768
-	
 extern uint32_t DSP_RAMSIZE;
 
 /* Host port, CPU side */
@@ -104,6 +100,13 @@ extern uint32_t DSP_RAMSIZE;
 #define DSP_HOST_HSR_HF0	0x03
 #define DSP_HOST_HSR_HF1	0x04
 #define DSP_HOST_HSR_DMA	0x07
+
+#define DSP_SCI_SCR_TMIE	0xd	/* Timer interrupt enabled */
+
+#define DSP_SCI_SCCR_COD	0xc	/* Clock output divider */
+#define DSP_SCI_SCCR_SCP	0xd	/* Clock prescaler */
+#define DSP_SCI_SCCR_RCM	0xe	/* Receive clock source bit */
+#define DSP_SCI_SCCR_TCM	0xf	/* Transmit clock source bit */
 
 #define DSP_SSI_CRA_DC0		0x8
 #define DSP_SSI_CRA_DC1		0x9
@@ -236,10 +239,10 @@ struct dsp_core_s {
 	uint16_t stack[2][16];
 
 	/* External ram[] (mapped to p:) */
-	uint32_t ramext[DSP_RAMSIZE_MAX];
+	uint32_t *ramext;
 
-	/* rom[0] is x:, rom[1] is y: */
-	uint32_t rom[2][512];
+	/* rom[0] is x:, rom[1] is y:, rom[2] is p: */
+	uint32_t rom[3][512];
 
 	/* Internal ram[0] is x:, ram[1] is y:, ram[2] is p: */
 	uint32_t ramint[3][512];
@@ -263,6 +266,8 @@ struct dsp_core_s {
 
 	/* For bootstrap routine */
 	uint16_t bootstrap_pos;
+	uint32_t mode;
+	uint32_t mode_wait;
 
 	/* Interruptions */
 	uint16_t interrupt_state;		/* NONE, FAST or LONG interrupt */
@@ -278,8 +283,15 @@ struct dsp_core_s {
 	uint32_t interrupt_mask_level[3];
 	uint32_t interrupt_edgetriggered_mask;
 
-	/* AGU pipeline simulation for indirect move ea instructions */
-	uint16_t agu_move_indirect_instr;	/* is the current instruction an indirect move ? (LUA, MOVE, MOVEC, MOVEM, TCC) (0=no ; 1 = yes)*/
+	/* AGU pipeline for indirect move ea instructions
+	   Indirect move instructions are : LUA, MOVEC, MOVEP, Tcc, parallel MOVE
+	   Registers concerned are Rx, Nx, Mx
+	   [LS] The motorola documentation includes MOVEM as an indirect move, but all my tests
+	   seem to conclude that MOVEM is not affected by the 1 instruction delay of the AGU
+	*/
+	uint16_t agu_move_indirect_instr;	/* is the current instruction an indirect move ? (0=no ; 1 = yes)*/
+	uint16_t agu_pipeline_reg[2];		/* pipeline index description : 0 = current delayed register ; 1 = new register to delay */
+	uint16_t agu_pipeline_val[2];		/* register value */
 };
 
 
@@ -290,7 +302,8 @@ extern dsp_core_t dsp_core;
 extern void dsp_core_init(void (*host_interrupt)(int));
 extern void dsp_core_shutdown(void);
 extern void dsp_core_reset(void);
-extern void dsp_core_start(uint8_t mode);
+extern void dsp_core_start(uint8_t mode, int bootstrap);
+extern void dsp_core_config_ramext(uint32_t* mem, uint32_t size);
 
 /* host port read/write by emulator, addr is 0-7, not 0xffa200-0xffa207 */
 extern uint8_t dsp_core_read_host(int addr);

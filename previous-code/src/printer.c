@@ -1,11 +1,12 @@
-/*  Previous - printer.c
- 
- This file is distributed under the GNU Public License, version 2 or at
- your option any later version. Read the file gpl.txt for details.
- 
- NeXT Laser Printer emulation.
- 
- */
+/*
+  Previous - printer.c
+
+  This file is distributed under the GNU General Public License, version 2
+  or at your option any later version. Read the file gpl.txt for details.
+
+  This file contains a simulation of the NeXT Laser Printer.
+*/
+const char Printer_fileid[] = "Previous printer.c";
 
 #include "ioMem.h"
 #include "m68000.h"
@@ -127,7 +128,7 @@ static void lp_png_finish(void) {
             png_set_rows(png_ptr, png_info_ptr, png_row_pointers);
             png_write_png(png_ptr, png_info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
         } else {
-            Statusbar_AddMessage("Laser Printer Error: Could not create output file!", 10000);
+            Statusbar_AddMessage("Laser printer error: Could not create output file", 10000);
         }
         
         File_Close(png_fp);
@@ -142,8 +143,6 @@ static void lp_png_finish(void) {}
 
 
 /* Laser Printer */
-#define IO_SEG_MASK 0x1FFFF
-
 #define LOG_LP_REG_LEVEL    LOG_DEBUG
 #define LOG_LP_LEVEL        LOG_DEBUG
 #define LOG_LP_PRINT_LEVEL  LOG_DEBUG
@@ -682,7 +681,7 @@ static void lp_command_in(uint8_t cmd, uint32_t data) {
                         lp_png_print();
                         lp_buffer.size = 0;
                     }
-                    Statusbar_AddMessage("Laser Printer Printing Page.", 0);
+                    Statusbar_AddMessage("Laser printer printing page", 0);
                     CycInt_AddRelativeInterruptUs(1000, 100, INTERRUPT_LP_IO);
                 } else {
                     Log_Printf(LOG_LP_LEVEL, "[LP] Disable printer data transfer");
@@ -742,13 +741,13 @@ void Printer_Reset(void) {
 
 /* Printer interface registers */
 void LP_CSR0_Read(void) { // 0x0200F000
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = lp.csr.dma;
-    Log_Printf(LOG_LP_REG_LEVEL,"[LP] DMA status read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, lp.csr.dma);
+    Log_Printf(LOG_LP_REG_LEVEL,"[LP] DMA status read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void LP_CSR0_Write(void) {
-    uint8_t val = IoMem[IoAccessCurrentAddress & IO_SEG_MASK];
-    Log_Printf(LOG_LP_REG_LEVEL,"[LP] DMA control write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    uint8_t val = IoMem_ReadByte(IoAccessCurrentAddress);
+    Log_Printf(LOG_LP_REG_LEVEL,"[LP] DMA control write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
     
     lp.csr.dma &= ~(LP_DMA_OUT_EN|LP_DMA_IN_EN);
     lp.csr.dma |= (val&(LP_DMA_OUT_EN|LP_DMA_IN_EN));
@@ -763,20 +762,20 @@ void LP_CSR0_Write(void) {
 }
 
 void LP_CSR1_Read(void) { // 0x0200F001
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = lp.csr.printer;
-    Log_Printf(LOG_LP_REG_LEVEL,"[LP] Printer status read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, lp.csr.printer);
+    Log_Printf(LOG_LP_REG_LEVEL,"[LP] Printer status read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void LP_CSR1_Write(void) {
-    uint8_t val = IoMem[IoAccessCurrentAddress & IO_SEG_MASK];
-    Log_Printf(LOG_LP_REG_LEVEL,"[LP] Printer control write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    uint8_t val = IoMem_ReadByte(IoAccessCurrentAddress);
+    Log_Printf(LOG_LP_REG_LEVEL,"[LP] Printer control write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
     
     if (((val&LP_ON) != (lp.csr.printer&LP_ON)) && ConfigureParams.Printer.bPrinterConnected) {
         if (val&LP_ON) {
-            Statusbar_AddMessage("Switching Laser Printer ON.", 0);
+            Statusbar_AddMessage("Switching laser printer ON", 0);
             lp_power_on();
         } else {
-            Statusbar_AddMessage("Switching Laser Printer OFF.", 0);
+            Statusbar_AddMessage("Switching laser printer OFF", 0);
             lp_power_off();
         }
     }
@@ -789,14 +788,14 @@ void LP_CSR1_Write(void) {
 }
 
 void LP_CSR2_Read(void) { // 0x0200F002
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = lp.csr.transmit;
-    Log_Printf(LOG_LP_REG_LEVEL,"[LP] Transmitter status read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, lp.csr.transmit);
+    Log_Printf(LOG_LP_REG_LEVEL,"[LP] Transmitter status read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void LP_CSR2_Write(void) {
     uint8_t old = lp.csr.transmit;
-    uint8_t val = IoMem[IoAccessCurrentAddress & IO_SEG_MASK];
-    Log_Printf(LOG_LP_REG_LEVEL,"[LP] Transmitter control write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    uint8_t val = IoMem_ReadByte(IoAccessCurrentAddress);
+    Log_Printf(LOG_LP_REG_LEVEL,"[LP] Transmitter control write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
     
     lp.csr.transmit &= ~(LP_TX_EN|LP_TX_LOOP);
     lp.csr.transmit |= (val&(LP_TX_EN|LP_TX_LOOP));
@@ -813,17 +812,17 @@ void LP_CSR2_Write(void) {
 }
 
 void LP_CSR3_Read(void) { // 0x0200F003
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = lp.csr.cmd;
-    Log_Printf(LOG_LP_REG_LEVEL,"[LP] Command read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, lp.csr.cmd);
+    Log_Printf(LOG_LP_REG_LEVEL,"[LP] Command read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void LP_CSR3_Write(void) {
-    lp.command = IoMem[IoAccessCurrentAddress & IO_SEG_MASK];
-    Log_Printf(LOG_LP_REG_LEVEL,"[LP] Command write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    lp.command = IoMem_ReadByte(IoAccessCurrentAddress);
+    Log_Printf(LOG_LP_REG_LEVEL,"[LP] Command write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void LP_Data_Read(void) { // 0x0200F004 (access must be 32-bit)
-    IoMem_WriteLong(IoAccessCurrentAddress&IO_SEG_MASK, lp.data);
+    IoMem_WriteLong(IoAccessCurrentAddress, lp.data);
     Log_Printf(LOG_LP_REG_LEVEL,"[LP] Data read at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, lp.data, m68k_getpc());
     
     lp.csr.printer &= ~LP_DATA;
@@ -833,7 +832,7 @@ void LP_Data_Read(void) { // 0x0200F004 (access must be 32-bit)
 }
 
 void LP_Data_Write(void) {
-    uint32_t val = IoMem_ReadLong(IoAccessCurrentAddress&IO_SEG_MASK);
+    uint32_t val = IoMem_ReadLong(IoAccessCurrentAddress);
     Log_Printf(LOG_LP_REG_LEVEL,"[LP] Data write at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, val, m68k_getpc());
     
     if (lp.csr.transmit&LP_TX_LOOP) {

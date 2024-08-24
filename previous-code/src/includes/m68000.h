@@ -84,24 +84,26 @@ static inline void M68000_SetSR(uint16_t v)
  * Add CPU cycles.
  */
 static inline void M68000_AddCycles(int cycles) {
-    nCyclesOver += cycles;
-    
-    if(PendingInterrupt.type == CYC_INT_CPU)
-        PendingInterrupt.time -= cycles;
-
-    if(usCheckCycles < 0) {
-        if(!(CycInt_SetNewInterruptUs())) {
-            usCheckCycles = 100 * ConfigureParams.System.nCpuFreq;
-        }
-    } else
-        usCheckCycles -= cycles;
-    nCyclesMainCounter += cycles;
+	nCyclesOver += cycles;
+	
+	if (PendingInterrupt.type == CYC_INT_CPU) {
+		PendingInterrupt.time -= cycles;
+	}
+	if (usCheckCycles < 0) {
+		if(!(CycInt_SetNewInterruptUs())) {
+			usCheckCycles = 100 * ConfigureParams.System.nCpuFreq;
+		}
+	} else {
+		usCheckCycles -= cycles;
+	}
+	nCyclesMainCounter += cycles;
 }
 
 extern void M68000_Init(void);
-extern void M68000_Reset(bool bCold);
+extern void M68000_Reset(void);
 extern void M68000_Stop(void);
 extern void M68000_Start(void);
+extern void M68000_CheckInterrupt(void);
 extern void M68000_CheckCpuSettings(void);
 extern void M68000_BusError (uint32_t addr, int ReadWrite, int Size, int AccessType, uae_u32 val);
 
@@ -115,5 +117,5 @@ extern void M68000_WriteByte(uint32_t addr,uint8_t  val);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-        
+
 #endif

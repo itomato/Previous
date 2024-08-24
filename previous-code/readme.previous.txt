@@ -1,6 +1,6 @@
 
 
-                                  Previous 2.9
+                                  Previous 3.3
 
 
 
@@ -56,6 +56,8 @@ Less common machines can be emulated using custom options:
      Select NeXTstation Turbo and set CPU clock to 25 MHz
   NeXTcube, NeXTstation or NeXTstation Color with board revision 1:
      Select one of the above machines and set RTC chip to MCCS1850
+  NeXTstation Turbo (Color) or NeXTcube Turbo with Nitro accelerator board:
+     Select one of the above machines and set CPU clock to 40 MHz
 
 Note that some hardware is only supported by later operating system versions.
 Listed below are the system and ROM versions that introduced support for new
@@ -64,17 +66,22 @@ hardware:
   NeXTstep 0.8: NeXT Computer
            2.0: NeXTcube, NeXTstation
            2.1: NeXTstation Color, NeXTdimension
-           2.2: NeXTcube Turbo, NeXTstation Turbo, NeXTstation Turbo Color
+           2.2: NeXTcube Turbo, NeXTstation Turbo, NeXTstation Turbo Color,
+                Apple Desktop Bus, Nitro
 
   ROM Rev. 0.8: NeXT Computer
            2.0: NeXTcube, NeXTstation, NeXTdimension
-           2.4: NeXTstation Color
+           2.2: NeXTstation Color
            3.0: NeXTcube Turbo, NeXTstation Turbo, NeXTstation Turbo Color
+           3.3: Apple Desktop Bus, Nitro
 
 Previous includes an internal NFS and NetInfo server for advanced interaction 
 with the host system. It also includes an internal time server that makes it 
 possible to automatically synchronise host and guest system time. Please note 
 that only NeXTstep 2.0 and later support automatic time synchronisation.
+
+Previous listens on some TCP ports and will forward connections to the emulated 
+machine. See the file networking.howto.txt for details.
 
 Previous comes with a command line utility called "ditool" (disk image tool). It
 can be used to extract raw disk image files into a directory on the host system. 
@@ -95,13 +102,13 @@ For using Previous, you need to have installed the following libraries:
 
 Required:
   > The SDL2 library v2.26.0 or later (http://www.libsdl.org)
-  > The zlib compression library (http://www.gzip.org/zlib/)
 
 Optional:
+  > The zlib compression library (https://www.zlib.net)
+    This is required for using libpng.
   > The libpng PNG reference library (http://www.libpng.org)
     This is required for printing to files.
-  > The pcap library (https://github.com/the-tcpdump-group/libpcap or 
-    https://www.winpcap.org)
+  > The pcap library (https://www.tcpdump.org or https://www.winpcap.org)
     This is required if networking via PCAP is preferred over SLiRP.
 
 
@@ -112,7 +119,7 @@ header files)!
 For compiling Previous, you need C and C++ compilers and a working CMake (v3.3 
 or later) installation (see http://www.cmake.org/ for details).
 
-CMake can generate makefiles for various flavors of "Make" (like GNU-Make) and 
+CMake can generate makefiles for various flavours of "Make" (like GNU-Make) and 
 various IDEs like Xcode on macOS. To run CMake, you have to pass the path to the 
 sources of Previous as parameter. For example, run the following command 
 sequence to configure the build of Previous in a separate build directory 
@@ -166,7 +173,7 @@ not yet emulated. Status of the individual components is as follows:
   Sound           good
   Keyboard        good
   Mouse           good
-  ADB             dummy
+  ADB             good
   Nitro           dummy
   Dimension       partial (no video I/O)
 
@@ -179,7 +186,7 @@ input devices.
  ---------------
 
 Issues in Previous:
-  > Un-emulated hardware may cause problems when attempted to being used.
+  > Un-emulated hardware may cause problems when attempting to use it.
   > NeXTdimension emulation does not work on hosts with big endian byte order.
   > Shortcuts do not work properly or overlap with host commands on some 
     platforms.
@@ -191,6 +198,9 @@ Issues in Previous:
     Monitor/Sound fail in certain situations due to timing issues. Disable 
     variable speed mode to reliably pass SCSI Disk diagnostics. Disable sound to 
     pass Monitor/Sound diagnostics.
+  > Background DMA Read from DSP test menu of the diagnostics utility fails for 
+    an unknown reason. The test program is probably faulty. It sets the DMA 
+    channel to the wrong direction.
 
 Issues in NeXTstep:
   > The MO drive causes slow downs and hangs when both drives are connected, but 
@@ -200,8 +210,12 @@ Issues in NeXTstep:
     a bug in the NeXT ROM.
   > Trying to netboot a non-Turbo 68040 machine while no Ethernet cable is 
     connected causes a hang. "ben" stops the system immediately while "btp" 
-    shows one dot before it stops. This is the exact same behavior as seen on 
+    shows one dot before it stops. This is the exact same behaviour as seen on 
     real hardware. This is confirmed to be a bug in the NeXT ROM.
+  > When accessing bus error locations from ROM Monitor using the 'e' command 
+    there might occur a double fault on the second or a subsequent access. This 
+    is confirmed for NeXTstation Turbo Color and ROM Rev. 3.3 but might also 
+    affect other models.
 
 
  6) Release notes
@@ -228,7 +242,7 @@ Previous v1.3:
 Previous v1.4:
   > Adds NeXTdimension emulation, including emulated i860 CPU.
   > Improves timings and adds a mode for higher than real speed.
-  > Improves emulator efficiency through optimizations and threads.
+  > Improves emulator efficiency through optimisations and threads.
   > Improves mouse movement handling.
   > Improves Real Time Clock. Time is now handled correctly.
 
@@ -335,8 +349,8 @@ Previous v2.7:
   > Adds compile-time option to do all rendering from the main thread.
   > Improves accuracy of Ethernet controller on Turbo systems.
   > Improves handling of caps lock and modifier keys when using shortcuts.
-  > Improves behavior of file selection dialog in certain situations.
-  > Improves behavior of user interface in some edge cases.
+  > Improves behaviour of file selection dialog in certain situations.
+  > Improves behaviour of user interface in some edge cases.
   > Fixes bug that caused Daydream to hang on start up.
   > Fixes bug that caused errors when formatting floppy disks.
   > Fixes bug that prevented sound recording on newer versions of macOS.
@@ -367,6 +381,38 @@ Previous v2.9:
   > Adds support for saving sound output to a file.
   > Improves SCC emulation for booting Mac OS 7.5.3 via Daydream.
 
+Previous v3.0:
+  > Adds option for simulating DSP bootstrap ROM.
+  > Adds support for changing shared directory without reset.
+  > Adds support for mapping scroll wheel to cursor keys.
+  > Adds support for RESET instruction.
+  > Adds support for identifying some SCSI disk models for easier setup.
+  > Improves screen simulation to not show screen contents while blanked.
+  > Improves DSP emulation accuracy.
+  > Improves CPU emulation accuracy.
+  > Improves SCSI disk emulation accuracy.
+  > Improves keyboard options to show actual shortcuts.
+  > Fixes bug that caused SCSI diagnostics to fail with 1024 byte blocks.
+  > Fixes bug that caused mouse to be unlocked after resuming emulation.
+  > Fixes bug that caused stuck modifier keys after using shortcuts.
+  > Fixes bug that caused sporadic display errors in the boot options dialog.
+
+Previous v3.1:
+  > Adds support for Apple Desktop Bus keyboard and mouse.
+  > Improves accuracy of the memory map for ROM and video memory.
+  > Improves key mapping for Backquote and Backslash.
+  > Fixes bug that caused kernel panics on 68040 during network transfers.
+
+Previous v3.2:
+  > Adds dummy Nitro cache for passing power-on DRAM test.
+  > Adds RAMDAC to CPU board.
+  > Improves accuracy of the memory map for devices.
+  > Fixes bug in DSP modulo addressing mode that could cause bad results.
+
+Previous v3.3:
+  > Adds support for FTP, SSH, Telnet and HTTP port forwarding via SLiRP.
+  > Improves throughput of simulated Ethernet connection.
+
 
  7) Running Previous
  -------------------
@@ -374,9 +420,21 @@ Previous v2.9:
 For running the emulator, you need an image of the boot ROM of the emulated 
 machine.
 
+You can initiate a clean shut down of the emulator using the simulated power 
+key. The power key is mapped to F10 and the Delete key of your keyboard.
+
+On later versions of NeXTstep you can also invoke the Restart/Power-Off dialog
+by simultaneously pressing Right Command and Backquote.
+
+You may also invoke the NMI mini-monitor by simultaneously pressing both Command
+keys and Backquote or if you are simulating the ADB keyboard Left Command and
+Left Alternate and Backquote. Note that Backquote is mapped to Num Lock.
+
+If all is lost you can initiate a hard CPU reset by simultaneously pressing Left 
+Command and Left Alternate and Asterisk.
+
 While the emulator is running, you can open the configuration menu by pressing 
-F12, toggle between fullscreen and windowed mode by pressing F11 and initiate a 
-clean shut down by pressing F10 (emulates the power button).
+F12 and toggle between fullscreen and windowed mode by pressing F11.
 
 Further shortcuts can be invoked by simultaneously pressing ctrl and alt and
 one of the following keys:
@@ -396,6 +454,22 @@ B: Hides the statusbar and shows it when pressed again.
 S: Disables sound output and re-enables it when pressed again.
 Q: Requests to quit Previous. All unsaved changes will be lost.
 
+Shortcuts can be changed by modifying the preferences file. To modify single 
+key shortcuts change or add key names in the section ShortcutsWithoutModifiers. 
+To modify shortcuts that are invoked with ctrl and alt change or add key names 
+in the section ShortcutsWithModifiers. The appropriate key names can be found 
+under https://wiki.libsdl.org/SDL2/SDL_Keycode.
+
+Previous comes with some empty disk images of different types and sizes. The 
+suffix of the respective file name indicates the image type:
+sd: Hard disk (SCSI disk)
+od: Magneto-optical disk
+fd: Floppy disk
+
+When working with versions of NeXTstep prior to 2.0 it is recommended to use
+the images marked with an 'x'. Only these are automatically detected by early 
+versions of BuildDisk.
+
 
  8) Contributors
  ---------------
@@ -406,7 +480,8 @@ Many thanks go to the members of the NeXT International Forums for their help.
 Special thanks go to Gavin Thomas Nicol, Piotr Twarecki, Toni Wilen, Michael 
 Bosshard, Thomas Huth, Olivier Galibert, Jason Eckhardt, Jason Stevens, Daniel 
 L'Hommedieu, Tomaz Slivnik, Vaughan Kaufman, Peter Leonard, Brent Spillner, 
-Frank Wegmann, Grzegorz Szwoch, Michael Engel and Izumi Tsutsui!
+Frank Wegmann, Grzegorz Szwoch, Michael Engel, Izumi Tsutsui and William
+Barnett-Lewis!
 
 This emulator would not exist without their help.
 

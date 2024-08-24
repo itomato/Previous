@@ -1,3 +1,10 @@
+/*
+  Previous - nd_sdl.cpp
+
+  This file is distributed under the GNU General Public License, version 2
+  or at your option any later version. Read the file gpl.txt for details.
+*/
+
 #include "main.h"
 #include "nd_sdl.hpp"
 #include "configuration.h"
@@ -5,9 +12,6 @@
 #include "screen.h"
 #include "host.h"
 #include "cycInt.h"
-#include "NextBus.hpp"
-
-#include <SDL.h>
 
 
 #ifdef ENABLE_RENDERING_THREAD
@@ -22,10 +26,7 @@ int NDSDL::repainter(void) {
 
     while (doRepaint) {
         if (SDL_AtomicGet(&blitNDFB)) {
-            Screen_BlitDimension(vram, ndTexture);
-            SDL_RenderClear(ndRenderer);
-            SDL_RenderCopy(ndRenderer, ndTexture, NULL, NULL);
-            SDL_RenderPresent(ndRenderer);
+            repaint();
         } else {
             host_sleep_ms(100);
         }
@@ -35,14 +36,18 @@ int NDSDL::repainter(void) {
 }
 #else // !ENABLE_RENDERING_THREAD
 NDSDL::NDSDL(int slot, uint32_t* vram) : slot(slot), vram(vram), ndWindow(NULL), ndRenderer(NULL), ndTexture(NULL) {}
+#endif // !ENABLE_RENDERING_THREAD
 
 void NDSDL::repaint(void) {
-    Screen_BlitDimension(vram, ndTexture);
+    if (nd_video_enabled(slot)) {
+        Screen_BlitDimension(vram, ndTexture);
+    } else {
+        Screen_Blank(ndTexture);
+    }
     SDL_RenderClear(ndRenderer);
     SDL_RenderCopy(ndRenderer, ndTexture, NULL, NULL);
     SDL_RenderPresent(ndRenderer);
 }
-#endif // !ENABLE_RENDERING_THREAD
 
 void NDSDL::init(void) {
     int x, y, w, h;
@@ -80,7 +85,7 @@ void NDSDL::init(void) {
                 }
             }
             SDL_RenderSetLogicalSize(ndRenderer, r.w, r.h);
-            ndTexture = SDL_CreateTexture(ndRenderer, SDL_PIXELFORMAT_UNKNOWN, SDL_TEXTUREACCESS_STREAMING, r.w, r.h);
+            ndTexture = SDL_CreateTexture(ndRenderer, SDL_PIXELFORMAT_BGRA32, SDL_TEXTUREACCESS_STREAMING, r.w, r.h);
 #ifdef ENABLE_RENDERING_THREAD
 
             snprintf(name, sizeof(name), "[Previous] Screen at slot %d", slot);

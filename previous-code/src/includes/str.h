@@ -23,5 +23,8 @@ extern char *Str_ToLower(char *pString);
 extern char *Str_Alloc(int len);
 extern char *Str_Dup(const char *str);
 extern long Str_Copy(char *pDest, const char *pSrc, long nBufLen);
+extern char *Str_Trunc(char *str);
+extern bool Str_IsHex(const char *str);
+extern void Str_UnEscape(char *str);
 
 #endif  /* HATARI_STR_H */

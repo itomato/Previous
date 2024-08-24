@@ -1,12 +1,12 @@
 /*
-  Hatari - dialog.c
+  Previous - dialog.c
 
   This file is distributed under the GNU General Public License, version 2
   or at your option any later version. Read the file gpl.txt for details.
 
   Code to handle our options dialog.
 */
-const char Dialog_fileid[] = "Hatari dialog.c";
+const char Dialog_fileid[] = "Previous dialog.c";
 
 #include "main.h"
 #include "configuration.h"
@@ -134,16 +134,16 @@ void Dialog_CheckFiles(void) {
 	/* Check if SCSI disk images exist. Present a dialog to select missing files. */
 	for (i = 0; i < ESP_MAX_DEVS; i++) {
 		while (!bQuitProgram &&
-		       (ConfigureParams.SCSI.target[i].nDeviceType!=DEVTYPE_NONE) &&
+		       (ConfigureParams.SCSI.target[i].nDeviceType!=SD_NONE) &&
 		       ConfigureParams.SCSI.target[i].bDiskInserted &&
 		       !File_Exists(ConfigureParams.SCSI.target[i].szImageName)) {
 			DlgMissing_Disk("SCSI disk", i,
 			                ConfigureParams.SCSI.target[i].szImageName,
 			                &ConfigureParams.SCSI.target[i].bDiskInserted,
 			                &ConfigureParams.SCSI.target[i].bWriteProtected);
-			if (ConfigureParams.SCSI.target[i].nDeviceType==DEVTYPE_HARDDISK &&
+			if (ConfigureParams.SCSI.target[i].nDeviceType==SD_HARDDISK &&
 			    !ConfigureParams.SCSI.target[i].bDiskInserted) {
-				ConfigureParams.SCSI.target[i].nDeviceType=DEVTYPE_NONE;
+				ConfigureParams.SCSI.target[i].nDeviceType=SD_NONE;
 			}
 		}
 	}

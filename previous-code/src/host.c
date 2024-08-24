@@ -1,3 +1,15 @@
+/*
+  Previous - host.c
+
+  This file is distributed under the GNU General Public License, version 2
+  or at your option any later version. Read the file gpl.txt for details.
+
+  Host system dependencies such as time synchronization and events that
+  occur on host threads (e.g. VBL & timers) which need to be synchronized
+  to Previous CPU threads.
+*/
+const char Host_fileid[] = "Previous host.c";
+
 #include "config.h"
 
 #if HAVE_NANOSLEEP
@@ -9,9 +21,11 @@
 #endif
 #endif
 #include <errno.h>
+#include <float.h>
 
 #include "host.h"
 #include "configuration.h"
+#include "cycInt.h"
 #include "main.h"
 #include "log.h"
 #include "memory.h"
@@ -19,9 +33,9 @@
 
 
 #define NUM_BLANKS 3
-static SDL_atomic_t vblCounter[NUM_BLANKS];
+static atomic_int  vblCounter[NUM_BLANKS];
 static const char* BLANKS[] = {
-  "main","nd_main","nd_video"  
+    "main","nd_main","nd_video"  
 };
 
 static int64_t      cycleCounterStart;
@@ -41,9 +55,6 @@ static time_t       unixTimeStart;
 static lock_t       timeLock;
 static uint64_t     saveTime;
 
-// external
-extern int64_t      nCyclesMainCounter;
-extern struct regstruct regs;
 
 static inline uint64_t real_time(void) {
     uint64_t rt = (SDL_GetPerformanceCounter() - perfCounterStart);
@@ -307,15 +318,15 @@ void host_sleep_ms(uint32_t ms) {
 }
 
 void host_lock(lock_t* lock) {
-  SDL_AtomicLock(lock);
+    SDL_AtomicLock(lock);
 }
 
 int host_trylock(lock_t* lock) {
-  return SDL_AtomicTryLock(lock);
+    return SDL_AtomicTryLock(lock);
 }
 
 void host_unlock(lock_t* lock) {
-  SDL_AtomicUnlock(lock);
+    SDL_AtomicUnlock(lock);
 }
 
 int host_atomic_set(atomic_int* a, int newValue) {
@@ -335,13 +346,13 @@ bool host_atomic_cas(atomic_int* a, int oldValue, int newValue) {
 }
 
 thread_t* host_thread_create(thread_func_t func, const char* name, void* data) {
-  return SDL_CreateThread(func, name, data);
+    return SDL_CreateThread(func, name, data);
 }
 
 int host_thread_wait(thread_t* thread) {
-  int status;
-  SDL_WaitThread(thread, &status);
-  return status;
+    int status;
+    SDL_WaitThread(thread, &status);
+    return status;
 }
 
 mutex_t* host_mutex_create(void) {
@@ -361,24 +372,26 @@ void host_mutex_destroy(mutex_t* mutex) {
 }
 
 int host_num_cpus(void) {
-  return  SDL_GetCPUCount();
+    return SDL_GetCPUCount();
 }
 
 static uint64_t lastVT;
-static char   report[512];
+static char report[512];
 
 const char* host_report(uint64_t realTime, uint64_t hostTime) {
-    double dVT = hostTime - lastVT;
-    dVT       /= 1000000.0;
-
+    int    nBlank    = 0;
+    char*  r         = report;
+    double dVT       = hostTime - lastVT;
     double hardClock = hardClockExpected;
+    
+    dVT       /= 1000000.0;
     hardClock /= hardClockActual == 0 ? 1 : hardClockActual;
     
-    char* r = report;
     r += sprintf(r, "[%s] hostTime:%llu hardClock:%.3fMHz", enableRealtime ? "Variable" : "CycleTime", hostTime, hardClock);
 
     for(int i = NUM_BLANKS; --i >= 0;) {
-        r += sprintf(r, " %s:%.1fHz", BLANKS[i], (double)(host_reset_blank_counter(i))/dVT);
+        nBlank = host_reset_blank_counter(i);
+        r += sprintf(r, " %s:%.1fHz", BLANKS[i], (double)nBlank/dVT);
     }
     
     lastVT = hostTime;

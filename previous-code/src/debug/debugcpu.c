@@ -61,7 +61,7 @@ static int DebugCpu_LoadBin(int nArgc, char *psArgs[])
 		return DebugUI_PrintCmdHelp(psArgs[0]);
 	}
 
-	if (!Eval_Number(psArgs[2], &address))
+	if (!Eval_Number(psArgs[2], &address, NUM_TYPE_CPU))
 	{
 		fprintf(stderr, "Invalid address!\n");
 		return DEBUGGER_CMDDONE;
@@ -108,13 +108,13 @@ static int DebugCpu_SaveBin(int nArgc, char *psArgs[])
 		return DebugUI_PrintCmdHelp(psArgs[0]);
 	}
 
-	if (!Eval_Number(psArgs[2], &address))
+	if (!Eval_Number(psArgs[2], &address, NUM_TYPE_CPU))
 	{
 		fprintf(stderr, "  Invalid address!\n");
 		return DEBUGGER_CMDDONE;
 	}
 
-	if (!Eval_Number(psArgs[3], &bytes))
+	if (!Eval_Number(psArgs[3], &bytes, NUM_TYPE_NORMAL))
 	{
 		fprintf(stderr, "  Invalid length!\n");
 		return DEBUGGER_CMDDONE;
@@ -372,7 +372,7 @@ int DebugCpu_Register(int nArgc, char *psArgs[])
 	}
 
 	*assign++ = '\0';
-	if (!Eval_Number(Str_Trim(assign), &value))
+	if (!Eval_Number(Str_Trim(assign), &value, NUM_TYPE_CPU))
 	{
 		goto error_msg;
 	}
@@ -442,19 +442,95 @@ static int DebugCpu_Profile(int nArgc, char *psArgs[])
 	return Profile_Command(nArgc, psArgs, false);
 }
 
+/**
+ * helper: return type width (b=1, w=2, l=4)
+ */
+static unsigned get_type_width(char mode)
+{
+	switch(mode)
+	{
+	case 'b':	/* byte */
+		return 1;
+	case 'w':	/* word */
+		return 2;
+	case 'l':	/* long */
+		return 4;
+	default:
+		return 0;
+	}
+}
+
+/**
+ * helper: print <count> <size> sized memory items from <addr> in <base>
+ */
+static void print_mem_values(uint32_t addr, int count, int size, int base)
+{
+	const char *separator = "";
+	for (int i = 0; i < count; i++)
+	{
+		uint32_t value;
+		switch (size)
+		{
+		case 4:
+			value = M68000_ReadLong(addr);
+			break;
+		case 2:
+			value = M68000_ReadWord(addr);
+			break;
+		case 1:
+		default:
+			value = M68000_ReadByte(addr);
+			break;
+		}
+		switch (base)
+		{
+		case 1:
+			fputs(separator, debugOutput);
+			DebugUI_PrintBinary(debugOutput, 8*size, value);
+			break;
+		case 8:
+			fprintf(debugOutput, "%s%0*o", separator, 3*size, value);
+			break;
+		case 10:
+			fprintf(debugOutput, "%s%d", separator, value);
+			break;
+		case 16:
+		default:
+			fprintf(debugOutput, "%s%0*x", separator, 2*size, value);
+			break;
+		}
+		addr += size;
+		separator = " ";
+	}
+}
+
+/**
+ * helper: print <count> bytes from <addr> as ascii chars
+ */
+static void print_mem_ascii(uint32_t addr, uint8_t count)
+{
+	for (int i = 0; i < count; i++)
+	{
+		char c = M68000_ReadByte(addr + i);
+		if(!isprint((unsigned)c))
+		{
+			/* non-printable as dots */
+			c = NON_PRINT_CHAR;
+		}
+		fprintf(debugOutput,"%c", c);
+	}
+}
 
 /**
  * Do a memory dump, args = starting address.
  */
 int DebugCpu_MemDump(int nArgc, char *psArgs[])
 {
-	char c, mode;
-	int i, arg, size;
-	uint32_t value, memdump_upper = 0;
+	int arg = 1;
+	unsigned size;
+	char mode = 0;
+	uint32_t memdump_upper = 0;
 
-	arg = 1;
-	mode = 0;
-	size = 1;
 	if (nArgc > 1)
 		mode = tolower(psArgs[arg][0]);
 
@@ -462,20 +538,11 @@ int DebugCpu_MemDump(int nArgc, char *psArgs[])
 	{
 		/* no args, single digit or multiple chars -> default mode */
 		mode = 'b';
+		size = 1;
 	}
-	else if (mode == 'b')
+	else if ((size = get_type_width(mode)))
 	{
 		arg += 1;
-	}
-	else if (mode == 'w')
-	{
-		arg += 1;
-		size = 2;
-	}
-	else if (mode == 'l')
-	{
-		arg += 1;
-		size = 4;
 	}
 	else
 	{
@@ -502,7 +569,7 @@ int DebugCpu_MemDump(int nArgc, char *psArgs[])
 		if (nArgc > arg)
 		{
 			int count = atoi(psArgs[arg]);
-			if (!count)
+			if (count < 1)
 			{
 				fprintf(stderr, "Invalid count %d!\n", count);
 				return DEBUGGER_CMDDONE;
@@ -519,40 +586,186 @@ int DebugCpu_MemDump(int nArgc, char *psArgs[])
 
 	while (memdump_addr < memdump_upper)
 	{
+		unsigned all, cols, align;
+		uint32_t memdump_line = memdump_addr;
+
+		/* how many colums to print */
+		all = MEMDUMP_COLS/size;
+		if (all*size > memdump_upper-memdump_addr)
+			cols = (memdump_upper - memdump_addr)/size;
+		else
+			cols = all;
+
+		/* print addr: HEX */
 		fprintf(debugOutput, "%08X: ", memdump_addr);
-		
-		/* print HEX data */
-		for (i = 0; i < MEMDUMP_COLS/size; i++)
-		{
-			switch (mode)
-			{
-			case 'l':
-				value = M68000_ReadLong(memdump_addr);
-				break;
-			case 'w':
-				value = M68000_ReadWord(memdump_addr);
-				break;
-			case 'b':
-			default:
-				value = M68000_ReadByte(memdump_addr);
-				break;
-			}
-			fprintf(debugOutput, "%0*x ", 2*size, value);
-			memdump_addr += size;
-		}
+		print_mem_values(memdump_addr, cols, size, 16);
 
 		/* print ASCII data */
-		fprintf(debugOutput, "  ");
-		for (i = 0; i < MEMDUMP_COLS; i++)
+		align = (all-cols)*(2*size+1);
+		fprintf(debugOutput, "%*c", align + 2, ' ');
+		print_mem_ascii(memdump_line, cols*size);
+		fprintf(debugOutput, "\n");
+
+		memdump_addr += cols*size;
+	}
+	fflush(debugOutput);
+
+	return DEBUGGER_CMDCONT;
+}
+
+/**
+ * helper: return type base (b=1, o=8, d=10, h=16)
+ */
+static unsigned get_type_base(char mode)
+{
+	switch(mode)
+	{
+	case 'b':	/* binary */
+		return 1;
+	case 'o':	/* oct */
+		return 8;
+	case 'd':	/* dec */
+		return 10;
+	case 'h':	/* hex */
+		return 16;
+	default:
+		return 0;
+	}
+}
+
+/**
+ * Sructured memory output
+ */
+static int DebugCpu_Struct(int nArgc, char *psArgs[])
+{
+	uint32_t start, addr, count;
+	int maxlen, offlen;
+
+	if (nArgc < 4)
+	{
+		fprintf(stderr, "Not enough arguments!\n");
+		return DEBUGGER_CMDDONE;
+	}
+
+	if (!Eval_Number(psArgs[2], &start, NUM_TYPE_CPU)) {
+		fprintf(stderr, "Invalid structure address!\n");
+		return DEBUGGER_CMDDONE;
+	}
+
+	/* determine max header len for aligning and validate
+	 * argument content before it's split up.
+	 */
+	maxlen = 0;
+	addr = start;
+	for (int i = 3; i < nArgc; i++)
+	{
+		/* [name]:<type-char>[:count] */
+		const char *arg, *str;
+		int size, type;
+
+		arg = psArgs[i];
+		str = strchr(arg, ':');
+		if (!str)
 		{
-			c = M68000_ReadByte(memdump_addr-MEMDUMP_COLS+i);
-			if(!isprint((unsigned)c))
-				c = NON_PRINT_CHAR;             /* non-printable as dots */
-			fprintf(debugOutput,"%c", c);
+			fprintf(stderr, "':' missing from arg: '%s'!\n", arg);
+			return DEBUGGER_CMDDONE;
+		}
+		/* lenght of longest title */
+		if (maxlen < str - arg)
+			maxlen = str - arg;
+
+		type = tolower(*++str);
+		size = get_type_width(type);
+		if (!size && (type == 'a' || type == 's'))
+		    size = 1;
+		if (!size)
+		{
+			fprintf(stderr, "invalid type for arg: '%s'!\n", arg);
+			return DEBUGGER_CMDDONE;
+		}
+
+		/* type followed by base? */
+		if (get_type_base(tolower(*++str)))
+			str++;
+
+		/* done? */
+		if (!*str)
+		{
+			addr += size;
+			continue;
+		}
+		if (*str++ != ':')
+		{
+			fprintf(stderr, "invalid base for arg: '%s'!\n", arg);
+			return DEBUGGER_CMDDONE;
+		}
+
+		if (!Eval_Number(str, &count, NUM_TYPE_NORMAL) || count > 255)
+		{
+			fprintf(stderr, "Invalid count for arg: '%s'!\n", arg);
+			return DEBUGGER_CMDDONE;
+		}
+		addr += count*size;
+	}
+
+	/* count of hex digits for last printed address */
+	offlen = 1;
+	count = addr - start;
+	while (count >>= 4)
+		offlen++;
+	if (offlen >= maxlen)
+		maxlen = offlen + 1; /* '$' prefix for numbers */
+
+	fprintf(debugOutput, "%s: $%x\n", psArgs[1], start);
+
+	addr = start;
+	for (int i = 3; i < nArgc; i++)
+	{
+		char *name, *str;
+		int size, type, base;
+
+		name = psArgs[i];
+		str = strchr(name, ':');
+		*str = '\0';
+
+		type = tolower(*++str);
+		size = get_type_width(type);
+		base = get_type_base(tolower(*++str));
+		if (!base)
+			base = 16;
+		else
+			str++;
+
+		if (*str)  /* ':' separator? */
+			Eval_Number(++str, &count, NUM_TYPE_NORMAL);
+		else
+			count = 1;
+
+		if (type == 's') /* skip */
+		{
+			addr += count;
+			continue;
+		}
+
+		if (*name)
+			fprintf(debugOutput, "+ %-*s: ",
+				maxlen+1, name);
+		else
+			fprintf(debugOutput, "+ $%0*x%*c: ",
+				offlen, addr-start, maxlen-offlen, ' ');
+
+		if (type == 'a')
+		{
+			print_mem_ascii(addr, count);
+			addr += count * size;
+		}
+		else
+		{
+			print_mem_values(addr, count, size, base);
+			addr += count * size;
 		}
 		fprintf(debugOutput, "\n");
 	}
-	fflush(debugOutput);
 
 	return DEBUGGER_CMDCONT;
 }
@@ -607,7 +820,7 @@ static int DebugCpu_MemWrite(int nArgc, char *psArgs[])
 		return DEBUGGER_CMDDONE;
 	}
 	/* Read address */
-	if (!Eval_Number(psArgs[arg++], &write_addr))
+	if (!Eval_Number(psArgs[arg++], &write_addr, NUM_TYPE_CPU))
 	{
 		fprintf(stderr, "Bad address!\n");
 		return DEBUGGER_CMDDONE;
@@ -624,7 +837,7 @@ static int DebugCpu_MemWrite(int nArgc, char *psArgs[])
 	values = 0;
 	for (i = arg; i < nArgc; i++)
 	{
-		if (!Eval_Number(psArgs[i], &d))
+		if (!Eval_Number(psArgs[i], &d, NUM_TYPE_NORMAL))
 		{
 			fprintf(stderr, "Bad value '%s'!\n", psArgs[i]);
 			return DEBUGGER_CMDDONE;
@@ -982,6 +1195,17 @@ static const dbgcommand_t cpucommands[] =
 	  "\toption, it will be done as words/longs instead.  Output amount\n"
 	  "\tcan be given either as a count or an address range.",
 	  false },
+	{ DebugCpu_Struct, Symbols_MatchCpuDataAddress,
+	  "struct", "",
+	  "structured memory output for breakpoints",
+	  "<name> <address> [name]:<type>[base][:<count>] ...]\n\n"
+	  "\tShow <name>d structure content at given <address>, with each\n"
+	  "\t[name]:<type>[base][:<count>] item shown on its own line, prefixed\n"
+	  "\twith offset from struct start address if [name] is not given.\n"
+	  "\tSupported <type>s are 'b|w|l|a|s' (byte|word|long|ASCII|skip).\n"
+	  "\tOptional [base] can be 'b|o|d|h' (bin|oct|dec|hex).\n"
+	  "\tDefaults are hex [base], and [count] of 1.\n",
+	  false },
 	{ DebugCpu_MemWrite, Symbols_MatchCpuAddress,
 	  "memwrite", "w",
 	  "write bytes/words/longs to memory",
@@ -1003,7 +1227,7 @@ static const dbgcommand_t cpucommands[] =
 	  "\tSave the memory block at <address> with given <length> to\n"
 	  "\tthe file <filename>.",
 	  false },
-	{ Symbols_Command, NULL,
+	{ Symbols_Command, Symbols_MatchCommand,
 	  "symbols", "",
 	  "load CPU symbols & their addresses",
 	  Symbols_Description,

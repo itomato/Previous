@@ -40,6 +40,7 @@ typedef struct {
 static flagname_t ExceptionFlags[] = {
 	{ EXCEPT_NONE,      "none" },
 
+	{ EXCEPT_NOHANDLER, "nohandler" },
 	{ EXCEPT_BUS,       "bus" },
 	{ EXCEPT_ADDRESS,   "address" },
 	{ EXCEPT_ILLEGAL,   "illegal" },
@@ -48,7 +49,8 @@ static flagname_t ExceptionFlags[] = {
 	{ EXCEPT_TRAPV,     "trapv" },
 	{ EXCEPT_PRIVILEGE, "privilege" },
 	{ EXCEPT_TRACE,     "trace" },
-	{ EXCEPT_NOHANDLER, "nohandler" },
+	{ EXCEPT_LINEA,     "linea" },
+	{ EXCEPT_LINEF,     "linef" },
 
 	{ EXCEPT_DSP,       "dsp" },
 
@@ -103,6 +105,7 @@ FILE *TraceFile = NULL;
  * repetition
  */
 static struct {
+	/* prev msg fp, in case same msg goes to multiple FILE*s */
 	FILE *fp;
 	int limit;
 	int count;
@@ -146,6 +149,11 @@ int Log_Init(void)
 {
 	Log_SetLevels();
 
+	/* Flush pending msg & drop cached prev msg FILE pointer
+	 * before default log & trace FILE pointers change
+	 */
+	Log_ResetMsgRepeat();
+
 	hLogFile = File_Open(ConfigureParams.Log.sLogFileName, "w");
 	TraceFile = File_Open(ConfigureParams.Log.sTraceFileName, "w");
 
@@ -171,6 +179,11 @@ int Log_SetAlertLevel(int level)
  */
 void Log_UnInit(void)
 {
+	/* Flush pending msg & drop cached prev msg FILE pointer
+	 * before log & trace FILE pointers change
+	 */
+	Log_ResetMsgRepeat();
+
 	hLogFile = File_Close(hLogFile);
 	TraceFile = File_Close(TraceFile);
 }
@@ -186,8 +199,8 @@ static void printMsgRepeat(FILE *fp)
 }
 
 /**
- * If there is a pending that has not been output yet, output it
- * and return true, otherwise false.
+ * If there is a pending message that has not been output yet,
+ * output it and return true, otherwise false.
  */
 static bool printPendingMsgRepeat(FILE *fp)
 {
@@ -201,8 +214,8 @@ static bool printPendingMsgRepeat(FILE *fp)
 }
 
 /**
- * Output pending and given messages when appropriate and
- * store given message if it's not a repeat.
+ * Output pending and given messages when appropriate,
+ * and cache given fp & message if it's not a repeat.
  */
 static void addMsgRepeat(FILE *fp, const char *line)
 {
@@ -234,12 +247,15 @@ static void addMsgRepeat(FILE *fp, const char *line)
 }
 
 /**
- * Output pending message repeat info and reset repeat info.
+ * Output pending messages repeat info and reset repeat info.
  */
 void Log_ResetMsgRepeat(void)
 {
 	if (!printPendingMsgRepeat(MsgState.fp))
+	{
+		MsgState.fp = NULL;
 		return;
+	}
 	MsgState.prev[0] = '\0';
 	if (MsgState.limit)
 		MsgState.limit = REPEAT_LIMIT_INIT;

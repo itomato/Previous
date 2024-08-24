@@ -1,3 +1,13 @@
+/*
+  Previous - tmc.c
+
+  This file is distributed under the GNU General Public License, version 2
+  or at your option any later version. Read the file gpl.txt for details.
+
+  This file contains a simulation of the Turbo Memory Controller (TMC).
+*/
+const char Tmc_fileid[] = "Previous tmc.c";
+
 #include "main.h"
 #include "configuration.h"
 #include "m68000.h"
@@ -19,10 +29,10 @@
 struct {
 	uint32_t scr1;
 	uint32_t control;
+	uint32_t nmi;
 	uint32_t horizontal;
 	uint32_t vertical;
-	uint8_t video_intr;
-	uint32_t nitro;
+	uint32_t video_intr;
 } tmc;
 
 /* Additional System Control Register for Turbo systems:
@@ -48,7 +58,7 @@ struct {
 
 #define TURBOSCR_FMASK   0x0FFF0F08
 
-static void TurboSCR1_Reset(void) {
+static void tmc_scr1_reset(void) {
 	uint8_t memory_speed = 0;
 	uint8_t cpu_speed = 0x07; // 33 MHz
 	
@@ -107,7 +117,7 @@ static uint8_t tmc_void_read(void) {
 static void tmc_void_write(uint8_t val) {
 }
 
-/* SCR1 */
+/* TMC SCR1 */
 static uint8_t tmc_scr1_read0(void) {
 	Log_Printf(LOG_WARN,"[TMC] SCR1 read at $0x2200000 PC=$%08x\n",m68k_getpc());
 	return (tmc.scr1>>24);
@@ -126,7 +136,6 @@ static uint8_t tmc_scr1_read3(void) {
 }
 
 /* TMC Control Register */
-
 static uint8_t tmc_ctrl_read0(void) {
 	return (tmc.control>>24);
 }
@@ -151,6 +160,16 @@ static void tmc_ctrl_write1(uint8_t val) {
 static void tmc_ctrl_write2(uint8_t val) {
 	val &= ~0x04; /* no parity memory */
 	
+	if ((tmc.control&0x00000100) && !(val&01)) {
+		Log_Printf(LOG_WARN,"[TMC] Disable local only");
+	} else if (!(tmc.control&0x00000100) && (val&0x01)) {
+		Log_Printf(LOG_WARN,"[TMC] Enable local only");
+	}
+	if ((tmc.control&0x00000200) && !(val&0x02)) {
+		Log_Printf(LOG_WARN,"[TMC] Disable ROM local");
+	} else if (!(tmc.control&0x00000200) && (val&0x02)) {
+		Log_Printf(LOG_WARN,"[TMC] Enable ROM local");
+	}
 	tmc.control &= 0xFFFF00FF;
 	tmc.control |= (val&0xFF)<<8;
 }
@@ -159,26 +178,50 @@ static void tmc_ctrl_write3(uint8_t val) {
 	tmc.control |= val&0xFF;
 }
 
+/* TMC NMI Register */
+#define TMC_NMI 0x00000001
+
+static uint8_t tmc_nmi_read3(void) {
+	return tmc.nmi;
+}
+
+static void tmc_nmi_write3(uint8_t val) {
+	tmc.nmi = val & 0x01;
+	
+	if (tmc.nmi & TMC_NMI) {
+		Log_Printf(LOG_WARN,"[TMC] Enable NMI");
+		set_interrupt(INT_NMI, SET_INT);
+	} else {
+		Log_Printf(LOG_WARN,"[TMC] Disable NMI");
+		set_interrupt(INT_NMI, RELEASE_INT);
+	}
+}
+
 
 /* Video Interrupt Register */
-#define TMC_VI_INTERRUPT	0x01
-#define TMC_VI_INT_MASK		0x02
+#define TMC_VI_INTERRUPT (0x01<<24)
+#define TMC_VI_INT_MASK  (0x02<<24)
+#define TMC_VI_ENABLE    (0x04<<24)
 
 /* Horizontal and Vertical Configruation Registers */
-#define HFPORCH  0x18
-#define HSYNC	 0x20
-#define HBPORCH  0x48
-#define HDISCNT	 0x118
+#define HFPORCH  (0x18<<25)
+#define HSYNC    (0x20<<19)
+#define HBPORCH  (0x48<<12)
+#define HDISCNT  (0x118<<0)
 
-#define VFPORCH  0x08
-#define VSYNC	 0x08
-#define VBPORCH	 0x30
-#define VDISCNT	 0x340
+#define VFPORCH  (0x08<<25)
+#define VSYNC    (0x08<<19)
+#define VBPORCH  (0x30<<12)
+#define VDISCNT  (0x340<<0)
+
+bool tmc_video_enabled(void) {
+	return (tmc.video_intr&TMC_VI_ENABLE);
+}
 
 static void tmc_video_reg_reset(void) {
-	tmc.video_intr = 0x00;
-	tmc.horizontal = (HFPORCH<<25)|(HSYNC<<19)|(HBPORCH<<12)|HDISCNT;
-	tmc.vertical = (VFPORCH<<25)|(VSYNC<<19)|(VBPORCH<<12)|VDISCNT;
+	tmc.video_intr = 0;
+	tmc.horizontal = HFPORCH|HSYNC|HBPORCH|HDISCNT;
+	tmc.vertical   = VFPORCH|VSYNC|VBPORCH|VDISCNT;
 }
 
 void tmc_video_interrupt(void) {
@@ -189,11 +232,11 @@ void tmc_video_interrupt(void) {
 }
 
 static uint8_t tmc_vir_read0(void) {
-	return tmc.video_intr;
+	return (tmc.video_intr>>24);
 }
 
 static void tmc_vir_write0(uint8_t val) {
-	tmc.video_intr = val;
+	tmc.video_intr = val<<24;
 	if (tmc.video_intr&TMC_VI_INTERRUPT) {
 		tmc.video_intr &= ~TMC_VI_INTERRUPT;
 		set_interrupt(INT_DISK, RELEASE_INT);
@@ -263,64 +306,53 @@ static void tmc_vcr_write3(uint8_t val) {
 
 /* Read register functions */
 static uint8_t (*tmc_read_reg[36])(void) = {
-	tmc_scr1_read0, tmc_scr1_read1, tmc_scr1_read2, tmc_scr1_read3,
+	tmc_scr1_read0,  tmc_scr1_read1,  tmc_scr1_read2,  tmc_scr1_read3,
 	tmc_unimpl_read, tmc_unimpl_read, tmc_unimpl_read, tmc_unimpl_read,
 	tmc_unimpl_read, tmc_unimpl_read, tmc_unimpl_read, tmc_unimpl_read,
 	tmc_unimpl_read, tmc_unimpl_read, tmc_unimpl_read, tmc_unimpl_read,
-	tmc_ctrl_read0, tmc_ctrl_read1, tmc_ctrl_read2, tmc_ctrl_read3,
+	tmc_ctrl_read0,  tmc_ctrl_read1,  tmc_ctrl_read2,  tmc_ctrl_read3,
 	tmc_unimpl_read, tmc_unimpl_read, tmc_unimpl_read, tmc_unimpl_read,
 	tmc_unimpl_read, tmc_unimpl_read, tmc_unimpl_read, tmc_unimpl_read,
 	tmc_unimpl_read, tmc_unimpl_read, tmc_unimpl_read, tmc_unimpl_read,
-	tmc_unimpl_read, tmc_unimpl_read, tmc_unimpl_read, tmc_unimpl_read
+	tmc_void_read,   tmc_void_read,   tmc_void_read,   tmc_nmi_read3
 };
 
 static uint8_t (*tmc_read_vid_reg[16])(void) = {
-	tmc_vir_read0, tmc_void_read, tmc_void_read, tmc_void_read,
+	tmc_vir_read0,   tmc_void_read,   tmc_void_read,   tmc_void_read,
 	tmc_unimpl_read, tmc_unimpl_read, tmc_unimpl_read, tmc_unimpl_read,
-	tmc_hcr_read0, tmc_hcr_read1, tmc_hcr_read2, tmc_hcr_read3,
-	tmc_vcr_read0, tmc_vcr_read1, tmc_vcr_read2, tmc_vcr_read3
+	tmc_hcr_read0,   tmc_hcr_read1,   tmc_hcr_read2,   tmc_hcr_read3,
+	tmc_vcr_read0,   tmc_vcr_read1,   tmc_vcr_read2,   tmc_vcr_read3
 };
 
 /* Write register functions */
 static void (*tmc_write_reg[36])(uint8_t) = {
-	tmc_ill_write, tmc_ill_write, tmc_ill_write, tmc_ill_write,
+	tmc_ill_write,    tmc_ill_write,    tmc_ill_write,    tmc_ill_write,
 	tmc_unimpl_write, tmc_unimpl_write, tmc_unimpl_write, tmc_unimpl_write,
 	tmc_unimpl_write, tmc_unimpl_write, tmc_unimpl_write, tmc_unimpl_write,
 	tmc_unimpl_write, tmc_unimpl_write, tmc_unimpl_write, tmc_unimpl_write,
-	tmc_ctrl_write0, tmc_ctrl_write1, tmc_ctrl_write2, tmc_ctrl_write3,
+	tmc_ctrl_write0,  tmc_ctrl_write1,  tmc_ctrl_write2,  tmc_ctrl_write3,
 	tmc_unimpl_write, tmc_unimpl_write, tmc_unimpl_write, tmc_unimpl_write,
 	tmc_unimpl_write, tmc_unimpl_write, tmc_unimpl_write, tmc_unimpl_write,
 	tmc_unimpl_write, tmc_unimpl_write, tmc_unimpl_write, tmc_unimpl_write,
-	tmc_unimpl_write, tmc_unimpl_write, tmc_unimpl_write, tmc_unimpl_write
+	tmc_void_write,   tmc_void_write,   tmc_void_write,   tmc_nmi_write3
 };
 
 static void (*tmc_write_vid_reg[16])(uint8_t) = {
-	tmc_vir_write0, tmc_void_write, tmc_void_write, tmc_void_write,
+	tmc_vir_write0,   tmc_void_write,   tmc_void_write,   tmc_void_write,
 	tmc_unimpl_write, tmc_unimpl_write, tmc_unimpl_write, tmc_unimpl_write,
-	tmc_hcr_write0, tmc_hcr_write1, tmc_hcr_write2, tmc_hcr_write3,
-	tmc_vcr_write0, tmc_vcr_write1, tmc_vcr_write2, tmc_vcr_write3
+	tmc_hcr_write0,   tmc_hcr_write1,   tmc_hcr_write2,   tmc_hcr_write3,
+	tmc_vcr_write0,   tmc_vcr_write1,   tmc_vcr_write2,   tmc_vcr_write3
 };
 
 
-uint32_t tmc_lget(uaecptr addr) {
-	uint32_t val = 0;
+uae_u32 tmc_lget(uaecptr addr) {
+	uae_u32 val = 0;
 	
-    if (addr%4) {
+    if (addr&3) {
         Log_Printf(LOG_WARN, "[TMC] Unaligned access.");
         abort();
     }
 	
-	if (addr==0x02210000) {
-		Log_Printf(LOG_WARN, "[TMC] Nitro register lget from $%08X",addr);
-		if (ConfigureParams.System.nCpuFreq==40) {
-			val = tmc.nitro;
-		} else {
-			Log_Printf(LOG_WARN, "[TMC] No nitro --> bus error!");
-			M68000_BusError(addr, BUS_ERROR_READ, BUS_ERROR_SIZE_LONG, BUS_ERROR_ACCESS_DATA, 0);
-		}
-		return val;
-	}
-
 	if ((addr&0xFFFFF00)==TMC_ADB_ADDR_MASK) {
 		return adb_lget(addr);
 	}
@@ -344,10 +376,10 @@ uint32_t tmc_lget(uaecptr addr) {
 	return val;
 }
 
-uint32_t tmc_wget(uaecptr addr) {
-    uint32_t val = 0;
+uae_u32 tmc_wget(uaecptr addr) {
+	uae_u32 val = 0;
     
-	if (addr%2) {
+	if (addr&1) {
 		Log_Printf(LOG_WARN, "[TMC] Unaligned access.");
 		abort();
 	}
@@ -371,7 +403,7 @@ uint32_t tmc_wget(uaecptr addr) {
 	return val;
 }
 
-uint32_t tmc_bget(uaecptr addr) {
+uae_u32 tmc_bget(uaecptr addr) {
 	if ((addr&0xFFFFF00)==TMC_ADB_ADDR_MASK) {
 		return adb_bget(addr);
 	}
@@ -389,21 +421,10 @@ uint32_t tmc_bget(uaecptr addr) {
     return 0;
 }
 
-void tmc_lput(uaecptr addr, uint32_t l) {
-	if (addr%4) {
+void tmc_lput(uaecptr addr, uae_u32 l) {
+	if (addr&3) {
 		Log_Printf(LOG_WARN, "[TMC] Unaligned access.");
 		abort();
-	}
-	
-	if (addr==0x02210000) {
-		Log_Printf(LOG_WARN, "[TMC] Nitro register lput %08X at $%08X",l,addr);
-		if (ConfigureParams.System.nCpuFreq==40) {
-			tmc.nitro = l&0x0000011F;
-		} else {
-			Log_Printf(LOG_WARN, "[TMC] No nitro --> bus error!");
-			M68000_BusError(addr, BUS_ERROR_WRITE, BUS_ERROR_SIZE_LONG, BUS_ERROR_ACCESS_DATA, l);
-		}
-		return;
 	}
 	
 	if ((addr&0xFFFFF00)==TMC_ADB_ADDR_MASK) {
@@ -428,8 +449,8 @@ void tmc_lput(uaecptr addr, uint32_t l) {
 	}
 }
 
-void tmc_wput(uaecptr addr, uint32_t w) {
-	if (addr%2) {
+void tmc_wput(uaecptr addr, uae_u32 w) {
+	if (addr&1) {
 		Log_Printf(LOG_WARN, "[TMC] Unaligned access.");
 		abort();
 	}
@@ -452,7 +473,7 @@ void tmc_wput(uaecptr addr, uint32_t w) {
 	}
 }
 
-void tmc_bput(uaecptr addr, uint32_t b) {
+void tmc_bput(uaecptr addr, uae_u32 b) {
 	if ((addr&0xFFFFF00)==TMC_ADB_ADDR_MASK) {
 		adb_bput(addr, b);
 		return;
@@ -471,12 +492,12 @@ void tmc_bput(uaecptr addr, uint32_t b) {
 
 
 /* TMC Reset */
-
 void TMC_Reset(void) {
-	TurboSCR1_Reset();
-	
+	tmc_scr1_reset();
 	tmc_video_reg_reset();
+	
 	tmc.control = 0x0D17038F;
-	tmc.nitro = 0x00000000;
-	ADB_Reset();
+	tmc.nmi     = 0x00000000;
+	
+	adb_reset();
 }

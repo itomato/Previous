@@ -37,9 +37,10 @@ other platforms you might need to also install libpcap, readline and zlib.
  -----------------------
 
 1. It seems that on some distributions of Linux rendering has to be done from 
-   the main thread. To make Previous render from the main thread you have to 
-   disable the rendering thread with following compile-time option:
-      ./configure --disable-rendering-thread
+   the main thread. Therefore it is not recommended to enable rendering threads 
+   on Linux. If you still want to experiment with rendering threads, you can 
+   enable them at compile time using the following option:
+      ./configure --enable-rendering-thread
       make
 
 2. Some Linux distributions have pre-installed outdated versions of SDL2. You 
@@ -60,7 +61,7 @@ replace with these steps:
 1. Build png.framework:
    a Download source code from http://libpng.org/pub/png/libpng.html
    b Go to the source directory and build an Xcode project:
-        cmake -G Xcode . -DPNG_FRAMEWORK=ON -DPNG_HARDWARE_OPTIMIZATIONS=OFF
+        cmake -G Xcode . -DPNG_HARDWARE_OPTIMIZATIONS=OFF
    c Open the Xcode project and select "libpng" in left side bar
    d Select "Targets > png_framework" in middle sector
    e Set "Architectures" to "Standard Architectures (Apple Silicon, Intel)"

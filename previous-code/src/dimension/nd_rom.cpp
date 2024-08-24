@@ -1,3 +1,10 @@
+/*
+  Previous - nd_rom.cpp
+
+  This file is distributed under the GNU General Public License, version 2
+  or at your option any later version. Read the file gpl.txt for details.
+*/
+
 #include "main.h"
 #include "configuration.h"
 #include "m68000.h"
@@ -89,7 +96,7 @@ void NextDimension::rom_load() {
         return;
     }
     
-    fread(rom,1, 128 * 1024 ,romfile);
+    fread(rom, 1, 128 * 1024, romfile);
     
     Log_Printf(LOG_WARN, "[ND] Read ROM from %s",ConfigureParams.Dimension.board[ND_NUM(slot)].szRomFileName);
     

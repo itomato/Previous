@@ -9,6 +9,7 @@
 #include <sys/statvfs.h>
 #endif
 #include <sys/time.h>
+#include <inttypes.h>
 
 #include "config.h"
 #include "NFS2Prog.h"

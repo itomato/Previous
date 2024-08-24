@@ -1,11 +1,11 @@
 /*
-  Hatari - video.c
+  Previous - video.c
 
   This file is distributed under the GNU General Public License, version 2
   or at your option any later version. Read the file gpl.txt for details.
 
 */
-const char Video_fileid[] = "Hatari video.c";
+const char Video_fileid[] = "Previous video.c";
 
 #include "main.h"
 #include "host.h"
@@ -42,6 +42,22 @@ static void Video_Interrupt(void) {
 		color_video_interrupt();
 	} else {
 		dma_video_interrupt();
+	}
+}
+
+/*-----------------------------------------------------------------------*/
+/**
+ * Return true if video output is enabled.
+ */
+bool Video_Enabled(void) {
+	if (ConfigureParams.Boot.bVisible) {
+		return true;
+	} else if (ConfigureParams.System.bTurbo) {
+		return tmc_video_enabled();
+	} else if (ConfigureParams.System.bColor) {
+		return color_video_enabled();
+	} else {
+		return brighness_video_enabled();
 	}
 }
 

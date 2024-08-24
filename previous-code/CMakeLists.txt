@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 
 # Set build type to "Release" if user did not specify any build type yet
 # Other possible values: Debug, Release, RelWithDebInfo and MinSizeRel
@@ -6,21 +6,21 @@ if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Release)
 endif(NOT CMAKE_BUILD_TYPE)
 
-IF (CMAKE_BUILD_TYPE STREQUAL "Release")
-	set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "Target architectures" FORCE)
-	set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Target Min 10.13" FORCE)
-ENDIF (CMAKE_BUILD_TYPE STREQUAL "Release")
+if(APPLE AND CMAKE_BUILD_TYPE STREQUAL "Release")
+	set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "Target architectures")
+	set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Target minimum macOS version")
+endif(APPLE AND CMAKE_BUILD_TYPE STREQUAL "Release")
 
 project(Previous)
-
-set(APP_NAME "Previous")
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
 include(CheckStructHasMember)
+include(CheckSymbolExists)
 include(CheckCCompilerFlag)
+include(CheckCXXCompilerFlag)
 include(DistClean)
 
 # set(CMAKE_VERBOSE_MAKEFILE 1)
@@ -36,18 +36,26 @@ set(ENABLE_DSP_EMU 1
     CACHE BOOL "Enable DSP 56k emulator")
 set(ENABLE_TRACING 1
     CACHE BOOL "Enable tracing messages for debugging")
-set(ENABLE_RENDERING_THREAD 1
-    CACHE BOOL "Enable rendering threads")
 
 if(APPLE)
+	set(ENABLE_RENDERING_THREAD 1
+		CACHE BOOL "Enable rendering threads")
 	set(ENABLE_OSX_BUNDLE 1
 	    CACHE BOOL "Built Previous as macOS application bundle")
 	set(ADDITIONAL_INCLUDES ${FRAMEWORKS})
 	set_source_files_properties(${FRAMEWORKS} PROPERTIES MACOSX_PACKAGE_LOCATION Frameworks)
 else()
+	set(ENABLE_RENDERING_THREAD 0
+		CACHE BOOL "Enable rendering threads")
 	set(ENABLE_OSX_BUNDLE 0
 	    CACHE BOOL "Built Previous as macOS application bundle")
 endif(APPLE)
+
+if(ENABLE_OSX_BUNDLE)
+	set(APP_NAME "Previous")
+else()
+	set(APP_NAME "previous")
+endif(ENABLE_OSX_BUNDLE)
 
 # ####################
 # Check for libraries:
@@ -139,7 +147,7 @@ check_symbol_exists(_aligned_malloc "stdlib.h" HAVE__ALIGNED_MALLOC)
 # ########################################
 # Check for non-POSIXness on macOS et al.:
 # ########################################
-message("-- The following HAVE_STRUCT_* tests are checking for non-POSIX systems such as MacOS; 'Failed' does not indicate a problem")
+message("-- The following HAVE_STRUCT_* tests are checking for non-POSIX systems such as macOS; 'Failed' does not indicate a problem")
 check_struct_has_member("struct stat" st_atimespec.tv_nsec
     "sys/types.h;sys/stat.h" HAVE_STRUCT_STAT_ST_ATIMESPEC)
 check_struct_has_member("struct stat" st_mtimespec.tv_nsec
@@ -147,7 +155,6 @@ check_struct_has_member("struct stat" st_mtimespec.tv_nsec
 # Linux glibc provides a _D_EXACT_NAMELEN macro to work around this exact issue, but other supported platforms may not
 check_struct_has_member("struct dirent" d_namelen
 	"dirent.h" HAVE_STRUCT_DIRENT_D_NAMELEN)
-
 
 # #############
 # Other CFLAGS:
@@ -163,7 +170,6 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wwrite-strings -Wsign-compare")
 	#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra -Wno-unused-parameter -Wno-empty-body")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wformat-security")
-	#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wshadow -D_FORTIFY_SOURCE=2")
 	# Enable and disable some warnings and flags for Previous:
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -D__USE_MINGW_ANSI_STDIO=1")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-conversion -Wno-unused -Wno-sign-compare")
@@ -171,6 +177,21 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wtautological-compare -Wno-unused-parameter")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-sign-compare -Wno-conversion -Wno-unused")
 endif()
+
+CHECK_C_COMPILER_FLAG("-Wimplicit-fallthrough=2" WARN_FALLTRHOUGH_AVAILABLE)
+if(WARN_FALLTRHOUGH_AVAILABLE)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wimplicit-fallthrough=2")
+endif(WARN_FALLTRHOUGH_AVAILABLE)
+
+CHECK_C_COMPILER_FLAG("-Wshadow=local" WARN_SHADOW_LOCAL_AVAILABLE)
+if(WARN_SHADOW_LOCAL_AVAILABLE)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wshadow=local")
+endif(WARN_SHADOW_LOCAL_AVAILABLE)
+
+CHECK_C_COMPILER_FLAG("-Wvla" WARN_VARIABLE_LENGTH_ARRAY_AVAILABLE)
+if(WARN_VARIABLE_LENGTH_ARRAY_AVAILABLE)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wvla")
+endif(WARN_VARIABLE_LENGTH_ARRAY_AVAILABLE)
 
 if(ENABLE_WERROR)
 	if (ENABLE_TRACING)
@@ -185,6 +206,12 @@ endif(ENABLE_WERROR)
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wpointer-bool-conversion -Wtautological-compare -Wno-unused-parameter ${CMAKE_CXX_FLAGS}")
 endif()
+
+# Silence warnings in DiskImage.cpp
+CHECK_CXX_COMPILER_FLAG("-Wimplicit-fallthrough=0" WARN_CXX_FALLTRHOUGH_AVAILABLE)
+if(WARN_CXX_FALLTRHOUGH_AVAILABLE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wimplicit-fallthrough=0")
+endif(WARN_CXX_FALLTRHOUGH_AVAILABLE)
 
 # Building Previous w/o optimization is no fun...
 IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -253,6 +280,10 @@ configure_file(${CMAKE_SOURCE_DIR}/cmake/config-cmake.h
 
 add_subdirectory(src)
 
+add_custom_target(uninstall
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_SOURCE_DIR}/cmake/Uninstall.cmake)
+
+
 # ###################################################################
 # Print a summary of the optional libraries with a short explanation:
 # ###################################################################
@@ -281,5 +312,35 @@ if(HAVE_SYS_XATTR_H)
 else()
   message( "  - xattr.h :\tnot found, no netboot possible" )
 endif(HAVE_SYS_XATTR_H)
+
+
+# #####################################
+# Print a summary of the configuration:
+# #####################################
+
+message( "
+Configuration summary :
+-----------------------
+")
+
+message( "  - Build configuration : ${CMAKE_BUILD_TYPE}" )
+
+if(ENABLE_OSX_BUNDLE)
+  message( "  - Build macOS bundle :  Enabled" )
+else()
+  message( "  - Build macOS bundle :  Disabled" )
+endif(ENABLE_OSX_BUNDLE)
+
+if(ENABLE_TRACING)
+  message( "  - Tracing :             Enabled" )
+else()
+  message( "  - Tracing :             Disabled" )
+endif(ENABLE_TRACING)
+
+if(ENABLE_RENDERING_THREAD)
+  message( "  - Rendering thread :    Enabled" )
+else()
+  message( "  - Rendering thread :    Disabled" )
+endif(ENABLE_RENDERING_THREAD)
 
 message( "" )

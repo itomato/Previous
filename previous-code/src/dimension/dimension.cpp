@@ -1,3 +1,10 @@
+/*
+  Previous - dimension.cpp
+
+  This file is distributed under the GNU General Public License, version 2
+  or at your option any later version. Read the file gpl.txt for details.
+*/
+
 #include <stdlib.h>
 
 #include "main.h"
@@ -369,6 +376,14 @@ extern "C" {
         
         // 120Hz with toggle gives 60Hz NTSC, blank time is 1/2 frame time
         CycInt_AddRelativeInterruptUs((1000*1000)/120, 0, INTERRUPT_ND_VIDEO_VBL);
+    }
+
+    bool nd_video_enabled(int slot) {
+        IF_NEXT_DIMENSION(slot, nd) {
+            return nd->unblanked();
+        } else {
+            return false;
+        }
     }
 
     uint32_t* nd_vram_for_slot(int slot) {

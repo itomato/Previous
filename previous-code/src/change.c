@@ -76,12 +76,6 @@ bool Change_DoNeedReset(CNF_PARAMS *current, CNF_PARAMS *changed)
 		}
 	}
 
-	/* Did we change NFS root directory? */
-	if (strcmp(current->Ethernet.szNFSroot, changed->Ethernet.szNFSroot)) {
-		printf("nfs reset\n");
-		return true;
-	}
-
 	/* Did we change network interface? */
 	if ((current->Ethernet.nHostInterface != changed->Ethernet.nHostInterface) ||
 		(current->Ethernet.bNetworkTime != changed->Ethernet.bNetworkTime)) {
@@ -105,7 +99,7 @@ bool Change_DoNeedReset(CNF_PARAMS *current, CNF_PARAMS *changed)
 	}
 
 	/* Did we change the realtime flag? */
-	if(current->System.bRealtime != changed->System.bRealtime) {
+	if (current->System.bRealtime != changed->System.bRealtime) {
 		printf("realtime flag reset\n");
 		return true;
 	}
@@ -142,6 +136,12 @@ bool Change_DoNeedReset(CNF_PARAMS *current, CNF_PARAMS *changed)
 		printf("nbic reset\n");
 		return true;
 	}
+	
+	/* Did we change ADB emulation? */
+	if (current->System.bADB != changed->System.bADB) {
+		printf("adb reset\n");
+		return true;
+	}
 
 	/* Did we change memory size? */
 	for (i = 0; i < 4; i++) {
@@ -152,35 +152,15 @@ bool Change_DoNeedReset(CNF_PARAMS *current, CNF_PARAMS *changed)
 	}
 
 	/* Did we change boot options? */
-	if (current->Boot.nBootDevice != changed->Boot.nBootDevice) {
-		printf("boot options reset\n");
-		return true;
-	}
-	if (current->Boot.bEnableDRAMTest != changed->Boot.bEnableDRAMTest) {
-		printf("boot options reset\n");
-		return true;
-	}
-	if (current->Boot.bEnablePot != changed->Boot.bEnablePot) {
-		printf("boot options reset\n");
-		return true;
-	}
-	if (current->Boot.bEnableSoundTest != changed->Boot.bEnableSoundTest) {
-		printf("boot options reset\n");
-		return true;
-	}
-	if (current->Boot.bEnableSCSITest != changed->Boot.bEnableSCSITest) {
-		printf("boot options reset\n");
-		return true;
-	}
-	if (current->Boot.bLoopPot != changed->Boot.bLoopPot) {
-		printf("boot options reset\n");
-		return true;
-	}
-	if (current->Boot.bVerbose != changed->Boot.bVerbose) {
-		printf("boot options reset\n");
-		return true;
-	}
-	if (current->Boot.bExtendedPot != changed->Boot.bExtendedPot) {
+	if ((current->Boot.nBootDevice != changed->Boot.nBootDevice) ||
+		(current->Boot.bEnableDRAMTest != changed->Boot.bEnableDRAMTest) ||
+		(current->Boot.bEnablePot != changed->Boot.bEnablePot) ||
+		(current->Boot.bEnableSoundTest != changed->Boot.bEnableSoundTest) ||
+		(current->Boot.bEnableSCSITest != changed->Boot.bEnableSCSITest) ||
+		(current->Boot.bLoopPot != changed->Boot.bLoopPot) ||
+		(current->Boot.bVerbose != changed->Boot.bVerbose) ||
+		(current->Boot.bExtendedPot != changed->Boot.bExtendedPot) ||
+		(current->Boot.bVisible != changed->Boot.bVisible)) {
 		printf("boot options reset\n");
 		return true;
 	}
@@ -188,14 +168,14 @@ bool Change_DoNeedReset(CNF_PARAMS *current, CNF_PARAMS *changed)
 	/* Did we change SCSI disk? */
 	for (i = 0; i < ESP_MAX_DEVS; i++) {
 		if (current->SCSI.target[i].nDeviceType != changed->SCSI.target[i].nDeviceType ||
-			(current->SCSI.target[i].nDeviceType==DEVTYPE_HARDDISK &&
+			(current->SCSI.target[i].nDeviceType == SD_HARDDISK &&
 			 (current->SCSI.target[i].bWriteProtected != changed->SCSI.target[i].bWriteProtected ||
 			  strcmp(current->SCSI.target[i].szImageName, changed->SCSI.target[i].szImageName)))) {
 				 printf("scsi disk reset\n");
 				 return true;
 			 }
 	}
-	if(current->SCSI.nWriteProtection != changed->SCSI.nWriteProtection) {
+	if (current->SCSI.nWriteProtection != changed->SCSI.nWriteProtection) {
 		printf("scsi disk reset\n");
 		return true;
 	}
@@ -272,7 +252,8 @@ void Change_CopyChangedParamsToConfiguration(CNF_PARAMS *current, CNF_PARAMS *ch
 	/* Do we need to change Ethernet connection? */
 	if (!NeedReset &&
 		(current->Ethernet.bEthernetConnected != changed->Ethernet.bEthernetConnected ||
-		 strcmp(current->Ethernet.szInterfaceName, changed->Ethernet.szInterfaceName))) {
+		 strcmp(current->Ethernet.szInterfaceName, changed->Ethernet.szInterfaceName) ||
+		 strcmp(current->Ethernet.szNFSroot, changed->Ethernet.szNFSroot))) {
 		bReInitEnetEmu = true;
 	}
 

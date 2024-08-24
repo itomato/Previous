@@ -11,8 +11,9 @@
 /* Hardware address details */
 typedef struct
 {
-	const uint32_t Address;   /* ST hardware address */
-	const int SpanInBytes;    /* E.g. SIZE_BYTE, SIZE_WORD or SIZE_LONG */
+	const uint32_t Address;   /* Hardware address */
+	const uint32_t Mask;      /* Mask */
+	const int SpanInBytes;    /* SIZE_BYTE, SIZE_WORD or SIZE_LONG */
 	void (*ReadFunc)(void);   /* Read function */
 	void (*WriteFunc)(void);  /* Write function */
 } INTERCEPT_ACCESS_FUNC;

@@ -1,11 +1,13 @@
-/*  Previous - ethernet.c
+/*
+  Previous - ethernet.c
 
-  This file is distributed under the GNU Public License, version 2 or at
-  your option any later version. Read the file gpl.txt for details.
+  This file is distributed under the GNU General Public License, version 2
+  or at your option any later version. Read the file gpl.txt for details.
 
-   Network adapter for non-turbo and turbo NeXT machines.
-
+  This file contains simulations of the Fujitsu MB8795 and the AT&T 7213
+  Ethernet transceivers.
 */
+const char Ethernet_fileid[] = "Previous ethernet.c";
 
 #include "ioMem.h"
 #include "ioMemTables.h"
@@ -20,11 +22,9 @@
 #include "cycInt.h"
 #include "statusbar.h"
 
-
 #define LOG_EN_LEVEL        LOG_DEBUG
 #define LOG_EN_REG_LEVEL    LOG_DEBUG
 
-#define IO_SEG_MASK	0x1FFFF
 
 EthernetBuffer enet_tx_buffer;
 EthernetBuffer enet_rx_buffer;
@@ -132,13 +132,13 @@ static void enet_rx_interrupt(uint8_t intr) {
 
 /* Register access functions */
 void EN_TX_Status_Read(void) { // 0x02006000
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = enet.tx_status;
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Transmitter status read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, enet.tx_status);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Transmitter status read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void EN_TX_Status_Write(void) {
-    uint8_t val=IoMem[IoAccessCurrentAddress & IO_SEG_MASK];
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Transmitter status write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    uint8_t val = IoMem_ReadByte(IoAccessCurrentAddress);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Transmitter status write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
     if (ConfigureParams.System.bTurbo) {
         enet.tx_status&=~(val&0xBE);
     } else {
@@ -148,13 +148,13 @@ void EN_TX_Status_Write(void) {
 }
 
 void EN_TX_Mask_Read(void) { // 0x02006001
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = enet.tx_mask;
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Transmitter masks read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, enet.tx_mask);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Transmitter masks read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void EN_TX_Mask_Write(void) {
-    enet.tx_mask=IoMem[IoAccessCurrentAddress & IO_SEG_MASK];
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Transmitter masks write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    enet.tx_mask = IoMem_ReadByte(IoAccessCurrentAddress);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Transmitter masks write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
     
     enet.tx_mask&=ConfigureParams.System.bTurbo?0xBE:0xAF;
     enet_tx_check_interrupt();
@@ -164,13 +164,13 @@ void EN_RX_Status_Read(void) { // 0x02006002
     if (new_enet_buserror()) {
         return;
     }
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = enet.rx_status;
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Receiver status read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, enet.rx_status);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Receiver status read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void EN_RX_Status_Write(void) {
-    uint8_t val=IoMem[IoAccessCurrentAddress & IO_SEG_MASK];
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Receiver status write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    uint8_t val = IoMem_ReadByte(IoAccessCurrentAddress);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Receiver status write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
     if (ConfigureParams.System.bTurbo) {
         enet.rx_status&=~(val&0xDF);
     } else {
@@ -180,114 +180,114 @@ void EN_RX_Status_Write(void) {
 }
 
 void EN_RX_Mask_Read(void) { // 0x02006003
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = enet.rx_mask;
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Receiver masks read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, enet.rx_mask);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Receiver masks read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void EN_RX_Mask_Write(void) {
-    enet.rx_mask=IoMem[IoAccessCurrentAddress & IO_SEG_MASK];
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Receiver masks write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    enet.rx_mask = IoMem_ReadByte(IoAccessCurrentAddress);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Receiver masks write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
     
     enet.rx_mask&=ConfigureParams.System.bTurbo?0xDF:0x9F;
     enet_rx_check_interrupt();
 }
 
 void EN_TX_Mode_Read(void) { // 0x02006004
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = enet.tx_mode;
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Transmitter mode read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, enet.tx_mode);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Transmitter mode read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void EN_TX_Mode_Write(void) {
-    enet.tx_mode=IoMem[IoAccessCurrentAddress & IO_SEG_MASK];
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Transmitter mode write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    enet.tx_mode = IoMem_ReadByte(IoAccessCurrentAddress);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Transmitter mode write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void EN_RX_Mode_Read(void) { // 0x02006005
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = enet.rx_mode;
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Receiver mode read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, enet.rx_mode);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Receiver mode read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void EN_RX_Mode_Write(void) {
-    enet.rx_mode=IoMem[IoAccessCurrentAddress & IO_SEG_MASK];
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Receiver mode write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    enet.rx_mode = IoMem_ReadByte(IoAccessCurrentAddress);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Receiver mode write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void EN_Reset_Write(void) { // 0x02006006
-    enet.reset=IoMem[IoAccessCurrentAddress & IO_SEG_MASK];
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Reset write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    enet.reset = IoMem_ReadByte(IoAccessCurrentAddress);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Reset write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
     enet_reset();
 }
 
 void EN_CounterLo_Read(void) { // 0x02006007
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = 0&0xFF; /* FIXME: bit counter value */
-    Log_Printf(LOG_WARN,"[EN] TDR counter lo read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, 0&0xFF); /* FIXME: bit counter value */
+    Log_Printf(LOG_WARN,"[EN] TDR counter lo read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void EN_NodeID0_Read(void) { // 0x02006008
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = enet.mac_addr[0];
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 0 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, enet.mac_addr[0]);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 0 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void EN_NodeID0_Write(void) {
-    enet.mac_addr[0]=IoMem[IoAccessCurrentAddress & IO_SEG_MASK];
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 0 write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    enet.mac_addr[0] = IoMem_ReadByte(IoAccessCurrentAddress);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 0 write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void EN_NodeID1_Read(void) { // 0x02006009
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = enet.mac_addr[1];
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 1 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, enet.mac_addr[1]);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 1 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void EN_NodeID1_Write(void) {
-    enet.mac_addr[1]=IoMem[IoAccessCurrentAddress & IO_SEG_MASK];
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 1 write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    enet.mac_addr[1] = IoMem_ReadByte(IoAccessCurrentAddress);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 1 write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void EN_NodeID2_Read(void) { // 0x0200600a
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = enet.mac_addr[2];
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 2 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, enet.mac_addr[2]);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 2 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void EN_NodeID2_Write(void) {
-    enet.mac_addr[2]=IoMem[IoAccessCurrentAddress & IO_SEG_MASK];
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 2 write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    enet.mac_addr[2] = IoMem_ReadByte(IoAccessCurrentAddress);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 2 write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void EN_NodeID3_Read(void) { // 0x0200600b
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = enet.mac_addr[3];
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 3 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, enet.mac_addr[3]);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 3 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void EN_NodeID3_Write(void) {
-    enet.mac_addr[3]=IoMem[IoAccessCurrentAddress & IO_SEG_MASK];
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 3 write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    enet.mac_addr[3] = IoMem_ReadByte(IoAccessCurrentAddress);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 3 write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void EN_NodeID4_Read(void) { // 0x0200600c
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = enet.mac_addr[4];
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 4 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, enet.mac_addr[4]);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 4 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void EN_NodeID4_Write(void) {
-    enet.mac_addr[4]=IoMem[IoAccessCurrentAddress & IO_SEG_MASK];
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 4 write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    enet.mac_addr[4] = IoMem_ReadByte(IoAccessCurrentAddress);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 4 write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void EN_NodeID5_Read(void) { // 0x0200600d
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = enet.mac_addr[5];
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 5 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, enet.mac_addr[5]);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 5 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void EN_NodeID5_Write(void) {
-    enet.mac_addr[5]=IoMem[IoAccessCurrentAddress & IO_SEG_MASK];
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 5 write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    enet.mac_addr[5] = IoMem_ReadByte(IoAccessCurrentAddress);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 5 write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
     /* Make sure the interface has the correct MAC */
     Ethernet_Reset(false);
 }
 
 void EN_CounterHi_Read(void) { // 0x0200600f
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = (0>>8)&0x3F; /* FIXME: bit counter value */
-    Log_Printf(LOG_WARN,"[EN] TDR counter hi read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, (0>>8)&0x3F); /* FIXME: bit counter value */
+    Log_Printf(LOG_WARN,"[EN] TDR counter hi read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 
@@ -593,23 +593,23 @@ void EN_Control_Read(void) { // 0x02006006
             val |= ENCTRL_BADTPE;
         }
     }
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = val;
-    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Control read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, val);
+    Log_Printf(LOG_EN_REG_LEVEL,"[EN] Control read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void EN_RX_SavedNibble_Read(void) { // 0x02006007
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = saved_nibble&0x0F;
-    Log_Printf(LOG_WARN,"[EN] Receiver saved nibble read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, saved_nibble&0x0F);
+    Log_Printf(LOG_WARN,"[EN] Receiver saved nibble read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void EN_TX_Seq_Read(void) { // 0x0200600e
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = 0&0x3F;
-    Log_Printf(LOG_WARN,"[EN] Transmitter sequence read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, 0&0x3F);
+    Log_Printf(LOG_WARN,"[EN] Transmitter sequence read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 void EN_RX_Seq_Read(void) { // 0x0200600f
-    IoMem[IoAccessCurrentAddress & IO_SEG_MASK] = 0&0x7F;
-    Log_Printf(LOG_WARN,"[EN] Receiver sequence read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem[IoAccessCurrentAddress & IO_SEG_MASK], m68k_getpc());
+    IoMem_WriteByte(IoAccessCurrentAddress, 0&0x7F);
+    Log_Printf(LOG_WARN,"[EN] Receiver sequence read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
 bool new_enet_buserror(void) {
@@ -769,6 +769,7 @@ void Ethernet_Reset(bool hard) {
         enet_rx_buffer.size=enet_tx_buffer.size=0;
         enet_rx_buffer.limit=enet_tx_buffer.limit=EN_BUF_MAX;
         enet.tx_status=ConfigureParams.System.bTurbo?0:TXSTAT_READY;
+        CycInt_RemovePendingInterrupt(INTERRUPT_ENET_IO);
     }
     
     if (init_done) {
