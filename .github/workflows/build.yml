@@ -16,9 +16,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Fetch Previous-tweaks repo and apply patches
-      run: |
-        FILES="font10x16.h font10x16.xbm sdlgui.c";  for file in $FILES ; do echo $file ; OLDFILE=$(find ../previous-code -name $file) ; cp $file $OLDFILE ; done
+   
     - name: Install Linux dependencies
       run: |
         sudo apt-get update
@@ -34,6 +32,17 @@ jobs:
         cmake -S . -B build/linux -DCMAKE_BUILD_TYPE=Release \
               -DSDL2_INCLUDE_DIR=/usr/include/SDL2 \
               -DSDL2_LIBRARY=/usr/lib/x86_64-linux-gnu/libSDL2.so
+
+    - name: Fetch Previous-tweaks repo and apply patches
+      run: |
+        FILES="font10x16.h sdlgui.c"\
+        cd Previous-tweaks\
+        for file in $FILES\
+        do echo $file\
+        OLDFILE=$(find ../previous-code -name $file) \
+        cp $file $OLDFILE\
+        done
+        
 
     - name: Build Previous Emulator on Linux
       run: |
