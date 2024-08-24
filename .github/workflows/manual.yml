@@ -36,8 +36,9 @@ jobs:
 
     - name: Build Previous Emulator on Linux
       run: |
-        cmake --build build/linux --config Release
-
+        #cmake --build build/linux --config Release
+        cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DSDL2_INCLUDE_DIR=/usr/include/SDL2 -DSDL2_LIBRARY=/usr/lib/x86_64-linux-gnu/libSDL2.so
+    
     - name: Package the Linux build
       run: |
         mkdir -p output
