@@ -87,7 +87,7 @@ jobs:
 
   # Job to create the release
   release:
-    needs: [build-linux, build-macos]
+    needs: [build-linux]
     runs-on: ubuntu-latest
 
     steps:
