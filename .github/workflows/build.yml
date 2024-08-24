@@ -18,7 +18,6 @@ jobs:
 
     - name: Fetch Previous-tweaks repo and apply patches
       run: |
-        git clone https://github.com/itomato/Previous-tweaks.git
         cd Previous-tweaks
         FILES="font10x16.h font10x16.xbm sdlgui.c"
         for file in $FILES; do
@@ -73,29 +72,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Fetch Previous-tweaks repo and apply patches
-      run: |
-        git clone https://github.com/itomato/Previous-tweaks.git
-        cd Previous-tweaks
-        FILES="font10x16.h font10x16.xbm sdlgui.c"
-        for file in $FILES; do
-          echo $file
-          OLDFILE=$(find ../ -name $file )
-          cp $file $OLDFILE
-          if [ $? -ne 0 ]; then
-            echo "Failed to replace $file"
-            exit 1
-          else
-            echo "Patched!"
-          fi
-        done
-
     - name: Fetch Previous-Xcode and Previous-DMG repos
       run: |
-        git clone https://github.com/itomato/Previous-Xcode.git
         git clone https://github.com/itomato/Previous-DMG.git
         # Move or copy the required Xcode project files to the correct location
-        cp -r Previous-Xcode/* .
         cp -r Previous-DMG/* .
 
     - name: Install macOS dependencies
