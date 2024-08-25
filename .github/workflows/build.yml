@@ -46,8 +46,8 @@ jobs:
 
     - name: Build Previous Emulator on Linux
       run: |
-          chmod +x build-mac.sh
-          ./build-mac.sh
+          chmod +x build-itomato.sh
+          ./build-itomato.sh
           #cmake --build build/linux --config Release
 
     - name: Package the Linux build
