@@ -29,10 +29,12 @@ jobs:
 
     - name: Configure CMake for Linux
       run: |
-        cmake -S . -B build/linux -DCMAKE_BUILD_TYPE=Release \
-              -DSDL2_INCLUDE_DIR=/usr/include/SDL2 \
-              -DSDL2_LIBRARY=/usr/lib/x86_64-linux-gnu/libSDL2.so
+        #cmake -S . -B build/linux -DCMAKE_BUILD_TYPE=Release \
+        #      -DSDL2_INCLUDE_DIR=/usr/include/SDL2 \
+        #      -DSDL2_LIBRARY=/usr/lib/x86_64-linux-gnu/libSDL2.so
 
+        cmake -S . -B build/linux -DCMAKE_BUILD_TYPE=Release
+        
     - name: Fetch Previous-tweaks repo and apply patches
       run: |
         #cd Previous-tweaks \
