@@ -46,7 +46,9 @@ jobs:
 
     - name: Build Previous Emulator on Linux
       run: |
-        cmake --build build/linux --config Release
+          chmod +x build-mac.sh
+          ./build-mac.sh
+          #cmake --build build/linux --config Release
 
     - name: Package the Linux build
       run: |
