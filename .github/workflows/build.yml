@@ -81,8 +81,9 @@ jobs:
     - name: Install macOS dependencies
       run: |
         brew update
-        brew install libpng libpcap cmake sdl2
-        # SDL2.framework will be handled by the fetched macOS-specific repos
+        brew install libpng libpcap cmake sdl2 npm node
+        brew install npm
+        npm install -g appdmg
 
     - name: Configure CMake for macOS
       run: |
@@ -98,6 +99,12 @@ jobs:
         mkdir -p output
         cd build/macos
         tar -czvf ../../output/previous_emulator_macos.tar.gz *
+        cd ../../
+        aspell			frei0r			icu4c			libidn2			libtool			lzip			p11-kit			selenium-server		x264
+        DATE=$(date +%Y%m%d)
+        convert background-base.png -font Arial -pointsize 9 -fill red -annotate +10+10 $(date +%Y%m%d) background.png
+        cp Previous.icns Previous.app/Contents/Resources/Previous.icns
+        appdmg previous.appdmg.json Previous.$DATE.dmg
 
     - name: Upload macOS build artifact
       uses: actions/upload-artifact@v3
