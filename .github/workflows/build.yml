@@ -88,7 +88,7 @@ jobs:
     - name: Configure CMake for macOS
       run: |
         cmake -S . -B build/macos -DCMAKE_BUILD_TYPE=Release \
-              -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"  # Universal build
+              -DCMAKE_OSX_ARCHITECTURES="arm64"  # Universal build
 
     - name: Build Previous Emulator on macOS
       run: |
