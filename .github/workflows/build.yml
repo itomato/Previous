@@ -81,7 +81,7 @@ jobs:
     - name: Install macOS dependencies
       run: |
         brew update
-        brew install libpng libpcap cmake libsdl2-dev
+        brew install libpng libpcap cmake sdl2
         # SDL2.framework will be handled by the fetched macOS-specific repos
 
     - name: Configure CMake for macOS
