@@ -1007,7 +1007,6 @@ static int SDLGui_HandleSelection(SGOBJ *dlg, int obj, int oldbutton)
 		SDL_FillRect(pSdlGuiScrn, &rct, colors.midgrey); /* Clear old */
 		SDLGui_DrawRadioButton(dlg, obj);
 		Screen_UpdateRects(pSdlGuiScrn, 1, &rct);
-		retbutton = obj; /* Added for Previous */
 		break;
 	case SGCHECKBOX:
 		dlg[obj].state ^= SG_SELECTED;
@@ -1018,7 +1017,6 @@ static int SDLGui_HandleSelection(SGOBJ *dlg, int obj, int oldbutton)
 		SDL_FillRect(pSdlGuiScrn, &rct, colors.midgrey); /* Clear old */
 		SDLGui_DrawCheckBox(dlg, obj);
 		Screen_UpdateRects(pSdlGuiScrn, 1, &rct);
-		retbutton = obj; /* Added for Previous */
 		break;
 	case SGPOPUP:
 		dlg[obj].state |= SG_SELECTED;
@@ -1028,9 +1026,6 @@ static int SDLGui_HandleSelection(SGOBJ *dlg, int obj, int oldbutton)
 			       (dlg[0].y+dlg[obj].y)*sdlgui_fontheight-2,
 			       dlg[obj].w*sdlgui_fontwidth+4,
 			       dlg[obj].h*sdlgui_fontheight+4);
-		retbutton=obj;
-		break;
-	case SGHIDDEN: /* Added for Previous */
 		retbutton=obj;
 		break;
 	}
@@ -1090,14 +1085,7 @@ void SDLGui_ScaleMouseStateCoordinates(int *x, int *y)
  */
 static void SDLGui_ScaleMouseButtonCoordinates(SDL_MouseButtonEvent *bev)
 {
-#if 0 /* This causes problems with Previous */
-	if (bInFullScreen)
-		return;
-
-	int x = bev->x, y = bev->y;
-	SDLGui_ScaleMouseStateCoordinates(&x, &y);
-	bev->x = x; bev->y = y;
-#endif
+	/* This is not necessary for Previous */
 }
 
 /*-----------------------------------------------------------------------*/
@@ -1189,12 +1177,18 @@ int SDLGui_DoDialogExt(SGOBJ *dlg, bool (*isEventOut)(SDL_EventType), SDL_Event 
 	/* If one of the keys that could exit the dialog is already held
 	 * before we start, then ignore the first keyup event since the
 	 * key press does not belong to the dialog, but rather to whatever
-	 * happened before the dialog */
+	 * happened before the dialog.
+	 *
+	 * Cannot be used when asked to return already on key down
+	 * (e.g. with file selector).
+	 */
 	keystates = SDL_GetKeyboardState(NULL);
-	ignore_first_keyup = keystates[SDL_GetScancodeFromKey(SDLK_RETURN)] ||
+	ignore_first_keyup = !(isEventOut && isEventOut(SDL_KEYDOWN)) && (
+	                     keystates[SDL_GetScancodeFromKey(SDLK_RETURN)] ||
 	                     keystates[SDL_GetScancodeFromKey(SDLK_KP_ENTER)] ||
 	                     keystates[SDL_GetScancodeFromKey(SDLK_SPACE)] ||
-	                     keystates[SDL_GetScancodeFromKey(SDLK_ESCAPE)];
+	                     keystates[SDL_GetScancodeFromKey(SDLK_ESCAPE)]
+	);
 
 	/* Is the left mouse button still pressed? Yes -> Handle TOUCHEXIT objects here */
 	SDL_PumpEvents();

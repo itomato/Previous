@@ -252,7 +252,7 @@ static int sector_increment = 0;
 
 /* OSP registers */
 
-void MO_TrackNumH_Read(void) { // 0x02012000
+void MO_TrackNumH_Read(void) { /* 0x02012000 */
     IoMem_WriteByte(IoAccessCurrentAddress, osp.tracknumh);
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Track number hi read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -262,7 +262,7 @@ void MO_TrackNumH_Write(void) {
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Track number hi write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void MO_TrackNumL_Read(void) { // 0x02012001
+void MO_TrackNumL_Read(void) { /* 0x02012001 */
     IoMem_WriteByte(IoAccessCurrentAddress, osp.tracknuml);
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Track number lo read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -272,7 +272,7 @@ void MO_TrackNumL_Write(void) {
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Track number lo write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void MO_SectorIncr_Read(void) { // 0x02012002
+void MO_SectorIncr_Read(void) { /* 0x02012002 */
     IoMem_WriteByte(IoAccessCurrentAddress, osp.sector_num&MOSEC_NUM_MASK);
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Sector increment and number read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -284,7 +284,7 @@ void MO_SectorIncr_Write(void) {
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Sector increment and number write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void MO_SectorCnt_Read(void) { // 0x02012003
+void MO_SectorCnt_Read(void) { /* 0x02012003 */
     IoMem_WriteByte(IoAccessCurrentAddress, osp.sector_count&0xFF);
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Sector count read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -297,7 +297,7 @@ void MO_SectorCnt_Write(void) {
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Sector count write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void MO_IntStatus_Read(void) { // 0x02012004
+void MO_IntStatus_Read(void) { /* 0x02012004 */
     IoMem_WriteByte(IoAccessCurrentAddress, osp.intstatus);
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Interrupt status read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -319,7 +319,7 @@ void MO_IntStatus_Write(void) {
     }
 }
 
-void MO_IntMask_Read(void) { // 0x02012005
+void MO_IntMask_Read(void) { /* 0x02012005 */
     IoMem_WriteByte(IoAccessCurrentAddress, osp.intmask);
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Interrupt mask read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -331,7 +331,7 @@ void MO_IntMask_Write(void) {
     osp_set_interrupts();
 }
 
-void MOctrl_CSR2_Read(void) { // 0x02012006
+void MOctrl_CSR2_Read(void) { /* 0x02012006 */
     IoMem_WriteByte(IoAccessCurrentAddress, osp.ctrlr_csr2);
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] CSR2 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -343,7 +343,7 @@ void MOctrl_CSR2_Write(void) {
     osp_formatter_cmd2();
 }
 
-void MOctrl_CSR1_Read(void) { // 0x02012007
+void MOctrl_CSR1_Read(void) { /* 0x02012007 */
     IoMem_WriteByte(IoAccessCurrentAddress, osp.ctrlr_csr1);
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] CSR1 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -355,7 +355,7 @@ void MOctrl_CSR1_Write(void) {
     osp_formatter_cmd();
 }
 
-void MO_CSR_H_Read(void) { // 0x02012009
+void MO_CSR_H_Read(void) { /* 0x02012009 */
     IoMem_WriteByte(IoAccessCurrentAddress, osp.csrh);
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] CSR hi read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -365,7 +365,7 @@ void MO_CSR_H_Write(void) {
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] CSR hi write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void MO_CSR_L_Read(void) { // 0x02012008
+void MO_CSR_L_Read(void) { /* 0x02012008 */
     IoMem_WriteByte(IoAccessCurrentAddress, osp.csrl);
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] CSR lo read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -377,32 +377,32 @@ void MO_CSR_L_Write(void) {
     mo_drive_cmd((osp.csrh<<8) | osp.csrl);
 }
 
-void MO_ErrStat_Read(void) { // 0x0201200a
+void MO_ErrStat_Read(void) { /* 0x0201200a */
     IoMem_WriteByte(IoAccessCurrentAddress, osp.err_stat);
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Error status read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void MO_EccCnt_Read(void) { // 0x0201200b
+void MO_EccCnt_Read(void) { /* 0x0201200b */
     IoMem_WriteByte(IoAccessCurrentAddress, osp.ecc_cnt);
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] ECC count read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void MO_Init_Write(void) { // 0x0201200c
+void MO_Init_Write(void) { /* 0x0201200c */
     osp.init = IoMem_ReadByte(IoAccessCurrentAddress);
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Init write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void MO_Format_Write(void) { // 0x0201200d
+void MO_Format_Write(void) { /* 0x0201200d */
     osp.format = IoMem_ReadByte(IoAccessCurrentAddress);
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Format write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void MO_Mark_Write(void) { // 0x0201200e
+void MO_Mark_Write(void) { /* 0x0201200e */
     osp.mark = IoMem_ReadByte(IoAccessCurrentAddress);
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Mark write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void MO_Flag0_Read(void) { // 0x02012010
+void MO_Flag0_Read(void) { /* 0x02012010 */
     IoMem_WriteByte(IoAccessCurrentAddress, osp.flag[0]);
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Flag 0 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -412,7 +412,7 @@ void MO_Flag0_Write(void) {
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Flag 0 write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void MO_Flag1_Read(void) { // 0x02012011
+void MO_Flag1_Read(void) { /* 0x02012011 */
     IoMem_WriteByte(IoAccessCurrentAddress, osp.flag[1]);
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Flag 1 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -422,7 +422,7 @@ void MO_Flag1_Write(void) {
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Flag 1 write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void MO_Flag2_Read(void) { // 0x02012012
+void MO_Flag2_Read(void) { /* 0x02012012 */
     IoMem_WriteByte(IoAccessCurrentAddress, osp.flag[2]);
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Flag 2 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -432,7 +432,7 @@ void MO_Flag2_Write(void) {
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Flag 2 write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void MO_Flag3_Read(void) { // 0x02012013
+void MO_Flag3_Read(void) { /* 0x02012013 */
     IoMem_WriteByte(IoAccessCurrentAddress, osp.flag[3]);
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Flag 3 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -442,7 +442,7 @@ void MO_Flag3_Write(void) {
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Flag 3 write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void MO_Flag4_Read(void) { // 0x02012014
+void MO_Flag4_Read(void) { /* 0x02012014 */
     IoMem_WriteByte(IoAccessCurrentAddress, osp.flag[4]);
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Flag 4 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -452,7 +452,7 @@ void MO_Flag4_Write(void) {
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Flag 4 write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void MO_Flag5_Read(void) { // 0x02012015
+void MO_Flag5_Read(void) { /* 0x02012015 */
     IoMem_WriteByte(IoAccessCurrentAddress, osp.flag[5]);
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Flag 5 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -462,7 +462,7 @@ void MO_Flag5_Write(void) {
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Flag 5 write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void MO_Flag6_Read(void) { // 0x02012016
+void MO_Flag6_Read(void) { /* 0x02012016 */
     IoMem_WriteByte(IoAccessCurrentAddress, osp.flag[6]);
     Log_Printf(LOG_MO_REG_LEVEL,"[OSP] Flag 6 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }

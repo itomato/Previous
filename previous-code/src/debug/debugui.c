@@ -306,49 +306,6 @@ static char *DebugUI_EvaluateExpressions(const char *initial)
 
 
 /**
- * Command: Set command line and debugger options
- */
-static int DebugUI_SetOptions(int argc, char *argv[])
-{
-	CNF_PARAMS current;
-	static const struct {
-		const char name[4];
-		int base;
-	} bases[] = {
-		{ "bin", 2 },
-		{ "dec", 10 },
-		{ "hex", 16 }
-	};
-	const char *arg;
-	int i;
-	
-	if (argc < 2)
-	{
-		return DebugUI_PrintCmdHelp(argv[0]);
-	}
-	arg = argv[1];
-
-	for (i = 0; i < ARRAY_SIZE(bases); i++)
-	{
-		if (strcasecmp(bases[i].name, arg) == 0)
-		{
-			if (ConfigureParams.Debugger.nNumberBase != bases[i].base)
-			{
-				fprintf(stderr, "Switched default number base from %d to %d-based (%s) values.\n",
-					ConfigureParams.Debugger.nNumberBase,
-					bases[i].base, bases[i].name);
-				ConfigureParams.Debugger.nNumberBase = bases[i].base;
-			} else {
-				fprintf(stderr, "Already in '%s' mode.\n", bases[i].name);
-			}
-			return DEBUGGER_CMDDONE;
-		}
-	}
-
-	return DEBUGGER_CMDDONE;
-}
-
-/**
  * Command: Set tracing
  */
 static int DebugUI_SetTracing(int argc, char *argv[])
@@ -458,15 +415,8 @@ static int DebugUI_CommandsFromFile(int argc, char *argv[])
  */
 static int DebugUI_QuitEmu(int nArgc, char *psArgv[])
 {
-	int exitval;
-
 	if (nArgc > 2)
 		return DebugUI_PrintCmdHelp(psArgv[0]);
-
-	if (nArgc == 2)
-		exitval = atoi(psArgv[1]);
-	else
-		exitval = 0;
 
 	Main_RequestQuit(false);
 	return DEBUGGER_END;
@@ -1077,6 +1027,21 @@ void DebugUI_UnInit(void)
 
 
 /**
+ * Return true if user wants to quit current command
+ */
+bool DebugUI_DoQuitQuery(const char *info)
+{
+	char input[8];
+	fprintf(stderr, "--- q to exit %s, enter to continue --- ", info);
+	if (fgets(input, sizeof(input), stdin) == NULL ||
+	    toupper(input[0]) == 'Q') {
+		return true;
+	}
+	return false;
+}
+
+
+/**
  * Add debugger command files during Hatari startup before things
  * needed by the debugger are initialized so that it can be parsed
  * when debugger itself gets initialized.
@@ -1129,7 +1094,7 @@ void DebugUI(debug_reason_t reason)
 	 * this is invoked from.  E.g. returning from fullscreen
 	 * enables grab if that was enabled on windowed mode.
 	 */
-	SDL_SetRelativeMouseMode(false);
+	Main_SetMouseGrab(false);
 
 	DebugUI_Init();
 

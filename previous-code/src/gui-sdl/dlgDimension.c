@@ -23,10 +23,6 @@ const char DlgDimension_fileid[] = "Previous dlgDimension.c";
 char dimension_memory[16] = "64 MB";
 char dimension_slot[16]   = "2:";
 
-/* Additional functions */
-void print_nd_overview(int slot);
-void get_nd_default_values(int slot);
-
 static SGOBJ dimensiondlg[] =
 {
 	{ SGBOX,      0, 0, 0,  0, 58, 22, NULL },
@@ -61,18 +57,9 @@ static SGOBJ dimensiondlg[] =
 void Dialog_NDMemDlg(int *membank);
 
 /* Function to print system overview */
-void print_nd_overview(int n) {
+static void print_nd_overview(int n) {
 	snprintf(dimension_memory, sizeof(dimension_memory), "%i MB",
 	         Configuration_CheckDimensionMemory(ConfigureParams.Dimension.board[n].nMemoryBankSize));
-}
-
-/* Function to get default values for each system */
-void get_nd_default_values(int n) {
-	int i;
-
-	for (i = 0; i < 4; i++) {
-		ConfigureParams.Dimension.board[n].nMemoryBankSize[i] = 4;
-	}
 }
 
 
@@ -152,10 +139,6 @@ void Dialog_DimensionDlg(int n)
 #define DLGNDMEM_DEFAULT       23
 #define DLGNDMEM_EXIT          24
 
-
-void Dialog_NDMemDraw(int *memorybank);
-void Dialog_NDMemRead(int *memorybank);
-
 static SGOBJ ndmemdlg[] =
 {
 	{ SGBOX, 0, 0, 0,0, 55,18, NULL },
@@ -192,7 +175,47 @@ static SGOBJ ndmemdlg[] =
 	{ SGSTOP, 0, 0, 0,0, 0,0, NULL }
 };
 
+/* Function to set up the dialog from the actual values */
+static void Dialog_NDMemDraw(int *bank) {
+	int i, j;
+	for (i = 0; i<4; i++) {
+		
+		for (j = (DLGNDMEM_BANK0_4MB+(5*i)); j <= (DLGNDMEM_BANK0_NONE+(5*i)); j++)
+		{
+			ndmemdlg[j].state &= ~SG_SELECTED;
+		}
+		
+		switch (bank[i])
+		{
+			case 0:
+				ndmemdlg[DLGNDMEM_BANK0_NONE+(i*5)].state |= SG_SELECTED;
+				break;
+			case 4:
+				ndmemdlg[DLGNDMEM_BANK0_4MB+(i*5)].state |= SG_SELECTED;
+				break;
+			case 16:
+				ndmemdlg[DLGNDMEM_BANK0_16MB+(i*5)].state |= SG_SELECTED;
+				break;
+				
+			default:
+				break;
+		}
+	}
+}
 
+
+/* Function to read the actual values from the dialog */
+static void Dialog_NDMemRead(int *bank) {
+	int i;
+	for (i = 0; i<4; i++) {
+		if (ndmemdlg[(DLGNDMEM_BANK0_4MB)+(i*5)].state & SG_SELECTED)
+			bank[i] = 4;
+		else if (ndmemdlg[(DLGNDMEM_BANK0_16MB)+(i*5)].state & SG_SELECTED)
+			bank[i] = 16;
+		else
+			bank[i] = 0;
+	}
+}
 
 /*-----------------------------------------------------------------------*/
 /**
@@ -225,50 +248,6 @@ void Dialog_NDMemDlg(int *membank) {
 	while (but != DLGNDMEM_EXIT && but != SDLGUI_QUIT
 		   && but != SDLGUI_ERROR && !bQuitProgram);
 	
-	
 	/* Read values from dialog: */
 	Dialog_NDMemRead(membank);
-}
-
-
-/* Function to set up the dialog from the actual values */
-void Dialog_NDMemDraw(int *bank) {
-	int i, j;
-	for (i = 0; i<4; i++) {
-		
-		for (j = (DLGNDMEM_BANK0_4MB+(5*i)); j <= (DLGNDMEM_BANK0_NONE+(5*i)); j++)
-		{
-			ndmemdlg[j].state &= ~SG_SELECTED;
-		}
-		
-		switch (bank[i])
-		{
-			case 0:
-				ndmemdlg[DLGNDMEM_BANK0_NONE+(i*5)].state |= SG_SELECTED;
-				break;
-			case 4:
-				ndmemdlg[DLGNDMEM_BANK0_4MB+(i*5)].state |= SG_SELECTED;
-				break;
-			case 16:
-				ndmemdlg[DLGNDMEM_BANK0_16MB+(i*5)].state |= SG_SELECTED;
-				break;
-				
-			default:
-				break;
-		}
-	}
-}
-
-
-/* Function to read the actual values from the dialog */
-void Dialog_NDMemRead(int *bank) {
-	int i;
-	for (i = 0; i<4; i++) {
-		if (ndmemdlg[(DLGNDMEM_BANK0_4MB)+(i*5)].state & SG_SELECTED)
-			bank[i] = 4;
-		else if (ndmemdlg[(DLGNDMEM_BANK0_16MB)+(i*5)].state & SG_SELECTED)
-			bank[i] = 16;
-		else
-			bank[i] = 0;
-	}
 }

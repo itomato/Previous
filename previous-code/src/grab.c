@@ -46,10 +46,10 @@ static bool Grab_FillBuffer(uint8_t* buf) {
 				if (i && (i%(NEXT_SCREEN_WIDTH*4))==0)
 					j+=32*4;
 
-				buf[i+0] = fb[j+2]; // r
-				buf[i+1] = fb[j+1]; // g
-				buf[i+2] = fb[j+0]; // b
-				buf[i+3] = 0xff;    // a
+				buf[i+0] = fb[j+2]; /* r */
+				buf[i+1] = fb[j+1]; /* g */
+				buf[i+2] = fb[j+0]; /* b */
+				buf[i+3] = 0xff;    /* a */
 			}
 			return true;
 		}
@@ -61,20 +61,20 @@ static bool Grab_FillBuffer(uint8_t* buf) {
 					if (!ConfigureParams.System.bTurbo && i && (i%(NEXT_SCREEN_WIDTH*4))==0)
 						j+=32*2;
 					
-					buf[i+0] = (fb[j+0]&0xf0) | ((fb[j+0]&0xf0)>>4); // r
-					buf[i+1] = (fb[j+0]&0x0f) | ((fb[j+0]&0x0f)<<4); // g
-					buf[i+2] = (fb[j+1]&0xf0) | ((fb[j+1]&0xf0)>>4); // b
-					buf[i+3] = 0xff;                                 // a
+					buf[i+0] = (fb[j+0]&0xf0) | ((fb[j+0]&0xf0)>>4); /* r */
+					buf[i+1] = (fb[j+0]&0x0f) | ((fb[j+0]&0x0f)<<4); /* g */
+					buf[i+2] = (fb[j+1]&0xf0) | ((fb[j+1]&0xf0)>>4); /* b */
+					buf[i+3] = 0xff;                                 /* a */
 				}
 			} else {
 				for (i = 0, j = 0; i < (NEXT_SCREEN_WIDTH*NEXT_SCREEN_HEIGHT*4); i+=16, j++) {
 					if (!ConfigureParams.System.bTurbo && i && (i%(NEXT_SCREEN_WIDTH*4))==0)
 						j+=32/4;
 					
-					buf[i+ 0] = buf[i+ 1] = buf[i+ 2] = (~(fb[j] >> 6) & 3) * 0x55; buf[i+ 3] = 0xff; // rgba
-					buf[i+ 4] = buf[i+ 5] = buf[i+ 6] = (~(fb[j] >> 4) & 3) * 0x55; buf[i+ 7] = 0xff; // rgba
-					buf[i+ 8] = buf[i+ 9] = buf[i+10] = (~(fb[j] >> 2) & 3) * 0x55; buf[i+11] = 0xff; // rgba
-					buf[i+12] = buf[i+13] = buf[i+14] = (~(fb[j] >> 0) & 3) * 0x55; buf[i+15] = 0xff; // rgba
+					buf[i+ 0] = buf[i+ 1] = buf[i+ 2] = (~(fb[j] >> 6) & 3) * 0x55; buf[i+ 3] = 0xff; /* rgba */
+					buf[i+ 4] = buf[i+ 5] = buf[i+ 6] = (~(fb[j] >> 4) & 3) * 0x55; buf[i+ 7] = 0xff; /* rgba */
+					buf[i+ 8] = buf[i+ 9] = buf[i+10] = (~(fb[j] >> 2) & 3) * 0x55; buf[i+11] = 0xff; /* rgba */
+					buf[i+12] = buf[i+13] = buf[i+14] = (~(fb[j] >> 0) & 3) * 0x55; buf[i+15] = 0xff; /* rgba */
 				}
 			}
 			return true;
@@ -97,7 +97,6 @@ static bool Grab_MakePNG(FILE* fp) {
 	int         y        = 0;
 	bool        result   = false;
 	
-	off_t       start    = 0;
 	uint8_t*    src_ptr  = NULL;
 	uint8_t*    buf      = malloc(NEXT_SCREEN_WIDTH*NEXT_SCREEN_HEIGHT*4);
 	
@@ -113,9 +112,6 @@ static bool Grab_MakePNG(FILE* fp) {
 					 * error handling functions in the png_create_write_struct() call.
 					 */
 					if (!setjmp(png_jmpbuf(png_ptr))) {
-						/* store current pos in fp (could be != 0 for avi recording) */
-						start = ftello(fp);
-						
 						/* initialize the png structure */
 						png_init_io(png_ptr, fp);
 						
@@ -190,29 +186,26 @@ void Grab_Screen(void) {
 	if (File_DirExists(ConfigureParams.Printer.szPrintToFileName)) {
 		for (i = 0; i < 1000; i++) {
 			snprintf(szFileName, sizeof(szFileName), "next_screen_%03d", i);
-			szPathName = File_MakePath(ConfigureParams.Printer.szPrintToFileName, szFileName, ".png");
+			szPathName = File_MakePath(ConfigureParams.Printer.szPrintToFileName, szFileName, "png");
 			
 			if (File_Exists(szPathName)) {
+				free(szPathName);
 				continue;
 			}
 			
 			Grab_SaveFile(szPathName);
-			break;
+			free(szPathName);
+			return;
 		}
 		
-		if (i >= 1000) {
-			Log_Printf(LOG_WARN, "[Grab] Error: Maximum screen grab count exceeded (%d)", i);
-		}
-	}
-	if (szPathName) {
-		free(szPathName);
+		Log_Printf(LOG_WARN, "[Grab] Error: Maximum screen grab count exceeded (%d)", i);
 	}
 }
-#else // !HAVE_LIBPNG
+#else /* !HAVE_LIBPNG */
 void Grab_Screen(void) {
 	Log_Printf(LOG_WARN, "[Grab] Screen grab not supported (libpng missing)");
 }
-#endif // HAVE_LIBPNG
+#endif /* HAVE_LIBPNG */
 
 
 /*
@@ -345,43 +338,33 @@ static void Grab_OpenSoundFile(void)
 		/* Build file name */
 		for (i = 0; i < 1000; i++) {
 			snprintf(szFileName, sizeof(szFileName), "next_sound_%03d", i);
-			szPathName = File_MakePath(ConfigureParams.Printer.szPrintToFileName, szFileName, ".aiff");
+			szPathName = File_MakePath(ConfigureParams.Printer.szPrintToFileName, szFileName, "aiff");
 			
 			if (File_Exists(szPathName)) {
+				free(szPathName);
 				continue;
 			}
-			break;
-		}
-		
-		if (i >= 1000) {
-			Log_Printf(LOG_WARN, "[Grab] Error: Maximum sound grab count exceeded (%d)", i);
-			goto done;
-		}
-		
-		/* Create our file */
-		AiffFileHndl = File_Open(szPathName, "wb");
-		if (!AiffFileHndl)
-		{
-			Log_Printf(LOG_WARN, "[Grab] Failed to create sound file %s: ", szPathName);
-			goto done;
-		}
-		
-		/* Write header to file */
-		if (File_Write(AiffHeader, sizeof(AiffHeader), 0, AiffFileHndl))
-		{
-			bRecordingAiff = true;
-			Log_Printf(LOG_WARN, "[Grab] Starting sound record");
-			Statusbar_AddMessage("Start saving sound to file", 0);
-		}
-		else
-		{
-			perror("[Grab] Grab_OpenSoundFile:");
-		}
-		
-	done:
-		if (szPathName) {
+			
+			/* Create our file */
+			AiffFileHndl = File_Open(szPathName, "wb");
+			if (AiffFileHndl) {
+				
+				/* Write header to file */
+				if (File_Write(AiffHeader, sizeof(AiffHeader), 0, AiffFileHndl)) {
+					bRecordingAiff = true;
+					Log_Printf(LOG_WARN, "[Grab] Starting sound record");
+					Statusbar_AddMessage("Start saving sound to file", 0);
+				} else {
+					perror("[Grab] Grab_OpenSoundFile:");
+				}
+			} else {
+				Log_Printf(LOG_WARN, "[Grab] Failed to create sound file %s: ", szPathName);
+			}
 			free(szPathName);
+			return;
 		}
+		
+		Log_Printf(LOG_WARN, "[Grab] Error: Maximum sound grab count exceeded (%d)", i);
 	}
 }
 

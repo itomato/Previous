@@ -21,7 +21,6 @@ extern SDL_Surface *sdlscrn;
 
 extern void Screen_Init(void);
 extern void Screen_UnInit(void);
-extern void Screen_Pause(bool pause);
 extern void Screen_EnterFullScreen(void);
 extern void Screen_ReturnFromFullScreen(void);
 extern void Screen_ShowMainWindow(void);
@@ -32,7 +31,7 @@ extern void Screen_UpdateRects(SDL_Surface *screen, int numrects, SDL_Rect *rect
 extern void Screen_UpdateRect(SDL_Surface *screen, int32_t x, int32_t y, int32_t w, int32_t h);
 extern void Screen_BlitDimension(uint32_t* vram, SDL_Texture* tex);
 extern void Screen_Blank(SDL_Texture* tex);
-extern void Screen_Repaint(void);
+extern bool Screen_Repaint(void);
 
 #ifdef __cplusplus
 }

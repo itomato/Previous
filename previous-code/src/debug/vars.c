@@ -32,38 +32,6 @@ static uint32_t GetCycleCounter(void)
 	return nCyclesMainCounter;
 }
 
-/* helpers for TOS OS call opcode accessor functions */
-
-static inline uint16_t getLineOpcode(uint8_t line)
-{
-	uint32_t pc;
-	uint16_t instr;
-	pc = M68000_GetPC();
-	instr = M68000_ReadWord(pc);
-	/* for opcode X, Line-A = 0xA00X, Line-F = 0xF00X */
-	if ((instr >> 12) == line) {
-		return instr & 0xFF;
-	}
-	return INVALID_OPCODE;
-}
-static inline bool isTrap(uint8_t trap)
-{
-	uint32_t pc;
-	uint16_t instr;
-	pc = M68000_GetPC();
-	instr = M68000_ReadWord(pc);
-	return (instr == (uint16_t)0x4e40u + trap);
-}
-static inline uint16_t getControlOpcode(void)
-{
-	/* Control[] address from D1, opcode in Control[0] */
-	return M68000_ReadWord(M68000_ReadLong(Regs[REG_D1]));
-}
-static inline uint16_t getStackOpcode(void)
-{
-	return M68000_ReadWord(Regs[REG_A7]);
-}
-
 static uint32_t GetNextPC(void)
 {
 	return Disasm_GetNextPC(M68000_GetPC());

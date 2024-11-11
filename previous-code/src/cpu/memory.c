@@ -1221,22 +1221,12 @@ int memory_init (void)
  */
 void memory_uninit (void)
 {
-	if (NEXTRom) {
-		free(NEXTRom);
-		NEXTRom = NULL;
-	}
-	if (NEXTVideo) {
-		free(NEXTVideo);
-		NEXTVideo = NULL;
-	}
-	if (NEXTRam) {
-		free(NEXTRam);
-		NEXTRam = NULL;
-	}
-	if (NEXTIo) {
-		free(NEXTIo);
-		NEXTIo = NULL;
-	}
+	free(NEXTRom);
+	free(NEXTVideo);
+	free(NEXTRam);
+	free(NEXTIo);
+	
+	NEXTRom = NEXTVideo = NEXTRam = NEXTIo = NULL;
 }
 
 

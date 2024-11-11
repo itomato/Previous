@@ -147,9 +147,9 @@ udp_input(register struct mbuf *m, int iphlen)
     u_int16_t      dst_port = uh->uh_dport;
     
     if(nfsd_match_addr(ntohl(save_ip.ip_dst.s_addr))) {
-        nfsd_udp_map_to_local_port(&dst_addr.s_addr, &dst_port);
+        nfsd_udp_map_to_local_port(&dst_addr, &dst_port);
     } else if(vdns_match(m, ntohl(save_ip.ip_dst.s_addr), dport)) {
-        vdns_udp_map_to_local_port(&dst_addr.s_addr, &dst_port);
+        vdns_udp_map_to_local_port(&dst_addr, &dst_port);
     }
     
     ip->ip_dst   = dst_addr; /* Copy back to packed structure. */
@@ -333,7 +333,7 @@ int udp_output(struct socket *so, struct mbuf *m,
     }
     
     if(so->so_faddr.s_addr == loopback_addr.s_addr)
-        udp_map_from_local_port(ntohs(so->so_fport), &saddr.sin_addr.s_addr, &saddr.sin_port);
+        udp_map_from_local_port(ntohs(so->so_fport), &saddr.sin_addr, &saddr.sin_port);
     
     daddr.sin_addr = so->so_laddr;
     daddr.sin_port = so->so_lport;

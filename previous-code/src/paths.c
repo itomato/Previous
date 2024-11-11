@@ -305,7 +305,16 @@ void Paths_Init(const char *argv0)
 	Paths_InitHomeDirs();
 
 	/* Init screenshot directory string */
+#if !defined(__APPLE__)
 	sScreenShotDir = Str_Dup(sWorkingDir);
+#else
+	sScreenShotDir = Paths_GetMacScreenShotDir();
+	if (!sScreenShotDir)
+	{
+		/* Failsafe, but should not be able to happen */
+		sScreenShotDir = Str_Dup(sWorkingDir);
+	}
+#endif
 
 	/* Get the directory where the executable resides */
 	psExecDir = Paths_InitExecDir(argv0);

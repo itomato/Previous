@@ -173,7 +173,7 @@ static inline float32 propagateFloat32NaN( float32 a, float32 b, float_status *s
  | signaling NaN, the invalid exception is raised.
  *----------------------------------------------------------------------------*/
 
-static float64 propagateFloat64NaN( float64 a, float64 b, float_status* c )
+static inline float64 propagateFloat64NaN( float64 a, float64 b, float_status* c )
 {
     flag aIsNaN, aIsSignalingNaN, bIsNaN, bIsSignalingNaN;
     

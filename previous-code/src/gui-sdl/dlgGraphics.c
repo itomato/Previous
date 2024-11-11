@@ -24,33 +24,33 @@ const char DlgGraphics_fileid[] = "Previous dlgGraphics.c";
 
 static SGOBJ graphicsdlg[] =
 {
-	{ SGBOX,      0, 0, 0,  0, 56,24, NULL },
-	{ SGTEXT,     0, 0, 20, 1, 16, 1, "Graphics options" },
+	{ SGBOX,      0,       0,  0, 0, 56,24, NULL },
+	{ SGTEXT,     0,       0, 20, 1, 16, 1, "Graphics options" },
 	
-	{ SGBOX,      0, 0, 2,  3, 32, 9, NULL },
-	{ SGTEXT,     0, 0, 3,  4, 21, 1, "NeXTdimension boards:" },
-	{ SGTEXT,     0, 0, 4,  6, 16, 1, "Board at slot 2:" },
-	{ SGBUTTON,   0, 0, 22, 6, 10, 1, "Add" },
-	{ SGTEXT,     0, 0, 4,  8, 16, 1, "Board at slot 4:" },
-	{ SGBUTTON,   0, 0, 22, 8, 10, 1, "Add" },
-	{ SGTEXT,     0, 0, 4, 10, 16, 1, "Board at slot 6:" },
-	{ SGBUTTON,   0, 0, 22,10, 10, 1, "Add" },
+	{ SGBOX,      0,       0,  2, 3, 32, 9, NULL },
+	{ SGTEXT,     0,       0,  3, 4, 21, 1, "NeXTdimension boards:" },
+	{ SGTEXT,     0,       0,  4, 6, 16, 1, "Board at slot 2:" },
+	{ SGBUTTON,   0,       0, 22, 6, 10, 1, "Add" },
+	{ SGTEXT,     0,       0,  4, 8, 16, 1, "Board at slot 4:" },
+	{ SGBUTTON,   0,       0, 22, 8, 10, 1, "Add" },
+	{ SGTEXT,     0,       0,  4,10, 16, 1, "Board at slot 6:" },
+	{ SGBUTTON,   0,       0, 22,10, 10, 1, "Add" },
 	
-	{ SGBOX,      0, 0, 35, 3, 19, 9, NULL },
-	{ SGTEXT,     0, 0, 36, 4, 13, 1, "Show display:" },
-	{ SGRADIOBUT, 0, 0, 37, 6, 12, 1, "Monochrome" },
-	{ SGRADIOBUT, 0, 0, 37, 8,  7, 1, "Color" },
-	{ SGRADIOBUT, 0, 0, 37,10,  5, 1, "All" },
+	{ SGBOX,      0,       0, 35, 3, 19, 9, NULL },
+	{ SGTEXT,     0,       0, 36, 4, 13, 1, "Show display:" },
+	{ SGRADIOBUT, SG_EXIT, 0, 37, 6, 12, 1, "Monochrome" },
+	{ SGRADIOBUT, SG_EXIT, 0, 37, 8,  7, 1, "Color" },
+	{ SGRADIOBUT, SG_EXIT, 0, 37,10,  5, 1, "All" },
 
-	{ SGBOX,      0, 0, 2, 13, 52, 3, NULL },
-	{ SGTEXT,     0, 0, 3, 14, 13, 1, "Main display:" },
-	{ SGCHECKBOX, 0, 0, 18,14, 26, 1, "Console on NeXTdimension" },
+	{ SGBOX,      0,       0,  2,13, 52, 3, NULL },
+	{ SGTEXT,     0,       0,  3,14, 13, 1, "Main display:" },
+	{ SGCHECKBOX, SG_EXIT, 0, 18,14, 26, 1, "Console on NeXTdimension" },
 
-	{ SGTEXT,     0, 0, 2, 18, 52, 1, "Note: NeXTdimension does not work with NeXTstations." },
+	{ SGTEXT,     0,       0,  2,18, 52, 1, "Note: NeXTdimension does not work with NeXTstations." },
 	
-	{ SGBUTTON, SG_DEFAULT, 0, 17,21, 21,1, "Back to main menu" },
+	{ SGBUTTON, SG_DEFAULT,0, 17,21, 21, 1, "Back to main menu" },
 
-	{ SGSTOP, 0, 0, 0,0, 0,0, NULL }
+	{ SGSTOP,     0,       0,  0, 0,  0, 0, NULL }
 };
 
 

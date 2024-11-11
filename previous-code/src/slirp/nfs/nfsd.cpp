@@ -120,31 +120,31 @@ extern "C" int nfsd_match_addr(uint32_t addr) {
            (addr == (ntohl(special_addr.s_addr) | ~(uint32_t)CTL_CLASS_MASK(CTL_NET))); // NS kernel seems to broadcast on 10.255.255.255
 }
 
-extern "C" void nfsd_udp_map_to_local_port(uint32_t* ipNBO, uint16_t* dportNBO) {
+extern "C" void nfsd_udp_map_to_local_port(struct in_addr* ipNBO, uint16_t* dportNBO) {
     uint16_t dport = ntohs(*dportNBO);
     uint16_t port  = UDPServerSocket::toLocalPort(dport);
     if(port) {
         *dportNBO = htons(port);
-        *ipNBO    = loopback_addr.s_addr;
+        *ipNBO    = loopback_addr;
     }
 }
 
-extern "C" void nfsd_tcp_map_to_local_port(uint16_t port, uint32_t* saddrNBO, uint16_t* sin_portNBO) {
+extern "C" void nfsd_tcp_map_to_local_port(uint16_t port, uint16_t* sin_portNBO) {
     uint16_t localPort = TCPServerSocket::toLocalPort(port);
     if(localPort)
         *sin_portNBO = htons(localPort);
 }
 
-extern "C" void udp_map_from_local_port(uint16_t port, uint32_t* saddrNBO, uint16_t* sin_portNBO) {
+extern "C" void udp_map_from_local_port(uint16_t port, struct in_addr* saddrNBO, uint16_t* sin_portNBO) {
     uint16_t localPort = UDPServerSocket::fromLocalPort(port);
     if(localPort) {
         *sin_portNBO = htons(localPort);
         switch(localPort) {
             case PORT_DNS:
-                *saddrNBO = special_addr.s_addr | htonl(CTL_DNS);
+                saddrNBO->s_addr = special_addr.s_addr | htonl(CTL_DNS);
                 break;
             default:
-                *saddrNBO = special_addr.s_addr | htonl(CTL_NFSD);
+                saddrNBO->s_addr = special_addr.s_addr | htonl(CTL_NFSD);
                 break;
         }
     }

@@ -27,9 +27,9 @@ const char DebugCpu_fileid[] = "Hatari debugcpu.c";
 #include "log.h"
 #include "m68000.h"
 #include "profile.h"
-#include "str.h"
 #include "symbols.h"
 #include "68kDisass.h"
+#include "str.h"
 #include "vars.h"
 
 
@@ -443,13 +443,14 @@ static int DebugCpu_Profile(int nArgc, char *psArgs[])
 }
 
 /**
- * helper: return type width (b=1, w=2, l=4)
+ * helper: return type width (b/c=1, w=2, l=4)
  */
 static unsigned get_type_width(char mode)
 {
 	switch(mode)
 	{
 	case 'b':	/* byte */
+	case 'c':	/* character */
 		return 1;
 	case 'w':	/* word */
 		return 2;
@@ -459,6 +460,7 @@ static unsigned get_type_width(char mode)
 		return 0;
 	}
 }
+
 
 /**
  * helper: print <count> <size> sized memory items from <addr> in <base>
@@ -507,7 +509,7 @@ static void print_mem_values(uint32_t addr, int count, int size, int base)
 /**
  * helper: print <count> bytes from <addr> as ascii chars
  */
-static void print_mem_ascii(uint32_t addr, uint8_t count)
+static void print_mem_chars(uint32_t addr, uint8_t count)
 {
 	for (int i = 0; i < count; i++)
 	{
@@ -600,10 +602,10 @@ int DebugCpu_MemDump(int nArgc, char *psArgs[])
 		fprintf(debugOutput, "%08X: ", memdump_addr);
 		print_mem_values(memdump_addr, cols, size, 16);
 
-		/* print ASCII data */
+		/* print character data */
 		align = (all-cols)*(2*size+1);
 		fprintf(debugOutput, "%*c", align + 2, ' ');
-		print_mem_ascii(memdump_line, cols*size);
+		print_mem_chars(memdump_line, cols*size);
 		fprintf(debugOutput, "\n");
 
 		memdump_addr += cols*size;
@@ -612,6 +614,7 @@ int DebugCpu_MemDump(int nArgc, char *psArgs[])
 
 	return DEBUGGER_CMDCONT;
 }
+
 
 /**
  * helper: return type base (b=1, o=8, d=10, h=16)
@@ -676,7 +679,7 @@ static int DebugCpu_Struct(int nArgc, char *psArgs[])
 
 		type = tolower(*++str);
 		size = get_type_width(type);
-		if (!size && (type == 'a' || type == 's'))
+		if (!size && type == 's')
 		    size = 1;
 		if (!size)
 		{
@@ -754,9 +757,9 @@ static int DebugCpu_Struct(int nArgc, char *psArgs[])
 			fprintf(debugOutput, "+ $%0*x%*c: ",
 				offlen, addr-start, maxlen-offlen, ' ');
 
-		if (type == 'a')
+		if (type == 'c')
 		{
-			print_mem_ascii(addr, count);
+			print_mem_chars(addr, count);
 			addr += count * size;
 		}
 		else
@@ -769,7 +772,6 @@ static int DebugCpu_Struct(int nArgc, char *psArgs[])
 
 	return DEBUGGER_CMDCONT;
 }
-
 
 /**
  * Command: Write to memory, optional arg for value lengths,
@@ -800,7 +802,7 @@ static int DebugCpu_MemWrite(int nArgc, char *psArgs[])
 		/* no args, single digit or multiple chars -> default mode */
 		mode = 'b';
 	}
-	else if (mode == 'b')
+	else if (mode == 'b' || mode == 'c')
 	{
 		arg += 1;
 	}
@@ -837,6 +839,16 @@ static int DebugCpu_MemWrite(int nArgc, char *psArgs[])
 	values = 0;
 	for (i = arg; i < nArgc; i++)
 	{
+		if (mode == 'c')
+		{
+			char str[3];
+			if (1)
+				return DEBUGGER_CMDDONE;
+			store.bytes[values] = str[0];
+			values++;
+			continue;
+		}
+
 		if (!Eval_Number(psArgs[i], &d, NUM_TYPE_NORMAL))
 		{
 			fprintf(stderr, "Bad value '%s'!\n", psArgs[i]);
@@ -873,6 +885,7 @@ static int DebugCpu_MemWrite(int nArgc, char *psArgs[])
 		switch(mode)
 		{
 		case 'b':
+		case 'c':
 			M68000_WriteByte(write_addr + i, store.bytes[i]);
 			break;
 		case 'w':
@@ -889,6 +902,192 @@ static int DebugCpu_MemWrite(int nArgc, char *psArgs[])
 			values, mode, write_addr);
 	}
 	return DEBUGGER_CMDDONE;
+}
+
+
+/* return end of memory area where given address is,
+ * or zero if address is invalid
+ */
+static uint32_t mem_end_for(uint32_t addr)
+{
+	return 0;
+}
+
+/**
+ * Do a memory find, args = mode, start-end, values
+ * (most of code is identical to MemWrite)
+ */
+static int DebugCpu_MemFind(int nArgc, char *psArgs[])
+{
+	int arg, max_values;
+	union {
+		uint8_t  bytes[256];
+		uint16_t words[128];
+		uint32_t longs[64];
+	} store;
+	char mode;
+
+	if (nArgc < 3)
+	{
+		return DebugUI_PrintCmdHelp(psArgs[0]);
+	}
+
+	arg = 1;
+	mode = tolower(psArgs[arg][0]);
+	max_values = ARRAY_SIZE(store.bytes);
+
+	if (!mode || isdigit((unsigned char)psArgs[arg][0]) || psArgs[arg][1])
+	{
+		/* no args, single digit or multiple chars -> default mode */
+		mode = 'b';
+	}
+	else if (mode == 'b' || mode == 'c')
+	{
+		arg += 1;
+	}
+	else if (mode == 'w')
+	{
+		max_values = ARRAY_SIZE(store.words);
+		arg += 1;
+	}
+	else if (mode == 'l')
+	{
+		max_values = ARRAY_SIZE(store.longs);
+		arg += 1;
+	}
+	else
+	{
+		fprintf(stderr, "Invalid width mode (not a|b|w|l)!\n");
+		return DEBUGGER_CMDDONE;
+	}
+
+	/* parse address range */
+
+	uint32_t find_addr, find_upper = 0;
+
+	switch (Eval_Range(psArgs[arg++], &find_addr, &find_upper, false))
+	{
+	case -1:
+		/* invalid value(s) */
+		return DEBUGGER_CMDDONE;
+	case 0:
+		/* single value */
+		break;
+	case 1:
+		/* range */
+		break;
+	}
+
+	if ((find_upper && find_upper <= find_addr) ||
+	    !(mem_end_for(find_addr) && mem_end_for(find_upper)))
+	{
+		fprintf(stderr, "Invalid address range: 0x%x[-0x%x]\n", find_addr, find_upper);
+		return DEBUGGER_CMDDONE;
+	}
+
+	if (!find_upper)
+		find_upper = mem_end_for(find_addr);
+
+	const int size = get_type_width(mode);
+
+	if (find_addr & (size-1)) {
+		fprintf(stderr, "Start address 0x%x not '%c' type aligned\n", find_addr, mode);
+		return DEBUGGER_CMDDONE;
+	}
+
+	/* parse values */
+
+	if (nArgc - arg > max_values)
+	{
+		fprintf(stderr, "Too many values (%d) given for mode '%c' (max %d)!\n",
+		       nArgc - arg, mode, max_values);
+		return DEBUGGER_CMDDONE;
+	}
+
+	uint32_t d;
+	int i, values;
+
+	for (values = 0, i = arg; i < nArgc; i++, values++)
+	{
+		if (mode == 'c')
+		{
+			char str[3];
+			if (1)
+				return DEBUGGER_CMDDONE;
+			store.bytes[values] = str[0];
+			continue;
+		}
+
+		if (!Eval_Number(psArgs[i], &d, NUM_TYPE_NORMAL))
+		{
+			fprintf(stderr, "Bad value '%s'!\n", psArgs[i]);
+			return DEBUGGER_CMDDONE;
+		}
+
+		switch(mode)
+		{
+		case 'b':
+			if (d > 0xff)
+			{
+				fprintf(stderr, "Illegal byte argument: 0x%x!\n", d);
+				return DEBUGGER_CMDDONE;
+			}
+			store.bytes[values] = (uint8_t)d;
+			break;
+		case 'w':
+			if (d > 0xffff)
+			{
+				fprintf(stderr, "Illegal word argument: 0x%x!\n", d);
+				return DEBUGGER_CMDDONE;
+			}
+			store.words[values] = be_swap16(d);
+			break;
+		case 'l':
+			store.longs[values] = be_swap32(d);
+			break;
+		}
+	}
+
+	/* search given range for specified values & show them */
+
+	const int rows = DebugUI_GetPageLines(ConfigureParams.Debugger.nFindLines, 20);
+	const int count = nArgc - arg;
+	const int bytes = count*size;
+
+	int row = 0, matches = 0;
+	while (find_addr < find_upper - bytes)
+	{
+		for (i = 0; i < bytes; i++)
+		{
+			if (M68000_ReadByte(find_addr+i) != store.bytes[i])
+				break;
+		}
+		if (i < bytes)
+		{
+			find_addr += size;
+			continue;
+		}
+
+		/* print <addr>: <hex> <chars> */
+		fprintf(debugOutput, "%08X: ", find_addr);
+		print_mem_values(find_addr, count, size, 16);
+		fprintf(debugOutput, "  ");
+		print_mem_chars(find_addr, count*size);
+		fprintf(debugOutput, "\n");
+
+		matches++;
+		if (++row >= rows) {
+			row = 0;
+			if (DebugUI_DoQuitQuery("find results"))
+				break;
+		}
+		find_addr += bytes;
+	}
+
+	fprintf(debugOutput, "%d matches.\n", matches);
+	fflush(debugOutput);
+
+	return DEBUGGER_CMDCONT;
 }
 
 
@@ -1174,6 +1373,14 @@ static const dbgcommand_t cpucommands[] =
 	  "\tWhen no address is given, disassemble from the last disasm\n"
 	  "\taddress, or from current PC when debugger is (re-)entered.",
 	  false },
+	{ DebugCpu_MemFind, Symbols_MatchCpuAddress,
+	  "find", "",
+	  "find given value sequence from memory",
+	  "[b|c|w|l] <start address>[-<end address>] <values>\n"
+	  "\tBy default values are interpreted as bytes, with 'c', 'w'\n"
+	  "\tor 'l', they're interpreted as chars/words/longs instead,\n"
+	  "\tand find is done for suitable aligned addresses.",
+	  false },
 	{ DebugCpu_Profile, Profile_Match,
 	  "profile", "",
 	  "profile CPU code",
@@ -1202,17 +1409,18 @@ static const dbgcommand_t cpucommands[] =
 	  "\tShow <name>d structure content at given <address>, with each\n"
 	  "\t[name]:<type>[base][:<count>] item shown on its own line, prefixed\n"
 	  "\twith offset from struct start address if [name] is not given.\n"
-	  "\tSupported <type>s are 'b|w|l|a|s' (byte|word|long|ASCII|skip).\n"
+	  "\tSupported <type>s are 'b|c|w|l|s' (byte|char|word|long|skip).\n"
 	  "\tOptional [base] can be 'b|o|d|h' (bin|oct|dec|hex).\n"
 	  "\tDefaults are hex [base], and [count] of 1.\n",
 	  false },
 	{ DebugCpu_MemWrite, Symbols_MatchCpuAddress,
 	  "memwrite", "w",
 	  "write bytes/words/longs to memory",
-	  "[b|w|l] address value1 [value2 ...]\n"
+	  "[b|c|w|l] <address> <values>\n"
 	  "\tWrite space separate values (in current number base) to given\n"
-	  "\tmemory address. By default writes are done as bytes, with\n"
-	  "\t'w' or 'l' option they will be done as words/longs instead",
+	  "\tmemory address. By default they are written as bytes, with\n"
+	  "\t'w' or 'l' they will be done as words/longs instead.\n"
+	  "\t'c' can be used to provide byte values as chars.",
 	  false },
 	{ DebugCpu_LoadBin, NULL,
 	  "loadbin", "l",

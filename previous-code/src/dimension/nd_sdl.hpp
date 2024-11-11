@@ -22,10 +22,10 @@ class NDSDL {
     SDL_Window*   ndWindow;
     SDL_Renderer* ndRenderer;
     SDL_Texture*  ndTexture;
-    SDL_atomic_t  blitNDFB;
 
 #ifdef ENABLE_RENDERING_THREAD
     volatile bool doRepaint;
+    SDL_atomic_t  blitNDFB;
     SDL_Thread*   repaintThread;
     static int    repainter(void *_this);
     int           repainter(void);
@@ -36,7 +36,6 @@ public:
     void    init(void);
     void    uninit(void);
     void    destroy(void);
-    void    pause(bool pause);
     void    resize(float scale);
 };
 

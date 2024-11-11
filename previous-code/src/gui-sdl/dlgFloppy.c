@@ -51,7 +51,7 @@ static SGOBJ flpdlg[] =
 	{ SGTEXT, 0, 0, 23,1, 10,1, "Floppy disk drives" },
 	
 	{ SGTEXT, 0, 0, 2,4, 16,1, "Floppy Drive 0:" },
-	{ SGCHECKBOX, 0, 0, 20, 4, 11, 1, "Connected" },
+	{ SGCHECKBOX, SG_EXIT, 0, 20, 4, 11, 1, "Connected" },
 	
 	{ SGBOX, 0, 0, 2,6, 60,6, NULL },
 	{ SGTEXT, 0, 0, 4,7, 14,1, "Floppy disk:" },
@@ -60,7 +60,7 @@ static SGOBJ flpdlg[] =
 	{ SGTEXT, 0, 0, 4,9, 56,1, NULL },
 #if DUAL_FLOPPY_DRIVE
 	{ SGTEXT, 0, 0, 2,14, 16,1, "Floppy Drive 1:" },
-	{ SGCHECKBOX, 0, 0, 20, 14, 11, 1, "Connected" },
+	{ SGCHECKBOX, SG_EXIT, 0, 20, 14, 11, 1, "Connected" },
 	
 	{ SGBOX, 0, 0, 2,16, 60,6, NULL },
 	{ SGTEXT, 0, 0, 4,17, 14,1, "Floppy disk:" },

@@ -49,15 +49,15 @@ static SGOBJ systemdlg[] =
 	
 	{ SGBOX, 0, 0, 2,3, 25,17, NULL },
 	{ SGTEXT, 0, 0, 3,4, 14,1, "Machine type" },
-	{ SGRADIOBUT, 0, 0, 5,6, 15,1, "NeXT Computer" },
-	{ SGRADIOBUT, 0, 0, 5,8, 10,1, "NeXTcube" },
-	{ SGCHECKBOX, 0, 0, 7,9, 7,1, "Turbo" },
-	{ SGRADIOBUT, 0, 0, 5,11, 13,1, "NeXTstation" },
-	{ SGCHECKBOX, 0, 0, 7,12, 7,1, "Turbo" },
-	{ SGCHECKBOX, 0, 0, 7,13, 7,1, "Color" },
+	{ SGRADIOBUT, SG_EXIT, 0, 5,6, 15,1, "NeXT Computer" },
+	{ SGRADIOBUT, SG_EXIT, 0, 5,8, 10,1, "NeXTcube" },
+	{ SGCHECKBOX, SG_EXIT, 0, 7,9, 7,1, "Turbo" },
+	{ SGRADIOBUT, SG_EXIT, 0, 5,11, 13,1, "NeXTstation" },
+	{ SGCHECKBOX, SG_EXIT, 0, 7,12, 7,1, "Turbo" },
+	{ SGCHECKBOX, SG_EXIT, 0, 7,13, 7,1, "Color" },
 	
-	{ SGBUTTON, SG_DEFAULT, 0, 5,16, 19,1, "Customize" },
-	{ SGBUTTON, SG_DEFAULT, 0, 5,18, 19,1, "System defaults" },
+	{ SGBUTTON, 0, 0, 5,16, 19,1, "Customize" },
+	{ SGBUTTON, 0, 0, 5,18, 19,1, "System defaults" },
 
 	{ SGTEXT, 0, 0, 30,4, 13,1, "System overview:" },
 	{ SGTEXT, 0, 0, 30,6, 13,1, "CPU clock:" },

@@ -409,7 +409,7 @@ int tcp_fconnect(struct socket *so)
       
       addr.sin_port = so->so_fport;
       if(nfsd_match_addr(ntohl(so->so_faddr.s_addr))) {
-          nfsd_tcp_map_to_local_port(ntohs(so->so_fport), &addr.sin_addr.s_addr, &addr.sin_port);
+          nfsd_tcp_map_to_local_port(ntohs(so->so_fport), &addr.sin_port);
       }
 
 	char addrstr[INET_ADDRSTRLEN];

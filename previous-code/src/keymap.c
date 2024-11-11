@@ -409,7 +409,7 @@ void Keymap_MouseWheel(const SDL_MouseWheelEvent *sdlwheel)
 
 /*-----------------------------------------------------------------------*/
 /**
- * User pressed key down
+ * User pressed a key down
  */
 void Keymap_KeyDown(const SDL_Keysym *sdlkey)
 {
@@ -435,7 +435,7 @@ void Keymap_KeyDown(const SDL_Keysym *sdlkey)
 
 /*-----------------------------------------------------------------------*/
 /**
- * User released key
+ * User released a key
  */
 void Keymap_KeyUp(const SDL_Keysym *sdlkey)
 {
@@ -461,7 +461,7 @@ void Keymap_KeyUp(const SDL_Keysym *sdlkey)
 
 /*-----------------------------------------------------------------------*/
 /**
- * User moved mouse
+ * User moved the mouse
  */
 void Keymap_MouseMove(int dx, int dy)
 {
@@ -486,7 +486,7 @@ void Keymap_MouseMove(int dx, int dy)
 
 /*-----------------------------------------------------------------------*/
 /**
- * User pressed mouse button
+ * User pressed a mouse button
  */
 void Keymap_MouseDown(bool left)
 {
@@ -500,7 +500,7 @@ void Keymap_MouseDown(bool left)
 
 /*-----------------------------------------------------------------------*/
 /**
- * User released mouse button
+ * User released a mouse button
  */
 void Keymap_MouseUp(bool left)
 {
@@ -512,15 +512,18 @@ void Keymap_MouseUp(bool left)
 }
 
 
-/*-----------------------------------------------------------------------*/
 /**
- * For use in configuration file routines
+ * Maps a key name to its SDL keycode
  */
 int Keymap_GetKeyFromName(const char *name)
 {
 	return SDL_GetKeyFromName(name);
 }
 
+
+/**
+ * Maps an SDL keycode to a name
+ */
 const char *Keymap_GetKeyName(int keycode)
 {
 	if (!keycode)

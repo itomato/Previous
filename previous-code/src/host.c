@@ -68,7 +68,7 @@ static inline uint64_t real_time(void) {
 
 #define DAY_TO_US (1000000ULL * 60 * 60 * 24)
 
-// Report counter capacity
+/* Report counter capacity */
 static void host_report_limits(void) {
     uint64_t cycleCounterLimit, perfCounterLimit, perfCounter;
     
@@ -105,7 +105,7 @@ static void host_report_limits(void) {
     }
 }
 
-// Check NeXT specific UNIX time limits and adjust time if needed
+/* Check NeXT specific UNIX time limits and adjust time if needed */
 #define TIME_LIMIT_SECONDS 0
 
 static void host_check_unix_time(void) {
@@ -172,7 +172,7 @@ void host_blank_count(int src, bool state) {
         SDL_AtomicAdd(&vblCounter[src], 1);
     }
     
-    // check first 4 bytes of version string in darkmatter/daydream kernel
+    /* Check first 4 bytes of version string in darkmatter/daydream kernel */
     osDarkmatter = get_long(0x04000246) == do_get_mem_long((uint8_t*)DARKMATTER);
 }
 
@@ -189,7 +189,7 @@ void host_hardclock(int expected, int actual) {
     }
 }
 
-// this can be used by other threads to read hostTime
+/* This can be used by other threads to read hostTime */
 uint64_t host_get_save_time(void) {
     uint64_t hostTime;
     host_lock(&timeLock);
@@ -198,7 +198,7 @@ uint64_t host_get_save_time(void) {
     return hostTime / 1000000ULL;
 }
 
-// Return current time as microseconds
+/* Return current time as microseconds */
 uint64_t host_time_us(void) {
     uint64_t hostTime;
     
@@ -211,24 +211,24 @@ uint64_t host_time_us(void) {
         hostTime /= cycleDivisor;
     }
     
-    // save hostTime to be read by other threads
+    /* save hostTime to be read by other threads */
     saveTime = hostTime;
     
-    // switch to realtime if...
-    // 1) ...realtime mode is enabled and...
-    // 2) ...either we are running darkmatter or the m68k CPU is in user mode
+    /* switch to realtime if...
+     * 1) ...realtime mode is enabled and...
+     * 2) ...either we are running darkmatter or the m68k CPU is in user mode */
     bool state = (osDarkmatter || !(regs.s)) && enableRealtime;
     if(currentIsRealtime != state) {
         uint64_t realTime  = real_time();
         
         if(currentIsRealtime) {
-            // switching from real-time to cycle-time
+            /* switching from real-time to cycle-time */
             cycleCounterStart = nCyclesMainCounter - realTime * cycleDivisor;
         } else {
-            // switching from cycle-time to real-time
+            /* switching from cycle-time to real-time */
             int64_t realTimeOffset = (int64_t)hostTime - realTime;
             if(realTimeOffset > 0) {
-                // if hostTime is in the future, wait until realTime is there as well
+                /* if hostTime is in the future, wait until realTime is there as well */
                 if(realTimeOffset > 10000LL)
                     host_sleep_us(realTimeOffset);
                 else
@@ -248,12 +248,12 @@ void host_time(uint64_t* realTime, uint64_t* hostTime) {
     *realTime = real_time();
 }
 
-// Return current time as seconds
+/* Return current time as seconds */
 uint64_t host_time_sec(void) {
     return host_time_us() / 1000000ULL;
 }
 
-// Return current time as milliseconds
+/* Return current time as milliseconds */
 uint64_t host_time_ms(void) {
     return host_time_us() / 1000ULL;
 }

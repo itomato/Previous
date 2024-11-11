@@ -939,6 +939,26 @@ static void trace_cpu_disasm(void)
 	m68k_disasm_file(TraceFile, m68k_getpc (), NULL, m68k_getpc (), 1);
 }
 
+static void trace_cpu_disasm_mmu030(void)
+{
+	uaecptr new_addr = mmu030_translate(m68k_getpc(), regs.s != 0, false, false);
+
+#ifndef WINUAE_FOR_PREVIOUS
+	if (LOG_TRACE_LEVEL(TRACE_CPU_VIDEO_CYCLES)) {
+		int FrameCycles, HblCounterVideo, LineCycles;
+		Video_GetPosition ( &FrameCycles, &HblCounterVideo, &LineCycles );
+		LOG_TRACE_DIRECT_INIT ();
+		LOG_TRACE_DIRECT ( "cpu video_cyc=%6d %3d@%3d %"PRIu64" : ",
+				   FrameCycles, LineCycles, HblCounterVideo,
+				   CyclesGlobalClockCounter );
+	}
+#endif
+
+	if ( new_addr != m68k_getpc() )
+		f_out(TraceFile , "(%08x) " , m68k_getpc() );
+	m68k_disasm_file(TraceFile, new_addr, NULL, new_addr, 1);
+}
+
 void (*x_do_cycles_hatari_blitter_save)(int);
 void (*x_do_cycles_pre_hatari_blitter_save)(int);
 void (*x_do_cycles_post_hatari_blitter_save)(int, uae_u32);
@@ -7673,6 +7693,24 @@ void m68k_disasm_file (FILE *f, uaecptr addr, uaecptr *nextpc, uaecptr lastpc, i
 	console_out_FILE = NULL;
 }
 
+
+#ifdef WINUAE_FOR_HATARI
+/*
+ * Functions called from debug/68Disass.c, we need to check if MMU is enabled to do some address
+ * translations on 'addr' if needed, depending on the CPU/MMU family
+ */
+void m68k_disasm_file_wrapper (FILE *f, uaecptr addr, uaecptr *nextpc, uaecptr lastpc, int cnt)
+{
+	uaecptr new_addr = addr;
+
+	if ( currprefs.cpu_model == 68030 && currprefs.mmu_model )		/* 68030 with MMU */
+		new_addr = mmu030_translate(addr, regs.s != 0, false, false);
+
+	m68k_disasm_file(TraceFile, new_addr, nextpc, lastpc, cnt);
+}
+#endif
+
+
 void m68k_dumpstate(uaecptr *nextpc, uaecptr prevpc)
 {
 	int i, j;
@@ -8895,9 +8933,9 @@ void m68k_resumestopped(void)
 uae_u32 mem_access_delay_word_read (uaecptr addr)
 {
 	uae_u32 v = 0;
-#ifndef WINUAE_FOR_HATARI
+#ifndef WINUAE_FOR_PREVIOUS
 	if ( BlitterPhase )	Blitter_HOG_CPU_mem_access_before ( 1 );	// WINUAE_FOR_HATARI
-#if 1
+
 	switch (ce_banktype[addr >> 16])
 	{
 	case CE_MEMBANK_CHIP16:
@@ -8913,11 +8951,6 @@ uae_u32 mem_access_delay_word_read (uaecptr addr)
 		v = get_word (addr);
 		break;
 	}
-#else
-//fprintf ( stderr , "word read mis %lu %lu\n" , currcycle / cpucycleunit , currcycle );
-	v = get_word (addr);
-	x_do_cycles_post (4 * cpucycleunit, v);
-#endif
 	regs.db = v;
 	regs.read_buffer = v;
 	if ( BlitterPhase )	Blitter_HOG_CPU_mem_access_after ( 1 );		// WINUAE_FOR_HATARI
@@ -8927,9 +8960,9 @@ uae_u32 mem_access_delay_word_read (uaecptr addr)
 uae_u32 mem_access_delay_wordi_read (uaecptr addr)
 {
 	uae_u32 v = 0;
-#ifndef WINUAE_FOR_HATARI
+#ifndef WINUAE_FOR_PREVIOUS
 	if ( BlitterPhase )	Blitter_HOG_CPU_mem_access_before ( 1 );	// WINUAE_FOR_HATARI
-#if 1
+
 	switch (ce_banktype[addr >> 16])
 	{
 	case CE_MEMBANK_CHIP16:
@@ -8945,11 +8978,6 @@ uae_u32 mem_access_delay_wordi_read (uaecptr addr)
 		v = get_wordi (addr);
 		break;
 	}
-#else
-//fprintf ( stderr , "wordi read mis %lu %lu\n" , currcycle / cpucycleunit , currcycle );
-	v = get_wordi (addr);
-	x_do_cycles_post (4 * cpucycleunit, v);
-#endif
 	regs.db = v;
 	regs.read_buffer = v;
 	if ( BlitterPhase )	Blitter_HOG_CPU_mem_access_after ( 1 );		// WINUAE_FOR_HATARI
@@ -8960,9 +8988,9 @@ uae_u32 mem_access_delay_wordi_read (uaecptr addr)
 uae_u32 mem_access_delay_byte_read (uaecptr addr)
 {
 	uae_u32  v = 0;
-#ifndef WINUAE_FOR_HATARI
+#ifndef WINUAE_FOR_PREVIOUS
 	if ( BlitterPhase )	Blitter_HOG_CPU_mem_access_before ( 1 );	// WINUAE_FOR_HATARI
-#if 1
+
 	switch (ce_banktype[addr >> 16])
 	{
 	case CE_MEMBANK_CHIP16:
@@ -8978,11 +9006,6 @@ uae_u32 mem_access_delay_byte_read (uaecptr addr)
 		v = get_byte (addr);
 		break;
 	}
-#else
-//fprintf ( stderr , "byte read mis %lu %lu\n" , currcycle / cpucycleunit , currcycle );
-	v = get_byte (addr);
-	x_do_cycles_post (4 * cpucycleunit, v);
-#endif
 	regs.db = (v << 8) | v;
 	regs.read_buffer = v;
 	if ( BlitterPhase )	Blitter_HOG_CPU_mem_access_after ( 1 );		// WINUAE_FOR_HATARI
@@ -8991,11 +9014,12 @@ uae_u32 mem_access_delay_byte_read (uaecptr addr)
 }
 void mem_access_delay_byte_write (uaecptr addr, uae_u32 v)
 {
+#ifndef WINUAE_FOR_PREVIOUS
 	regs.db = (v << 8)  | v;
 	regs.write_buffer = v;
-#ifndef WINUAE_FOR_HATARI
+
 	if ( BlitterPhase )	Blitter_HOG_CPU_mem_access_before ( 1 );	// WINUAE_FOR_HATARI
-#if 1
+
 	switch (ce_banktype[addr >> 16])
 	{
 	case CE_MEMBANK_CHIP16:
@@ -9011,17 +9035,13 @@ void mem_access_delay_byte_write (uaecptr addr, uae_u32 v)
 		return;
 	}
 	put_byte (addr, v);
-#else
-	put_byte (addr, v);
-	x_do_cycles_post (4 * cpucycleunit, v);
-#endif
 #endif
 }
 void mem_access_delay_word_write (uaecptr addr, uae_u32 v)
 {
-#ifndef WINUAE_FOR_HATARI
+#ifndef WINUAE_FOR_PREVIOUS
 	if ( BlitterPhase )	Blitter_HOG_CPU_mem_access_before ( 1 );	// WINUAE_FOR_HATARI
-#if 1
+
 	regs.db = v;
 	regs.write_buffer = v;
 	switch (ce_banktype[addr >> 16])
@@ -9039,10 +9059,6 @@ void mem_access_delay_word_write (uaecptr addr, uae_u32 v)
 		return;
 	}
 	put_word (addr, v);
-#else
-	put_word (addr, v);
-	x_do_cycles_post (4 * cpucycleunit, v);
-#endif
 #endif
 }
 
@@ -10283,7 +10299,24 @@ uae_u32 get_word_ce030_prefetch_opcode (int o)
 	return get_word_ce030_prefetch_2(o);
 }
 
+// [HATARI] Define next line to check for 68030 prefetch mismatch
+//#define WINUAE_FOR_HATARI_DEBUG_PREFETCH_030
+#ifdef WINUAE_FOR_HATARI_DEBUG_PREFETCH_030
+uae_u32 get_word_030_prefetch_real (int o);
 uae_u32 get_word_030_prefetch (int o)
+{
+	uae_u32 v;
+
+	v = get_word_030_prefetch_real(o);
+	if ( ( v & 0xffff ) != ( get_iword_mmu030(o) & 0xffff ) )
+		fprintf ( stderr , "prefetch mismatch m68k_getpc=%x o=%d prefetch=%04x != mem=%04x, i-cache error ?\n" , m68k_getpc() , o , v&0xffff , get_iword_mmu030(o)&0xffff );
+
+	return v;
+}
+uae_u32 get_word_030_prefetch_real (int o)
+#else
+uae_u32 get_word_030_prefetch (int o)
+#endif
 {
 	uae_u32 pc = m68k_getpc () + o;
 	uae_u32 v;

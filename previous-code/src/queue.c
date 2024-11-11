@@ -55,7 +55,7 @@ void QueueEnter(queueADT queue, queueElementT element)
   int newElementIndex;
 
   if (queue->count >= MAX_QUEUE_SIZE) {
-//    fprintf(stderr, "QueueEnter on Full Queue.\n");
+    fprintf(stderr, "QueueEnter on Full Queue.\n");
 //    exit(ERROR_QUEUE);  /* Exit program, returning error code. */
 	return;
   }
@@ -82,7 +82,7 @@ queueElementT QueueDelete(queueADT queue)
   queueElementT oldElement;
 
   if (queue->count <= 0) {
-    //fprintf(stderr, "QueueDelete on Empty Queue.\n");
+    fprintf(stderr, "QueueDelete on Empty Queue.\n");
     //exit(ERROR_QUEUE);  /* Exit program, returning error code. */
 	return NULL;
   }

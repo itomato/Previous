@@ -35,33 +35,33 @@ uint8_t scc_register_pointer = 0;
 
 
 /* Read Registers */
-#define R_STATUS    0   // Transmit/Receive buffer status and External status
-#define R_SPECSTAT  1   // Special receive condition status
-#define R_INTVEC    2   // Interrupt vector
-#define R_INTBITS   3   // Interrupt pending bits
-#define R_RECBUF    8   // Receive buffer
-#define R_MISCSTAT  10  // Miscellaneous status
-#define R_BRG_LOW   12  // Lower byte of baud rate generator time constant
-#define R_BRG_HIGH  13  // Upper byte of baud rate generator time constant
-#define R_EXTSTAT   15  // External/Status interrupt information
+#define R_STATUS    0   /* Transmit/Receive buffer status and External status */
+#define R_SPECSTAT  1   /* Special receive condition status */
+#define R_INTVEC    2   /* Interrupt vector */
+#define R_INTBITS   3   /* Interrupt pending bits */
+#define R_RECBUF    8   /* Receive buffer */
+#define R_MISCSTAT  10  /* Miscellaneous status */
+#define R_BRG_LOW   12  /* Lower byte of baud rate generator time constant */
+#define R_BRG_HIGH  13  /* Upper byte of baud rate generator time constant */
+#define R_EXTSTAT   15  /* External/Status interrupt information */
 
 /* Write Registers */
-#define W_INIT      0   // Initialization commands
-#define W_MODE      1   // Transmit/Receive interrupt and data transfer mode
-#define W_INTVEC    2   // Interrupt vector
-#define W_RECCONT   3   // Receive parameters and control
-#define W_MISCMODE  4   // Transmit/Receive miscellaneous parameters and modes
-#define W_TRANSCONT 5   // Transmit parameters and controls
-#define W_SYNCCHARA 6   // Sync characters or SDLC address field
-#define W_SYNCCHARF 7   // Sync character or SDLC flag
-#define W_TRANSBUF  8   // Transmit buffer
-#define W_MASTERINT 9   // Master interrupt control and reset
-#define W_MISCCONT  10  // Miscellaneous transmitter/receiver control bits
-#define W_CLOCK     11  // Clock mode control
-#define W_BRG_LOW   12  // Lower byte of baud rate generator time constant
-#define W_BRG_HIGH  13  // Upper byte of baud rate generator time constant
-#define W_MISC      14  // Miscellaneous control bits
-#define W_EXTSTAT   15  // External/Status interrupt control
+#define W_INIT      0   /* Initialization commands */
+#define W_MODE      1   /* Transmit/Receive interrupt and data transfer mode */
+#define W_INTVEC    2   /* Interrupt vector */
+#define W_RECCONT   3   /* Receive parameters and control */
+#define W_MISCMODE  4   /* Transmit/Receive miscellaneous parameters and modes */
+#define W_TRANSCONT 5   /* Transmit parameters and controls */
+#define W_SYNCCHARA 6   /* Sync characters or SDLC address field */
+#define W_SYNCCHARF 7   /* Sync character or SDLC flag */
+#define W_TRANSBUF  8   /* Transmit buffer */
+#define W_MASTERINT 9   /* Master interrupt control and reset */
+#define W_MISCCONT  10  /* Miscellaneous transmitter/receiver control bits */
+#define W_CLOCK     11  /* Clock mode control */
+#define W_BRG_LOW   12  /* Lower byte of baud rate generator time constant */
+#define W_BRG_HIGH  13  /* Upper byte of baud rate generator time constant */
+#define W_MISC      14  /* Miscellaneous control bits */
+#define W_EXTSTAT   15  /* External/Status interrupt control */
 
 
 /* SCC clock select register (0x02018004) */
@@ -640,7 +640,7 @@ void SCC_Reset(void) {
 
 
 /* Registers */
-void SCC_ControlB_Read(void) { // 0x02018000
+void SCC_ControlB_Read(void) { /* 0x02018000 */
     IoMem_WriteByte(IoAccessCurrentAddress, scc_control_read(1));
     Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Channel B control read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -650,7 +650,7 @@ void SCC_ControlB_Write(void) {
     Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Channel B control write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void SCC_ControlA_Read(void) { // 0x02018001
+void SCC_ControlA_Read(void) { /* 0x02018001 */
     IoMem_WriteByte(IoAccessCurrentAddress, scc_control_read(0));
     Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Channel A control read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -660,7 +660,7 @@ void SCC_ControlA_Write(void) {
     Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Channel A control write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void SCC_DataB_Read(void) { // 0x02018002
+void SCC_DataB_Read(void) { /* 0x02018002 */
     IoMem_WriteByte(IoAccessCurrentAddress, scc_data_read(1));
     Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Channel B data read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -670,7 +670,7 @@ void SCC_DataB_Write(void) {
     Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Channel B data write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void SCC_DataA_Read(void) { // 0x02018003
+void SCC_DataA_Read(void) { /* 0x02018003 */
     IoMem_WriteByte(IoAccessCurrentAddress, scc_data_read(0));
     Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Channel A data read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -680,7 +680,7 @@ void SCC_DataA_Write(void) {
     Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Channel A data write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void SCC_Clock_Read(void) { // 0x02018004
+void SCC_Clock_Read(void) { /* 0x02018004 */
     IoMem_WriteByte(IoAccessCurrentAddress, scc_clock_read());
     Log_Printf(LOG_SCC_REG_LEVEL,"[SCC] Clock select read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }

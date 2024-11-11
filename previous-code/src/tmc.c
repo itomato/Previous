@@ -60,7 +60,7 @@ struct {
 
 static void tmc_scr1_reset(void) {
 	uint8_t memory_speed = 0;
-	uint8_t cpu_speed = 0x07; // 33 MHz
+	uint8_t cpu_speed = 0x07; /* 33 MHz */
 	
 	if (ConfigureParams.System.nCpuFreq<20) {
 		cpu_speed = 4;

@@ -25,7 +25,7 @@
 #include <unistd.h>
 #include "ctl.h"
 
-#if 0 // unused
+#if 0 /* unused */
 static void rip_request(void)
 {
     struct mbuf *m;

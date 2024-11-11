@@ -52,12 +52,12 @@ static SGOBJ memorydlg[] =
 
 	{ SGBOX, 0, 0, 1,3, 19,10, NULL },
 	{ SGTEXT, 0, 0, 2,4, 12,1, "Memory size" },
-	{ SGRADIOBUT, 0, 0, 3,6, 6,1, "8 MB" },
-	{ SGRADIOBUT, 0, 0, 3,7, 7,1, "16 MB" },
-	{ SGRADIOBUT, 0, 0, 3,8, 7,1, "32 MB" },
-	{ SGRADIOBUT, 0, 0, 3,11, 11,1, custom_memsize },
-	{ SGRADIOBUT, 0, 0, 3,9, 7,1, "64 MB" },
-	{ SGRADIOBUT, 0, 0, 3,10, 8,1, "128 MB" },
+	{ SGRADIOBUT, SG_EXIT, 0, 3,6, 6,1, "8 MB" },
+	{ SGRADIOBUT, SG_EXIT, 0, 3,7, 7,1, "16 MB" },
+	{ SGRADIOBUT, SG_EXIT, 0, 3,8, 7,1, "32 MB" },
+	{ SGRADIOBUT, SG_EXIT, 0, 3,11, 11,1, custom_memsize },
+	{ SGRADIOBUT, SG_EXIT, 0, 3,9, 7,1, "64 MB" },
+	{ SGRADIOBUT, SG_EXIT, 0, 3,10, 8,1, "128 MB" },
 	
 	{ SGBOX, 0, 0, 21,3, 19,10, NULL },
 	{ SGTEXT, 0, 0, 22,4, 12,1, "Memory speed" },
@@ -83,9 +83,9 @@ static SGOBJ memorydlg[] =
 
 /* Variable objects */
 SGOBJ disable_128mb_option = { SGTEXT, 0, 0, 3,10, 8,1, " " };
-SGOBJ enable_128mb_option = { SGRADIOBUT, 0, 0, 3,10, 8,1, "128 MB" };
+SGOBJ enable_128mb_option = { SGRADIOBUT, SG_EXIT, 0, 3,10, 8,1, "128 MB" };
 SGOBJ disable_64mb_option = { SGTEXT, 0, 0, 3,9, 7,1, " " };
-SGOBJ enable_64mb_option = { SGRADIOBUT, 0, 0, 3,9, 7,1, "64 MB" };
+SGOBJ enable_64mb_option = { SGRADIOBUT, SG_EXIT, 0, 3,9, 7,1, "64 MB" };
 
 /* Default configuration constants */
 int defsize[9][4] = {

@@ -52,7 +52,7 @@ static SGOBJ modlg[] =
 	{ SGTEXT, 0, 0, 21,1, 10,1, "Magneto-optical drives" },
 
 	{ SGTEXT, 0, 0, 2,4, 14,1, "MO Drive 0:" },
-	{ SGCHECKBOX, 0, 0, 16, 4, 11, 1, "Connected" },
+	{ SGCHECKBOX, SG_EXIT, 0, 16, 4, 11, 1, "Connected" },
 	
 	{ SGBOX, 0, 0, 2,6, 60,6, NULL },
 	{ SGTEXT, 0, 0, 4,7, 14,1, "Optical disk:" },
@@ -61,7 +61,7 @@ static SGOBJ modlg[] =
 	{ SGTEXT, 0, 0, 4,9, 56,1, NULL },
 #if DUAL_MO_DRIVE
 	{ SGTEXT, 0, 0, 2,14, 14,1, "MO Drive 1:" },
-	{ SGCHECKBOX, 0, 0, 16, 14, 11, 1, "Connected" },
+	{ SGCHECKBOX, SG_EXIT, 0, 16, 14, 11, 1, "Connected" },
 	
 	{ SGBOX, 0, 0, 2,16, 60,6, NULL },
 	{ SGTEXT, 0, 0, 4,17, 14,1, "Optical disk:" },

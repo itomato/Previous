@@ -206,8 +206,8 @@ void SCR_Reset(void) {
     
     /* Turbo */
     if (ConfigureParams.System.bTurbo) {
-        scr2_2=0x10; // video mode is 25 MHz
-        scr2_3=0x80; // local only resets to 1
+        scr2_2=0x10; /* video mode is 25 MHz */
+        scr2_3=0x80; /* local only resets to 1 */
         
         scr_have_dsp_memreset = 1;
         
@@ -248,7 +248,7 @@ void SCR_Reset(void) {
     scr1 |= system_type<<12;
     scr1 |= board_rev<<8;
     
-    scr1 |= MEM_100NS<<6; // video memory
+    scr1 |= MEM_100NS<<6; /* video memory */
     
     switch (ConfigureParams.Memory.nMemorySpeed) {
         case MEMORY_60NS:  memory_speed = MEM_60NS;  break;
@@ -257,7 +257,7 @@ void SCR_Reset(void) {
         case MEMORY_120NS: memory_speed = MEM_120NS; break;
         default: break;
     }
-    scr1 |= memory_speed<<4; // main memory
+    scr1 |= memory_speed<<4; /* main memory */
 
     if (ConfigureParams.System.nCpuFreq<20) {
         cpu_speed = CPU_16MHZ;
@@ -587,7 +587,7 @@ void set_interrupt(uint32_t intr, uint8_t state) {
 
 /* Interrupt Mask Register */
 #define INT_NONMASKABLE 0x80027640
-#define INT_ZEROBITS    0xC22E7600 // Turbo
+#define INT_ZEROBITS    0xC22E7600 /* Turbo */
 
 void IntRegMaskRead(void) {
     if (ConfigureParams.System.bTurbo) {
@@ -626,7 +626,7 @@ void Hardclock_InterruptHandler ( void )
 {
     CycInt_AcknowledgeInterrupt();
     if ((hardclock_csr&HARDCLOCK_ENABLE) && (latch_hardclock>0)) {
-//      Log_Printf(LOG_WARN,"[INT] throwing hardclock %lld", host_time_us());
+        Log_Printf(LOG_DEBUG, "[INT] throwing hardclock %lld", host_time_us());
         set_interrupt(INT_TIMER,SET_INT);
         uint64_t now = host_time_us();
         host_hardclock(latch_hardclock, now - hardClockLastLatch);
@@ -672,7 +672,7 @@ void HardclockWriteCSR(void) {
 }
 void HardclockReadCSR(void) {
     IoMem_WriteByte(IoAccessCurrentAddress, hardclock_csr);
-//  Log_Printf(LOG_WARN,"[hardclock] read at $%08x val=%02x PC=$%08x", IoAccessCurrentAddress,IoMem_ReadByte(IoAccessCurrentAddress),m68k_getpc());
+    Log_Printf(LOG_DEBUG, "[hardclock] read at $%08x val=%02x PC=$%08x", IoAccessCurrentAddress,IoMem_ReadByte(IoAccessCurrentAddress),m68k_getpc());
     set_interrupt(INT_TIMER,RELEASE_INT);
 }
 

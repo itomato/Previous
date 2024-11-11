@@ -58,7 +58,7 @@ public:
 extern "C" int vdns_match(struct mbuf *m, uint32_t addr, int dport);
 #else
     int  vdns_match(struct mbuf *m, uint32_t addr, int dport);
-    void vdns_udp_map_to_local_port(uint32_t* ipNBO, uint16_t* dportNBO);
+    void vdns_udp_map_to_local_port(struct in_addr* ipNBO, uint16_t* dportNBO);
 #endif /* __cplusplus */
 
 #endif /* VDNS_h */

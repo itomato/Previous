@@ -21,49 +21,36 @@ const char Printer_fileid[] = "Previous printer.c";
 #include <png.h>
 
 /* Helper function for building path and filename of output file */
-static const char *lp_get_filename(void) {
-    static const char *lp_outfile = NULL;
-    static char lp_filename[32];
-    static char lp_extension[16];
-    static int lp_pagecount = 0;
-    int lp_duplicate_count = 0;
+static char *lp_png_filename(void) {
     
     if (File_DirExists(ConfigureParams.Printer.szPrintToFileName)) {
-        snprintf(lp_filename, sizeof(lp_filename), "%05d_next_printer", lp_pagecount);
+        int i;
+        char szFileName[32];
+        char *szPathName = NULL;
         
-        do {
-            if (lp_duplicate_count) {
-                snprintf(lp_extension, sizeof(lp_extension), "%i.png",lp_duplicate_count);
-            } else {
-                snprintf(lp_extension, sizeof(lp_extension), ".png");
-            }
-            lp_outfile = File_MakePath(ConfigureParams.Printer.szPrintToFileName,
-                                       lp_filename, lp_extension);
+        for (i = 0; i < 1000000; i++) {
+            snprintf(szFileName, sizeof(szFileName), "next_print_%06d", i);
+            szPathName = File_MakePath(ConfigureParams.Printer.szPrintToFileName, szFileName, "png");
             
-            lp_duplicate_count++;
-        } while (File_Exists(lp_outfile) && lp_duplicate_count<1000);
+            if (!File_Exists(szPathName)) {
+                return szPathName;
+            }
+            
+            free(szPathName);
+        }
+        
+        Log_Printf(LOG_WARN, "[Printer] Error: Maximum print count exceeded (%d)", i);
     }
-    
-    if (lp_outfile==NULL) {
-        lp_outfile = "\0";
-    }
-    
-    lp_pagecount++;
-    lp_pagecount %= 100000;
-    
-    return lp_outfile;
+    return NULL;
 }
 
 /* PNG printing functions */
-const int MAX_PAGE_LEN = 400 * 14; // 14 inches is the length of US legal paper, longest paper that fits into the NeXT printer cartridge
+const int MAX_PAGE_LEN = 400 * 14; /* 14 inches is the length of US legal paper, longest paper that fits into the NeXT printer cartridge */
 png_structp png_ptr          = NULL;
 png_infop   png_info_ptr     = NULL;
 png_byte**  png_row_pointers = NULL;
 int         png_width;
-int         png_height;
 int         png_count;
-int         png_page_count   = 0;
-const char* png_path;
 
 static void lp_png_setup(uint32_t data) {
     int i;
@@ -93,11 +80,10 @@ static void lp_png_setup(uint32_t data) {
         png_row_pointers[i] = png_malloc(png_ptr, sizeof (uint8_t) * (png_width / 8));
     }
     png_count  = 0;
-    png_height = 0;
 }
 
 static void lp_png_print(void) {
-    if(png_ptr) {
+    if (png_ptr) {
         int i;
         
         for (i = 0; i < lp_buffer.size; i++) {
@@ -108,7 +94,10 @@ static void lp_png_print(void) {
 }
 
 static void lp_png_finish(void) {
-    if(png_ptr) {
+    if (png_ptr) {
+        char* png_path = NULL;
+        FILE* png_file = NULL;
+        
         png_set_IHDR(png_ptr,
                      png_info_ptr,
                      png_width,
@@ -119,20 +108,21 @@ static void lp_png_finish(void) {
                      PNG_COMPRESSION_TYPE_DEFAULT,
                      PNG_FILTER_TYPE_DEFAULT);
         
-        png_path = lp_get_filename();
+        png_path = lp_png_filename();
         
-        FILE* png_fp = File_Open(png_path, "wb");
+        if (png_path) {
+            png_file = File_Open(png_path, "wb");
+            free(png_path);
+        }
         
-        if (png_fp) {
-            png_init_io(png_ptr, png_fp);
+        if (png_file) {
+            png_init_io(png_ptr, png_file);
             png_set_rows(png_ptr, png_info_ptr, png_row_pointers);
             png_write_png(png_ptr, png_info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
+            File_Close(png_file);
         } else {
             Statusbar_AddMessage("Laser printer error: Could not create output file", 10000);
         }
-        
-        File_Close(png_fp);
-        png_page_count++;
     }
 }
 #else
@@ -740,7 +730,7 @@ void Printer_Reset(void) {
 
 
 /* Printer interface registers */
-void LP_CSR0_Read(void) { // 0x0200F000
+void LP_CSR0_Read(void) { /* 0x0200F000 */
     IoMem_WriteByte(IoAccessCurrentAddress, lp.csr.dma);
     Log_Printf(LOG_LP_REG_LEVEL,"[LP] DMA status read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -761,7 +751,7 @@ void LP_CSR0_Write(void) {
     lp_check_interrupt();
 }
 
-void LP_CSR1_Read(void) { // 0x0200F001
+void LP_CSR1_Read(void) { /* 0x0200F001 */
     IoMem_WriteByte(IoAccessCurrentAddress, lp.csr.printer);
     Log_Printf(LOG_LP_REG_LEVEL,"[LP] Printer status read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -787,7 +777,7 @@ void LP_CSR1_Write(void) {
     lp_check_interrupt();
 }
 
-void LP_CSR2_Read(void) { // 0x0200F002
+void LP_CSR2_Read(void) { /* 0x0200F002 */
     IoMem_WriteByte(IoAccessCurrentAddress, lp.csr.transmit);
     Log_Printf(LOG_LP_REG_LEVEL,"[LP] Transmitter status read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -811,7 +801,7 @@ void LP_CSR2_Write(void) {
     }
 }
 
-void LP_CSR3_Read(void) { // 0x0200F003
+void LP_CSR3_Read(void) { /* 0x0200F003 */
     IoMem_WriteByte(IoAccessCurrentAddress, lp.csr.cmd);
     Log_Printf(LOG_LP_REG_LEVEL,"[LP] Command read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -821,7 +811,7 @@ void LP_CSR3_Write(void) {
     Log_Printf(LOG_LP_REG_LEVEL,"[LP] Command write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void LP_Data_Read(void) { // 0x0200F004 (access must be 32-bit)
+void LP_Data_Read(void) { /* 0x0200F004 (access must be 32-bit) */
     IoMem_WriteLong(IoAccessCurrentAddress, lp.data);
     Log_Printf(LOG_LP_REG_LEVEL,"[LP] Data read at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, lp.data, m68k_getpc());
     

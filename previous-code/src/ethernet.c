@@ -131,7 +131,7 @@ static void enet_rx_interrupt(uint8_t intr) {
 
 
 /* Register access functions */
-void EN_TX_Status_Read(void) { // 0x02006000
+void EN_TX_Status_Read(void) { /* 0x02006000 */
     IoMem_WriteByte(IoAccessCurrentAddress, enet.tx_status);
     Log_Printf(LOG_EN_REG_LEVEL,"[EN] Transmitter status read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -147,7 +147,7 @@ void EN_TX_Status_Write(void) {
     enet_tx_check_interrupt();
 }
 
-void EN_TX_Mask_Read(void) { // 0x02006001
+void EN_TX_Mask_Read(void) { /* 0x02006001 */
     IoMem_WriteByte(IoAccessCurrentAddress, enet.tx_mask);
     Log_Printf(LOG_EN_REG_LEVEL,"[EN] Transmitter masks read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -160,7 +160,7 @@ void EN_TX_Mask_Write(void) {
     enet_tx_check_interrupt();
 }
 
-void EN_RX_Status_Read(void) { // 0x02006002
+void EN_RX_Status_Read(void) { /* 0x02006002 */
     if (new_enet_buserror()) {
         return;
     }
@@ -179,7 +179,7 @@ void EN_RX_Status_Write(void) {
     enet_rx_check_interrupt();
 }
 
-void EN_RX_Mask_Read(void) { // 0x02006003
+void EN_RX_Mask_Read(void) { /* 0x02006003 */
     IoMem_WriteByte(IoAccessCurrentAddress, enet.rx_mask);
     Log_Printf(LOG_EN_REG_LEVEL,"[EN] Receiver masks read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -192,7 +192,7 @@ void EN_RX_Mask_Write(void) {
     enet_rx_check_interrupt();
 }
 
-void EN_TX_Mode_Read(void) { // 0x02006004
+void EN_TX_Mode_Read(void) { /* 0x02006004 */
     IoMem_WriteByte(IoAccessCurrentAddress, enet.tx_mode);
     Log_Printf(LOG_EN_REG_LEVEL,"[EN] Transmitter mode read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -202,7 +202,7 @@ void EN_TX_Mode_Write(void) {
     Log_Printf(LOG_EN_REG_LEVEL,"[EN] Transmitter mode write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void EN_RX_Mode_Read(void) { // 0x02006005
+void EN_RX_Mode_Read(void) { /* 0x02006005 */
     IoMem_WriteByte(IoAccessCurrentAddress, enet.rx_mode);
     Log_Printf(LOG_EN_REG_LEVEL,"[EN] Receiver mode read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -212,18 +212,18 @@ void EN_RX_Mode_Write(void) {
     Log_Printf(LOG_EN_REG_LEVEL,"[EN] Receiver mode write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void EN_Reset_Write(void) { // 0x02006006
+void EN_Reset_Write(void) { /* 0x02006006 */
     enet.reset = IoMem_ReadByte(IoAccessCurrentAddress);
     Log_Printf(LOG_EN_REG_LEVEL,"[EN] Reset write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
     enet_reset();
 }
 
-void EN_CounterLo_Read(void) { // 0x02006007
+void EN_CounterLo_Read(void) { /* 0x02006007 */
     IoMem_WriteByte(IoAccessCurrentAddress, 0&0xFF); /* FIXME: bit counter value */
     Log_Printf(LOG_WARN,"[EN] TDR counter lo read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void EN_NodeID0_Read(void) { // 0x02006008
+void EN_NodeID0_Read(void) { /* 0x02006008 */
     IoMem_WriteByte(IoAccessCurrentAddress, enet.mac_addr[0]);
     Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 0 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -233,7 +233,7 @@ void EN_NodeID0_Write(void) {
     Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 0 write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void EN_NodeID1_Read(void) { // 0x02006009
+void EN_NodeID1_Read(void) { /* 0x02006009 */
     IoMem_WriteByte(IoAccessCurrentAddress, enet.mac_addr[1]);
     Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 1 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -243,7 +243,7 @@ void EN_NodeID1_Write(void) {
     Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 1 write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void EN_NodeID2_Read(void) { // 0x0200600a
+void EN_NodeID2_Read(void) { /* 0x0200600a */
     IoMem_WriteByte(IoAccessCurrentAddress, enet.mac_addr[2]);
     Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 2 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -253,7 +253,7 @@ void EN_NodeID2_Write(void) {
     Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 2 write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void EN_NodeID3_Read(void) { // 0x0200600b
+void EN_NodeID3_Read(void) { /* 0x0200600b */
     IoMem_WriteByte(IoAccessCurrentAddress, enet.mac_addr[3]);
     Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 3 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -263,7 +263,7 @@ void EN_NodeID3_Write(void) {
     Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 3 write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void EN_NodeID4_Read(void) { // 0x0200600c
+void EN_NodeID4_Read(void) { /* 0x0200600c */
     IoMem_WriteByte(IoAccessCurrentAddress, enet.mac_addr[4]);
     Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 4 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -273,7 +273,7 @@ void EN_NodeID4_Write(void) {
     Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 4 write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void EN_NodeID5_Read(void) { // 0x0200600d
+void EN_NodeID5_Read(void) { /* 0x0200600d */
     IoMem_WriteByte(IoAccessCurrentAddress, enet.mac_addr[5]);
     Log_Printf(LOG_EN_REG_LEVEL,"[EN] MAC byte 5 read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -285,7 +285,7 @@ void EN_NodeID5_Write(void) {
     Ethernet_Reset(false);
 }
 
-void EN_CounterHi_Read(void) { // 0x0200600f
+void EN_CounterHi_Read(void) { /* 0x0200600f */
     IoMem_WriteByte(IoAccessCurrentAddress, (0>>8)&0x3F); /* FIXME: bit counter value */
     Log_Printf(LOG_WARN,"[EN] TDR counter hi read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -294,15 +294,15 @@ void EN_CounterHi_Read(void) { // 0x0200600f
 /* Functions to find out if we are intended to receive a packet */
 
 /* Non-turbo */
-#define RX_NOPACKETS        0   // Accept no packets
-#define RX_LIMITED          1   // Accept broadcast/limited
-#define RX_NORMAL           2   // Accept broadcast/multicast
-#define RX_PROMISCUOUS      3   // Accept all packets
+#define RX_NOPACKETS        0   /* Accept no packets */
+#define RX_LIMITED          1   /* Accept broadcast/limited */
+#define RX_NORMAL           2   /* Accept broadcast/multicast */
+#define RX_PROMISCUOUS      3   /* Accept all packets */
 
 /* Turbo */
-#define RX_ENABLED      0x80    // Accept packets
-#define RX_ANY          0x01    // Accept any packets
-#define RX_OWN          0x02    // Accept own packets
+#define RX_ENABLED      0x80    /* Accept packets */
+#define RX_ANY          0x01    /* Accept any packets */
+#define RX_OWN          0x02    /* Accept own packets */
 
 /* Ethernet frame size limits */
 #define ENET_FRAMESIZE_MIN  64      /* 46 byte data and 14 byte header, 4 byte CRC */
@@ -424,9 +424,8 @@ void enet_receive(uint8_t *pkt, int len) {
         }
         enet_rx_buffer.size=enet_rx_buffer.limit=len;
         enet.tx_status |= TXSTAT_NET_BUSY;
-    } else {
-        if (en_state != EN_LOOPBACK && en_state != EN_THINWIRE) // don't log warning if it is a self-sent packed
-            Log_Printf(LOG_WARN, "[EN] Packet is not for me.");
+    } else if (en_state != EN_LOOPBACK && en_state != EN_THINWIRE) {
+        Log_Printf(LOG_WARN, "[EN] Packet is not for me."); /* Log warning if it is not a self-sent packet */
     }
 }
 
@@ -586,7 +585,7 @@ static void enet_io(void) {
 
 uint8_t saved_nibble = 0;
 
-void EN_Control_Read(void) { // 0x02006006
+void EN_Control_Read(void) { /* 0x02006006 */
     uint8_t val = enet.reset&EN_RESET;
     if (enet.tx_mode&TXMODE_TPE) {
         if (!ConfigureParams.Ethernet.bEthernetConnected || !ConfigureParams.Ethernet.bTwistedPair) {
@@ -597,17 +596,17 @@ void EN_Control_Read(void) { // 0x02006006
     Log_Printf(LOG_EN_REG_LEVEL,"[EN] Control read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void EN_RX_SavedNibble_Read(void) { // 0x02006007
+void EN_RX_SavedNibble_Read(void) { /* 0x02006007 */
     IoMem_WriteByte(IoAccessCurrentAddress, saved_nibble&0x0F);
     Log_Printf(LOG_WARN,"[EN] Receiver saved nibble read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void EN_TX_Seq_Read(void) { // 0x0200600e
+void EN_TX_Seq_Read(void) { /* 0x0200600e */
     IoMem_WriteByte(IoAccessCurrentAddress, 0&0x3F);
     Log_Printf(LOG_WARN,"[EN] Transmitter sequence read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
 
-void EN_RX_Seq_Read(void) { // 0x0200600f
+void EN_RX_Seq_Read(void) { /* 0x0200600f */
     IoMem_WriteByte(IoAccessCurrentAddress, 0&0x7F);
     Log_Printf(LOG_WARN,"[EN] Receiver sequence read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
 }
@@ -975,7 +974,7 @@ print_data:
     } else {
         printf("Data:      no additional data");
     }
-#endif // LOG_EN_ANALYZE
+#endif /* LOG_EN_ANALYZE */
     for (i=offset; i<size; i++) {
         if (i > offset && (i - offset) % 16 == 0) {
             printf("\n");
@@ -987,6 +986,6 @@ print_data:
     if (padding) {
         printf("Padding:   %d byte at end of packet\n", padding);
     }
-#endif // LOG_EN_ANALYZE
-#endif // LOG_EN_DATA
+#endif /* LOG_EN_ANALYZE */
+#endif /* LOG_EN_DATA */
 }

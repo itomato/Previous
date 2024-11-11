@@ -9,9 +9,14 @@ set(SOURCES
 
 # When building for macOS, define specific sources for gui and resources
 if(ENABLE_OSX_BUNDLE)
+	set(GUIOSX_SOURCES
+	    gui-osx/paths.m gui-osx/shortcut.m)
+	set_source_files_properties(${GUIOSX_SOURCES} PROPERTIES LANGUAGE C)
 	set(GUIOSX_RSRCS
 	    gui-osx/Previous.icns gui-osx/en.lproj gui-osx/fr.lproj)
-endif(ENABLE_OSX_BUNDLE)
+elseif(APPLE)
+	set(SOURCES ${SOURCES} gui-osx/paths.m gui-osx/shortcut.m)
+endif()
 
 # When building for Windows, define specific sources for gui and resources
 # and set the subsystem of the resulting .exe to "windows GUI" instead of "console"
@@ -57,7 +62,7 @@ add_subdirectory(ditool)
 
 # When building for macOS, add specific sources
 if(ENABLE_OSX_BUNDLE)
-	add_executable(${APP_NAME} MACOSX_BUNDLE ${GUIOSX_RSRCS} ${SOURCES})
+	add_executable(${APP_NAME} MACOSX_BUNDLE ${GUIOSX_RSRCS} ${SOURCES} ${GUIOSX_SOURCES})
 	set_target_properties(${APP_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST
 			      ${CMAKE_CURRENT_SOURCE_DIR}/gui-osx/Info-Previous.plist)
 	set_target_properties(${APP_NAME} PROPERTIES INSTALL_RPATH
@@ -66,6 +71,9 @@ if(ENABLE_OSX_BUNDLE)
 	set(MACOSX_BUNDLE_ICON_FILE Previous.icns)
 	set(MACOSX_BUNDLE_GUI_IDENTIFIER com.sourceforge.previous)
 	if(CMAKE_GENERATOR MATCHES "Xcode")
+		set_target_properties(${APP_NAME} PROPERTIES
+				      XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER
+				      "com.sourceforge.previous")
 		set(BUNDLE_CONTENTS ${CMAKE_CURRENT_BINARY_DIR}/\${CONFIGURATION}/${APP_NAME}.app/Contents)
 	else()
 		set(BUNDLE_CONTENTS ${CMAKE_CURRENT_BINARY_DIR}/${APP_NAME}.app/Contents)
@@ -138,6 +146,10 @@ endif(PNG_FOUND)
 if(PCAP_FOUND)
 	target_link_libraries(${APP_NAME} ${PCAP_LIBRARY})
 endif(PCAP_FOUND)
+
+if(APPLE)
+	target_link_libraries(${APP_NAME} "-framework Cocoa")
+endif()
 
 if(WIN32)
 	# Needed for socket() on Windows

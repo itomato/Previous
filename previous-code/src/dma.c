@@ -31,18 +31,18 @@ const char Dma_fileid[] = "Previous dma.c";
 #define LOG_DMA_LEVEL LOG_DEBUG
 
 typedef enum {
-    CHANNEL_SCSI,       // 0x00000010
-    CHANNEL_SOUNDOUT,   // 0x00000040
-    CHANNEL_DISK,       // 0x00000050
-    CHANNEL_SOUNDIN,    // 0x00000080
-    CHANNEL_PRINTER,    // 0x00000090
-    CHANNEL_SCC,        // 0x000000c0
-    CHANNEL_DSP,        // 0x000000d0
-    CHANNEL_EN_TX,      // 0x00000110
-    CHANNEL_EN_RX,      // 0x00000150
-    CHANNEL_VIDEO,      // 0x00000180
-    CHANNEL_M2R,        // 0x000001d0
-    CHANNEL_R2M         // 0x000001c0
+    CHANNEL_SCSI,       /* 0x00000010 */
+    CHANNEL_SOUNDOUT,   /* 0x00000040 */
+    CHANNEL_DISK,       /* 0x00000050 */
+    CHANNEL_SOUNDIN,    /* 0x00000080 */
+    CHANNEL_PRINTER,    /* 0x00000090 */
+    CHANNEL_SCC,        /* 0x000000c0 */
+    CHANNEL_DSP,        /* 0x000000d0 */
+    CHANNEL_EN_TX,      /* 0x00000110 */
+    CHANNEL_EN_RX,      /* 0x00000150 */
+    CHANNEL_VIDEO,      /* 0x00000180 */
+    CHANNEL_M2R,        /* 0x000001d0 */
+    CHANNEL_R2M         /* 0x000001c0 */
 } DMA_CHANNEL;
 
 struct {
@@ -171,7 +171,7 @@ static void dma_initialize_buffer(int channel, uint8_t offset) {
 
 /* DMA register access functions */
 
-void DMA_CSR_Read(void) { // 0x02000010
+void DMA_CSR_Read(void) { /* 0x02000010 */
     int channel = get_channel(IoAccessCurrentAddress);
     IoMem_WriteLong(IoAccessCurrentAddress, dma[channel].csr);
     Log_Printf(LOG_DMA_LEVEL,"DMA CSR read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].csr, m68k_getpc());
@@ -246,7 +246,7 @@ void DMA_CSR_Write(void) {
     }
 }
 
-void DMA_Saved_Next_Read(void) { // 0x02004000
+void DMA_Saved_Next_Read(void) { /* 0x02004000 */
     int channel = get_channel(IoAccessCurrentAddress-0x3FF0);
     IoMem_WriteLong(IoAccessCurrentAddress, dma[channel].saved_next);
     Log_Printf(LOG_DMA_LEVEL,"DMA SNext read at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].saved_next, m68k_getpc());
@@ -258,7 +258,7 @@ void DMA_Saved_Next_Write(void) {
     Log_Printf(LOG_DMA_LEVEL,"DMA SNext write at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].saved_next, m68k_getpc());
 }
 
-void DMA_Saved_Limit_Read(void) { // 0x02004004
+void DMA_Saved_Limit_Read(void) { /* 0x02004004 */
     int channel = get_channel(IoAccessCurrentAddress-0x3FF4);
     IoMem_WriteLong(IoAccessCurrentAddress, dma[channel].saved_limit);
     Log_Printf(LOG_DMA_LEVEL,"DMA SLimit read at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].saved_limit, m68k_getpc());
@@ -270,7 +270,7 @@ void DMA_Saved_Limit_Write(void) {
     Log_Printf(LOG_DMA_LEVEL,"DMA SLimit write at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].saved_limit, m68k_getpc());
 }
 
-void DMA_Saved_Start_Read(void) { // 0x02004008
+void DMA_Saved_Start_Read(void) { /* 0x02004008 */
     int channel = get_channel(IoAccessCurrentAddress-0x3FF8);
     IoMem_WriteLong(IoAccessCurrentAddress, dma[channel].saved_start);
     Log_Printf(LOG_DMA_LEVEL,"DMA SStart read at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].saved_start, m68k_getpc());
@@ -282,7 +282,7 @@ void DMA_Saved_Start_Write(void) {
     Log_Printf(LOG_DMA_LEVEL,"DMA SStart write at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].saved_start, m68k_getpc());
 }
 
-void DMA_Saved_Stop_Read(void) { // 0x0200400c
+void DMA_Saved_Stop_Read(void) { /* 0x0200400c */
     int channel = get_channel(IoAccessCurrentAddress-0x3FFC);
     IoMem_WriteLong(IoAccessCurrentAddress, dma[channel].saved_stop);
     Log_Printf(LOG_DMA_LEVEL,"DMA SStop read at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].saved_stop, m68k_getpc());
@@ -294,7 +294,7 @@ void DMA_Saved_Stop_Write(void) {
     Log_Printf(LOG_DMA_LEVEL,"DMA SStop write at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].saved_stop, m68k_getpc());
 }
 
-void DMA_Next_Read(void) { // 0x02004010
+void DMA_Next_Read(void) { /* 0x02004010 */
     int channel = get_channel(IoAccessCurrentAddress-0x4000);
     IoMem_WriteLong(IoAccessCurrentAddress, dma[channel].next);
     Log_Printf(LOG_DMA_LEVEL,"DMA Next read at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].next, m68k_getpc());
@@ -306,7 +306,7 @@ void DMA_Next_Write(void) {
     Log_Printf(LOG_DMA_LEVEL,"DMA Next write at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].next, m68k_getpc());
 }
 
-void DMA_Limit_Read(void) { // 0x02004014
+void DMA_Limit_Read(void) { /* 0x02004014 */
     int channel = get_channel(IoAccessCurrentAddress-0x4004);
     IoMem_WriteLong(IoAccessCurrentAddress, dma[channel].limit);
     Log_Printf(LOG_DMA_LEVEL,"DMA Limit read at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].limit, m68k_getpc());
@@ -318,7 +318,7 @@ void DMA_Limit_Write(void) {
     Log_Printf(LOG_DMA_LEVEL,"DMA Limit write at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].limit, m68k_getpc());
 }
 
-void DMA_Start_Read(void) { // 0x02004018
+void DMA_Start_Read(void) { /* 0x02004018 */
     int channel = get_channel(IoAccessCurrentAddress-0x4008);
     IoMem_WriteLong(IoAccessCurrentAddress, dma[channel].start);
     Log_Printf(LOG_DMA_LEVEL,"DMA Start read at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].start, m68k_getpc());
@@ -330,7 +330,7 @@ void DMA_Start_Write(void) {
     Log_Printf(LOG_DMA_LEVEL,"DMA Start write at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].start, m68k_getpc());
 }
 
-void DMA_Stop_Read(void) { // 0x0200401c
+void DMA_Stop_Read(void) { /* 0x0200401c */
     int channel = get_channel(IoAccessCurrentAddress-0x400C);
     IoMem_WriteLong(IoAccessCurrentAddress, dma[channel].stop);
     Log_Printf(LOG_DMA_LEVEL,"DMA Stop read at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].stop, m68k_getpc());
@@ -342,7 +342,7 @@ void DMA_Stop_Write(void) {
     Log_Printf(LOG_DMA_LEVEL,"DMA Stop write at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].stop, m68k_getpc());
 }
 
-void DMA_Init_Read(void) { // 0x02004210
+void DMA_Init_Read(void) { /* 0x02004210 */
     int channel = get_channel(IoAccessCurrentAddress-0x4200);
     IoMem_WriteLong(IoAccessCurrentAddress, dma[channel].next);
     Log_Printf(LOG_DMA_LEVEL,"DMA Init read at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[channel].next, m68k_getpc());
@@ -1111,7 +1111,7 @@ bool dma_scc_ready(void) {
 /* CSR masks */
 #define DMA_CMD_MASK_T     0x00FB0000
 
-void TDMA_CSR_Read(void) { // 0x02000010
+void TDMA_CSR_Read(void) { /* 0x02000010 */
     int channel = get_channel(IoAccessCurrentAddress);
     
     IoMem_WriteLong(IoAccessCurrentAddress, dma[channel].csr);
@@ -1179,7 +1179,7 @@ void TDMA_CSR_Write(void) {
     }
 }
 
-void TDMA_Saved_Limit_Read(void) { // 0x02004050
+void TDMA_Saved_Limit_Read(void) { /* 0x02004050 */
     IoMem_WriteLong(IoAccessCurrentAddress, dma[CHANNEL_EN_RX].saved_limit);
     Log_Printf(LOG_DMA_LEVEL,"TDMA SNext read at $%08x val=$%08x PC=$%08x\n", IoAccessCurrentAddress, dma[CHANNEL_EN_RX].saved_limit, m68k_getpc());
 }

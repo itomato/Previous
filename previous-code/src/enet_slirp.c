@@ -37,16 +37,14 @@ int slirp_started;
 static mutex_t *slirp_mutex = NULL;
 thread_t *tick_func_handle;
 
-//Is slirp initalized?
-//Is set to true from the init, and false on ethernet disconnect
+/* This function returns 1 if SLiRP is running and 0 if not. */
 int slirp_can_output(void)
 {
     return slirp_started;
 }
 
-//This is a callback function for SLiRP that sends a packet
-//to the calling library.  In this case I stuff
-//it in q queue
+/* This is a callback function for SLiRP that sends a packet *
+ * to the calling library by putting it in a queue.          */
 void slirp_output (const unsigned char *pkt, int pkt_len)
 {
     struct queuepacket *p;
@@ -59,8 +57,8 @@ void slirp_output (const unsigned char *pkt, int pkt_len)
     Log_Printf(LOG_EN_SLIRP_LEVEL, "[SLIRP] Output packet with %i bytes to queue",pkt_len);
 }
 
-//This function is to be periodically called
-//to keep the internal packet state flowing.
+/* This function is to be called periodically *
+ * to keep the internal packet state flowing. */
 static void slirp_tick(void)
 {
     int ret2,nfds;
@@ -75,13 +73,13 @@ static void slirp_tick(void)
         FD_ZERO(&wfds);
         FD_ZERO(&xfds);
         host_mutex_lock(slirp_mutex);
-        timeout=slirp_select_fill(&nfds,&rfds,&wfds,&xfds); //this can crash
+        timeout=slirp_select_fill(&nfds,&rfds,&wfds,&xfds); /* this can crash */
         host_mutex_unlock(slirp_mutex);
         
         if(timeout<0)
             timeout=500;
         tv.tv_sec=0;
-        tv.tv_usec = timeout;    //basilisk default 10000
+        tv.tv_usec = timeout;    /* basilisk default 10000 */
         
         ret2 = select(nfds + 1, &rfds, &wfds, &xfds, &tv);
         if(ret2>=0){
@@ -92,8 +90,8 @@ static void slirp_tick(void)
     }
 }
 
-//This function is to be called every 30 seconds
-//to broadcast a simple routing table.
+/* This function is to be called every 30 seconds *
+ * to broadcast a simple routing table.           */
 static void slirp_rip_tick(void)
 {
     if (slirp_started)
@@ -120,12 +118,12 @@ static int tick_func(void *arg)
         host_sleep_us(SLIRP_TICK_US);
         slirp_tick();
         
-        // for routing information protocol
+        /* for routing information protocol */
         last_time = time;
         time = host_get_save_time();
-        if (time < last_time) // if time counter wrapped
+        if (time < last_time) /* if time counter wrapped */
         {
-            next_time = time; // reset next_time
+            next_time = time; /* reset next_time */
         }
         if (time >= next_time)
         {
@@ -164,9 +162,9 @@ void enet_slirp_stop(void) {
     if (slirp_started) {
         Log_Printf(LOG_WARN, "Stopping SLIRP");
         slirp_started=0;
-        QueueDestroy(slirpq);
-        host_mutex_destroy(slirp_mutex);
         host_thread_wait(tick_func_handle);
+        host_mutex_destroy(slirp_mutex);
+        QueueDestroy(slirpq);
     }
 }
 

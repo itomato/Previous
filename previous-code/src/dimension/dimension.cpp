@@ -82,7 +82,6 @@ void NextDimension::reset(void) {
 
 void NextDimension::pause(bool pause) {
     i860.pause(pause);
-    sdl.pause(pause);
 }
 
 /* NeXTdimension board memory access (m68k) */

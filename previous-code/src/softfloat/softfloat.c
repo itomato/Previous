@@ -2163,10 +2163,8 @@ floatx80 floatx80_round_to_int(floatx80 a, float_status *status)
     flag aSign;
     int32_t aExp;
     uint64_t lastBitMask, roundBitsMask;
-	int8_t roundingMode;
 	floatx80 z;
 
-	roundingMode = status->float_rounding_mode;
 	aSign = extractFloatx80Sign(a);
     aExp = extractFloatx80Exp( a );
     if ( 0x403E <= aExp ) {

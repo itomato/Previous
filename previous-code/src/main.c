@@ -47,7 +47,6 @@ const char Main_fileid[] = "Previous main.c";
 
 volatile bool bQuitProgram = false;            /* Flag to quit program cleanly */
 volatile bool bEmulationActive = false;        /* Do not run emulation during initialization */
-static bool   bAccurateDelays;                 /* Host system has an accurate SDL_Delay()? */
 static bool   bIgnoreNextMouseMotion = false;  /* Next mouse motion will be ignored (needed after SDL_WarpMouse) */
 
 #ifndef ENABLE_RENDERING_THREAD
@@ -127,7 +126,6 @@ bool Main_PauseEmulation(bool visualize) {
 		Log_Printf(LOG_WARN, "Warning: Pause flag timeout!");
 #endif
 	host_pause_time(true);
-	Screen_Pause(true);
 	Sound_Pause(true);
 	NextBus_Pause(true);
 
@@ -159,7 +157,6 @@ bool Main_UnPauseEmulation(void) {
 
 	NextBus_Pause(false);
 	Sound_Pause(false);
-	Screen_Pause(false);
 	host_pause_time(false);
 
 	/* Set mouse pointer to the middle of the screen and hide it */
@@ -220,31 +217,6 @@ void Main_RequestQuit(bool confirm) {
 	}
 }
 
-/*-----------------------------------------------------------------------*/
-/**
- * Since SDL_Delay and friends are very inaccurate on some systems, we have
- * to check if we can rely on this delay function.
- */
-static void Main_CheckForAccurateDelays(void) {
-	int nStartTicks, nEndTicks;
-
-	/* Force a task switch now, so we have a longer timeslice afterwards */
-	SDL_Delay(10);
-
-	nStartTicks = SDL_GetTicks();
-	SDL_Delay(1);
-	nEndTicks = SDL_GetTicks();
-
-	/* If the delay took longer than 10ms, we are on an inaccurate system! */
-	bAccurateDelays = ((nEndTicks - nStartTicks) < 9);
-
-	if (bAccurateDelays)
-		Log_Printf(LOG_WARN, "Host system has accurate delays. (%d)\n", nEndTicks - nStartTicks);
-	else
-		Log_Printf(LOG_WARN, "Host system does not have accurate delays. (%d)\n", nEndTicks - nStartTicks);
-}
-
-
 /* ----------------------------------------------------------------------- */
 /**
  * Set mouse pointer to new coordinates and set flag to ignore the mouse event
@@ -285,12 +257,22 @@ void Main_SetMouseGrab(bool grab) {
 		if (bEmulationActive) {
 			Main_WarpMouse(sdlscrn->w/2, sdlscrn->h/2); /* Cursor must be inside window */
 			SDL_SetRelativeMouseMode(SDL_TRUE);
-			SDL_SetWindowGrab(sdlWindow, SDL_TRUE);
-			Main_SetTitle("Mouse is locked. Ctrl-click to release.");
+			SDL_SetWindowKeyboardGrab(sdlWindow, SDL_TRUE);
+			SDL_SetWindowMouseGrab(sdlWindow, SDL_TRUE);
+			if (ConfigureParams.Mouse.bEnableAutoGrab) {
+				Main_SetTitle("Mouse is locked. Ctrl-click to release.");
+			} else {
+				char message[64];
+
+				snprintf(message, sizeof(message), "Mouse is locked. Press ctrl-alt-%s to release.", 
+				         Keymap_GetKeyName(ConfigureParams.Shortcut.withModifier[SHORTCUT_MOUSEGRAB]));
+				Main_SetTitle(message);
+			}
 		}
 	} else {
 		SDL_SetRelativeMouseMode(SDL_FALSE);
-		SDL_SetWindowGrab(sdlWindow, SDL_FALSE);
+		SDL_SetWindowKeyboardGrab(sdlWindow, SDL_FALSE);
+		SDL_SetWindowMouseGrab(sdlWindow, SDL_FALSE);
 		Main_SetTitle(NULL);
 	}
 }
@@ -359,7 +341,7 @@ static bool Main_GetEvent(SDL_Event* event) {
 
 	return valid;
 }
-#endif // !ENABLE_RENDERING_THREAD
+#endif /* !ENABLE_RENDERING_THREAD */
 
 /* ----------------------------------------------------------------------- */
 /**
@@ -560,9 +542,9 @@ void Main_EventHandlerInterrupt(void) {
 	if (time_offset > 0) {
 		host_sleep_us(time_offset);
 	}
-#endif // !ENABLE_RENDERING_THREAD
+#endif /* !ENABLE_RENDERING_THREAD */
 
-	CycInt_AddRelativeInterruptUs((1000*1000)/200, 0, INTERRUPT_EVENT_LOOP); // poll events with 200 Hz
+	CycInt_AddRelativeInterruptUs((1000*1000)/200, 0, INTERRUPT_EVENT_LOOP); /* Poll events at 200 Hz */
 }
 
 #ifndef ENABLE_RENDERING_THREAD
@@ -585,7 +567,7 @@ static int Main_Thread(void* unused) {
 
 	return 0;
 }
-#endif // !ENABLE_RENDERING_THREAD
+#endif /* !ENABLE_RENDERING_THREAD */
 
 
 /* ----------------------------------------------------------------------- */
@@ -624,7 +606,7 @@ void Main_EventHandler(void) {
 			case SDL_WINDOWEVENT:
 				switch(event.window.event) {
 					case SDL_WINDOWEVENT_CLOSE:
-						SDL_FlushEvent(SDL_QUIT); // remove SDL_Quit if pending
+						SDL_FlushEvent(SDL_QUIT); /* Remove quit event if pending */
 						Main_RequestQuit(true);
 						break;
 					case SDL_WINDOWEVENT_RESIZED:
@@ -646,14 +628,14 @@ void Main_EventHandler(void) {
 
 			case SDL_MOUSEBUTTONDOWN:
 				if (event.button.button == SDL_BUTTON_LEFT) {
-					if (bGrabMouse) {
-						if (SDL_GetModState() & KMOD_CTRL) {
-							bGrabMouse = false;
-							Main_SetMouseGrab(bGrabMouse);
-							break;
-						}
-					} else {
-						if (ConfigureParams.Mouse.bEnableAutoGrab) {
+					if (ConfigureParams.Mouse.bEnableAutoGrab) {
+						if (bGrabMouse) {
+							if (SDL_GetModState() & KMOD_CTRL) {
+								bGrabMouse = false;
+								Main_SetMouseGrab(bGrabMouse);
+								break;
+							}
+						} else {
 							bGrabMouse = true;
 							Main_SetMouseGrab(bGrabMouse);
 							break;
@@ -739,7 +721,7 @@ void Main_EventHandler(void) {
 							break;
 #ifndef ENABLE_RENDERING_THREAD
 						case MAIN_REPAINT:
-							Main_CheckStatusbarUpdate();
+							Statusbar_Update(sdlscrn);
 							Screen_Repaint();
 							break;
 						case MAIN_ND_DISPLAY:
@@ -791,15 +773,6 @@ static void Main_Loop(void) {
 		Main_EventHandler();
 	}
 #endif
-}
-
-/* ----------------------------------------------------------------------- */
-/**
- * Statusbar update with reduced update frequency to save CPU cycles.
- * Call this on emulated machine VBL.
- */
-void Main_CheckStatusbarUpdate(void) {
-	Statusbar_Update(sdlscrn);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -994,19 +967,13 @@ int main(int argc, char *argv[])
 	/* Needed on maemo but useful also with normal X11 window managers for
 	 * window grouping when you have multiple Previous SDL windows open */
 	setenv("SDL_VIDEO_X11_WMCLASS", "previous", 1);
-
-	/* Needed for proper behavior of Caps Lock on some systems */
-	setenv("SDL_DISABLE_LOCK_KEYS", "1", 1);
 #endif
 
 	/* Init emulator system */
 	if (Main_Init()) {
 		/* Set initial Statusbar information */
 		Main_StatusbarSetup();
-		
-		/* Check if SDL_Delay is accurate */
-		Main_CheckForAccurateDelays();
-		
+
 		/* Run emulation */
 		Main_Loop();
 	}

@@ -869,12 +869,12 @@ static uint8_t ADB_GetKeyFromScancode(SDL_Scancode sdlscancode)
 		case SDL_SCANCODE_RSHIFT:
 		case SDL_SCANCODE_LSHIFT:         return APPLEKEY_SHIFT_LEFT;
 		case SDL_SCANCODE_RGUI:
-		case SDL_SCANCODE_LGUI:           return APPLEKEY_APPLE_LEFT;
+		case SDL_SCANCODE_LGUI:           return ConfigureParams.Keyboard.bSwapCmdAlt?APPLEKEY_OPTION_LEFT:APPLEKEY_APPLE_LEFT;
 		case SDL_SCANCODE_MENU:
 		case SDL_SCANCODE_RCTRL:          return APPLEKEY_HELP;
 		case SDL_SCANCODE_LCTRL:          return APPLEKEY_CTL_LEFT;
 		case SDL_SCANCODE_RALT:
-		case SDL_SCANCODE_LALT:           return APPLEKEY_OPTION_LEFT;
+		case SDL_SCANCODE_LALT:           return ConfigureParams.Keyboard.bSwapCmdAlt?APPLEKEY_APPLE_LEFT:APPLEKEY_OPTION_LEFT;
 		case SDL_SCANCODE_CAPSLOCK:       return APPLEKEY_CAPS_LOCK;
 		
 		/* Special keys */
@@ -978,12 +978,12 @@ static uint8_t ADB_GetKeyFromSymbol(SDL_Keycode sdlkey)
 		case SDLK_RSHIFT:
 		case SDLK_LSHIFT:                 return APPLEKEY_SHIFT_LEFT;
 		case SDLK_RGUI:
-		case SDLK_LGUI:                   return APPLEKEY_APPLE_LEFT;
+		case SDLK_LGUI:                   return ConfigureParams.Keyboard.bSwapCmdAlt?APPLEKEY_OPTION_LEFT:APPLEKEY_APPLE_LEFT;
 		case SDLK_MENU:
 		case SDLK_RCTRL:                  return APPLEKEY_HELP;
 		case SDLK_LCTRL:                  return APPLEKEY_CTL_LEFT;
 		case SDLK_RALT:
-		case SDLK_LALT:                   return APPLEKEY_OPTION_LEFT;
+		case SDLK_LALT:                   return ConfigureParams.Keyboard.bSwapCmdAlt?APPLEKEY_APPLE_LEFT:APPLEKEY_OPTION_LEFT;
 		case SDLK_CAPSLOCK:               return APPLEKEY_CAPS_LOCK;
 
 		/* Special Keys */

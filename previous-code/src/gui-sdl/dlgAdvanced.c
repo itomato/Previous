@@ -69,12 +69,12 @@ static SGOBJ advanceddlg[] =
 
 	{ SGBOX, 0, 0, 17,3, 14,15, NULL },
 	{ SGTEXT, 0, 0, 18,4, 12,1, "Memory size" },
-	{ SGRADIOBUT, 0, 0, 19,DLG_MEM_Y, 8,1, custom_memory },
-	{ SGRADIOBUT, 0, 0, 19,6, 6,1, "8 MB" },
-	{ SGRADIOBUT, 0, 0, 19,8, 7,1, "16 MB" },
-	{ SGRADIOBUT, 0, 0, 19,10, 7,1, "32 MB" },
-	{ SGRADIOBUT, 0, 0, 19,12, 7,1, "64 MB" },
-	{ SGRADIOBUT, 0, 0, 19,14, 8,1, "128 MB" },
+	{ SGRADIOBUT, SG_EXIT, 0, 19,DLG_MEM_Y, 8,1, custom_memory },
+	{ SGRADIOBUT, SG_EXIT, 0, 19,6, 6,1, "8 MB" },
+	{ SGRADIOBUT, SG_EXIT, 0, 19,8, 7,1, "16 MB" },
+	{ SGRADIOBUT, SG_EXIT, 0, 19,10, 7,1, "32 MB" },
+	{ SGRADIOBUT, SG_EXIT, 0, 19,12, 7,1, "64 MB" },
+	{ SGRADIOBUT, SG_EXIT, 0, 19,14, 8,1, "128 MB" },
 
 	{ SGBOX, 0, 0, 32,3, 14,15, NULL },
 	{ SGTEXT, 0, 0, 33,4, 12,1, "Memory speed" },
@@ -85,9 +85,9 @@ static SGOBJ advanceddlg[] =
 
 	{ SGBOX, 0, 0, 47,3, 14,15, NULL },
 	{ SGTEXT, 0, 0, 48,4, 12,1, "DSP type" },
-	{ SGRADIOBUT, 0, 0, 49,6, 6,1, "none" },
-	{ SGRADIOBUT, 0, 0, 49,8, 7,1, "56001" },
-	{ SGCHECKBOX, 0, 0, 49,10, 9,1, "Use ROM" },
+	{ SGRADIOBUT, SG_EXIT, 0, 49,6, 6,1, "none" },
+	{ SGRADIOBUT, SG_EXIT, 0, 49,8, 7,1, "56001" },
+	{ SGCHECKBOX, SG_EXIT, 0, 49,10, 9,1, "Use ROM" },
 	{ SGTEXT, 0, 0, 48,12, 8,1, "DSP memory" },
 	{ SGRADIOBUT, 0, 0, 49,14, 7,1, "24 kB" },
 	{ SGRADIOBUT, 0, 0, 49,16, 7,1, "96 kB" },
@@ -114,9 +114,9 @@ static SGOBJ advanceddlg[] =
 
 /* Variable objects */
 SGOBJ disable_128mb_opt = { SGTEXT, 0, 0, 19,14, 0,1, "" };
-SGOBJ enable_128mb_opt = { SGRADIOBUT, 0, 0, 19,14, 8,1, "128 MB" };
+SGOBJ enable_128mb_opt = { SGRADIOBUT, SG_EXIT, 0, 19,14, 8,1, "128 MB" };
 SGOBJ disable_64mb_opt = { SGTEXT, 0, 0, 19,12, 0,1, "" };
-SGOBJ enable_64mb_opt = { SGRADIOBUT, 0, 0, 19,12, 7,1, "64 MB" };
+SGOBJ enable_64mb_opt = { SGRADIOBUT, SG_EXIT, 0, 19,12, 7,1, "64 MB" };
 SGOBJ disable_40mhz_opt = { SGTEXT, 0, 0, 4,14, 0,1, "" };
 SGOBJ enable_40mhz_opt = { SGRADIOBUT, 0, 0, 4,14, 8,1, "40 MHz" };
 

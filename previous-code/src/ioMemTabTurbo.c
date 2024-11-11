@@ -233,5 +233,5 @@ const INTERCEPT_ACCESS_FUNC IoMemTable_Turbo[] =
 	{ 0x0201c002, 0x0001e003, SIZE_BYTE, RAMDAC_Read, RAMDAC_Write },
 	{ 0x0201c003, 0x0001e003, SIZE_BYTE, RAMDAC_Read, RAMDAC_Write },
 	
-	{ 0, 0, NULL, NULL }
+	{ 0, 0, 0, NULL, NULL }
 };

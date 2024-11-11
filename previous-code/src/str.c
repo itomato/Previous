@@ -14,6 +14,7 @@ const char Str_fileid[] = "Hatari str.c";
 #include <stdbool.h>
 #include <stdlib.h>
 #include <assert.h>
+#include "main.h"
 #include "configuration.h"
 #include "str.h"
 

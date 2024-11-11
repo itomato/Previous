@@ -13,6 +13,7 @@ const char Video_fileid[] = "Previous video.c";
 #include "cycInt.h"
 #include "ioMem.h"
 #include "screen.h"
+#include "statusbar.h"
 #include "shortcut.h"
 #include "video.h"
 #include "dma.h"
@@ -69,7 +70,7 @@ void Video_InterruptHandler(void) {
 #ifdef ENABLE_RENDERING_THREAD
 	CycInt_AcknowledgeInterrupt();
 	host_blank_count(MAIN_DISPLAY, true);
-	Main_CheckStatusbarUpdate();
+	Statusbar_Update(sdlscrn);
 	Video_Interrupt();
 	CycInt_AddRelativeInterruptUs((1000*1000)/NEXT_VBL_FREQ, 0, INTERRUPT_VIDEO_VBL);
 #else

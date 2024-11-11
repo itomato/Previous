@@ -162,12 +162,12 @@ extern "C" int vdns_match(struct mbuf *m, uint32_t addr, int dport) {
         return false;
 }
 
-extern "C" void vdns_udp_map_to_local_port(uint32_t* ipNBO, uint16_t* dportNBO) {
+extern "C" void vdns_udp_map_to_local_port(struct in_addr* ipNBO, uint16_t* dportNBO) {
     switch(ntohs(*dportNBO)) {
         case PORT_DNS:
             // map port & address for virtual DNS
             *dportNBO = htons(UDPServerSocket::toLocalPort(PORT_DNS));
-            *ipNBO    = loopback_addr.s_addr;
+            *ipNBO    = loopback_addr;
             break;
         default:
             break;

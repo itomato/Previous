@@ -36,8 +36,8 @@ int pcap_started;
 static mutex_t *pcap_mutex = NULL;
 thread_t *pcap_tick_func_handle;
 
-//This function is to be periodically called
-//to keep the internal packet state flowing.
+/* This function is to be called periodically *
+ * to keep the internal packet state flowing. */
 static void pcap_tick(void)
 {
     struct pcap_pkthdr h;
@@ -106,9 +106,9 @@ void enet_pcap_stop(void) {
     if (pcap_started) {
         Log_Printf(LOG_WARN, "Stopping PCAP");
         pcap_started=0;
-        QueueDestroy(pcapq);
-        host_mutex_destroy(pcap_mutex);
         host_thread_wait(pcap_tick_func_handle);
+        host_mutex_destroy(pcap_mutex);
+        QueueDestroy(pcapq);
         pcap_close(pcap_handle);
     }
 }
@@ -155,7 +155,7 @@ void enet_pcap_start(uint8_t *mac) {
             return;
         }
         
-#if 1 // TODO: Check if we need to take care of RXMODE_ADDR_SIZE and RX_PROMISCUOUS/RX_ANY
+#if 1 /* TODO: Check if we need to take care of RXMODE_ADDR_SIZE and RX_PROMISCUOUS/RX_ANY */
         snprintf(filter_exp, sizeof(filter_exp),
                  "(((ether dst ff:ff:ff:ff:ff:ff) or (ether dst %02x:%02x:%02x:%02x:%02x:%02x) or (ether[0] & 0x01 = 0x01)))",
                  mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
