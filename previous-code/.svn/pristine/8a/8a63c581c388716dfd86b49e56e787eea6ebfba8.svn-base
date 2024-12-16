@@ -1,6 +1,6 @@
 
 
-                                  Previous 3.4
+                                  Previous 3.5
 
 
 
@@ -216,6 +216,8 @@ Issues in NeXTstep:
     there might occur a double fault on the second or a subsequent access. This 
     is confirmed for NeXTstation Turbo Color and ROM Rev. 3.3 but might also 
     affect other models.
+  > Formatting floppy disks sporadically fails under NeXTstep 2.0 and 2.1. The 
+    cause of this issue is unknown but is likely inside NeXTstep.
 
 
  6) Release notes
@@ -419,6 +421,12 @@ Previous v3.4:
   > Improves handling of conflicting host keyboard shortcuts.
   > Fixes bug that prevented swapping cmd and alt key on ADB keyboard.
 
+Previous v3.5:
+  > Adds option for mapping control-click to right-click.
+  > Adds option for changing keyboard shortcuts from the keyboard dialog.
+  > Improves accuracy of floppy controller memory map.
+  > Fixes bug that could prevent the scroll wheel option from displaying.
+
 
  7) Running Previous
  -------------------
@@ -460,11 +468,7 @@ B: Hides the statusbar and shows it when pressed again.
 S: Disables sound output and re-enables it when pressed again.
 Q: Requests to quit Previous. All unsaved changes will be lost.
 
-Shortcuts can be changed by modifying the preferences file. To modify single 
-key shortcuts change or add key names in the section ShortcutsWithoutModifiers. 
-To modify shortcuts that are invoked with ctrl and alt change or add key names 
-in the section ShortcutsWithModifiers. The appropriate key names can be found 
-under https://wiki.libsdl.org/SDL2/SDL_Keycode.
+Shortcuts can be changed from the keyboard preferences dialog.
 
 Previous comes with some empty disk images of different types and sizes. The 
 suffix of the respective file name indicates the image type:

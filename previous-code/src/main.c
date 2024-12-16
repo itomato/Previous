@@ -627,6 +627,13 @@ void Main_EventHandler(void) {
 				break;
 
 			case SDL_MOUSEBUTTONDOWN:
+				if (ConfigureParams.Mouse.bEnableMacClick) {
+					if (event.button.button == SDL_BUTTON_LEFT) {
+						if (SDL_GetModState() & KMOD_CTRL) {
+							event.button.button = SDL_BUTTON_RIGHT;
+						}	
+					}
+				}
 				if (event.button.button == SDL_BUTTON_LEFT) {
 					if (ConfigureParams.Mouse.bEnableAutoGrab) {
 						if (bGrabMouse) {
@@ -658,6 +665,13 @@ void Main_EventHandler(void) {
 				break;
 
 			case SDL_MOUSEBUTTONUP:
+				if (ConfigureParams.Mouse.bEnableMacClick) {
+					if (event.button.button == SDL_BUTTON_LEFT) {
+						if (SDL_GetModState() & KMOD_CTRL) {
+							event.button.button = SDL_BUTTON_RIGHT;
+						}	
+					}
+				}
 				if (event.button.button == SDL_BUTTON_LEFT) {
 #ifdef ENABLE_RENDERING_THREAD
 					Keymap_MouseUp(true);

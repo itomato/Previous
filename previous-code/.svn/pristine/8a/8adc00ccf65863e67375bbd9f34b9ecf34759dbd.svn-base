@@ -122,100 +122,6 @@ struct {
 #define CTRL_MEDIA_ID0  0x01
 
 
-/* Functions */
-void floppy_reset(void);
-void floppy_start(void);
-void floppy_stop(void);
-uint8_t floppy_fifo_read(void);
-void floppy_fifo_write(uint8_t val);
-uint8_t floppy_dor_read(void);
-void floppy_dor_write(uint8_t val);
-uint8_t floppy_sra_read(void);
-void floppy_ctrl_write(uint8_t val);
-uint8_t floppy_stat_read(void);
-
-
-void FLP_StatA_Read(void) { /* 0x02014100 */
-    IoMem_WriteByte(IoAccessCurrentAddress, floppy_sra_read());
-    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Status A read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
-}
-
-void FLP_StatB_Read(void) { /* 0x02014101 */
-    IoMem_WriteByte(IoAccessCurrentAddress, flp.srb|SRB_ALL1);
-    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Status B read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
-}
-
-void FLP_DataOut_Read(void) { /* 0x02014102 */
-    IoMem_WriteByte(IoAccessCurrentAddress, floppy_dor_read());
-    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Data out read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
-}
-
-void FLP_DataOut_Write(void) {
-    floppy_dor_write(IoMem_ReadByte(IoAccessCurrentAddress));
-    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Data out write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
-}
-
-void FLP_MainStatus_Read(void) { /* 0x02014104 */
-    IoMem_WriteByte(IoAccessCurrentAddress, flp.msr);
-    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Main status read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
-}
-
-void FLP_DataRate_Write(void) {
-    flp.dsr = IoMem_ReadByte(IoAccessCurrentAddress);
-    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Data rate write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
-    
-    if (flp.dsr&DSR_RESET) {
-        Log_Printf(LOG_WARN,"[Floppy] Entering and leaving reset state.");
-        floppy_stop();
-        floppy_start();
-        flp.dsr&=~DSR_RESET;
-    }
-}
-
-void FLP_FIFO_Read(void) { /* 0x02014105 */
-    IoMem_WriteByte(IoAccessCurrentAddress, floppy_fifo_read());
-    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] FIFO read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
-}
-
-void FLP_FIFO_Write(void) {
-    uint8_t val = IoMem_ReadByte(IoAccessCurrentAddress);
-    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] FIFO write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
-    
-    floppy_fifo_write(val);
-}
-
-void FLP_DataIn_Read(void) { /* 0x02014107 */
-    IoMem_WriteByte(IoAccessCurrentAddress, flp.din);
-    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Data in read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
-}
-
-void FLP_Configuration_Write(void) {
-    flp.ccr = IoMem_ReadByte(IoAccessCurrentAddress);
-    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Configuration write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
-}
-
-void FLP_Status_Read(void) { /* 0x02014108 */
-    IoMem_WriteByte(IoAccessCurrentAddress, floppy_stat_read());
-    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Control read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
-}
-
-void FLP_Control_Write(void) {
-    uint8_t val = IoMem_ReadByte(IoAccessCurrentAddress);
-    Log_Printf(LOG_DEBUG,"[Floppy] Select write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
-    
-    floppy_ctrl_write(val);
-}
-
-void set_floppy_select(uint8_t sel, bool osp) {
-    if (sel) {
-        Log_Printf(LOG_DEBUG,"[%s] Selecting floppy controller",osp?"OSP":"Floppy");
-        floppy_select = 1;
-    } else {
-        Log_Printf(LOG_FLP_REG_LEVEL,"[%s] Selecting SCSI controller",osp?"OSP":"Floppy");
-        floppy_select = 0;
-    }
-}
-
 enum {
     FLP_STATE_WRITE,
     FLP_STATE_READ,
@@ -261,7 +167,7 @@ int flp_io_drv = 0;
 
 
 
-void floppy_start(void) {
+static void floppy_start(void) {
     flp.sra &= ~(SRA_INT|SRA_STEP|SRA_HDSEL|SRA_DIR);
     flp.srb &= ~(SRB_R_TOGGLE|SRB_W_TOGGLE);
     flp.msr &= ~MSR_DIO;
@@ -274,14 +180,14 @@ void floppy_start(void) {
     CycInt_AddRelativeInterruptUs(1000*1000, 0, INTERRUPT_FLP_IO);
 }
 
-void floppy_stop(void) {
+static void floppy_stop(void) {
     flp.sra &= ~SRA_INT;
     set_interrupt(INT_PHONE, RELEASE_INT);
     flp_io_state = FLP_STATE_DONE;
     CycInt_RemovePendingInterrupt(INTERRUPT_FLP_IO);
 }
 
-void floppy_reset(void) {
+static void floppy_reset(void) {
     Log_Printf(LOG_WARN,"[Floppy] Reset");
     
     flp.dor = flp.sel = 0;
@@ -882,7 +788,7 @@ static void floppy_execute_cmd(void) {
     Statusbar_BlinkLed(DEVICE_LED_FD);
 }
 
-void floppy_fifo_write(uint8_t val) {
+static void floppy_fifo_write(uint8_t val) {
     
     flp.msr &= ~MSR_RQM;
     
@@ -903,7 +809,7 @@ void floppy_fifo_write(uint8_t val) {
     }
 }
 
-uint8_t floppy_fifo_read(void) {
+static uint8_t floppy_fifo_read(void) {
     int i;
     uint8_t val;
     if (result_size>0) {
@@ -928,7 +834,7 @@ uint8_t floppy_fifo_read(void) {
     return val;
 }
 
-void floppy_dor_write(uint8_t val) {
+static void floppy_dor_write(uint8_t val) {
     uint8_t changed = flp.dor ^ val;
     
     flp.dor = val;
@@ -959,10 +865,10 @@ void floppy_dor_write(uint8_t val) {
     }
 }
 
-uint8_t floppy_dor_read(void) {
+static uint8_t floppy_dor_read(void) {
     int i;
     uint8_t val = flp.dor&~DOR_MOTEN_MASK;  /* clear motor bits */
-    for (i=0; i<FLP_MAX_DRIVES; i++) {
+    for (i = 0; i < FLP_MAX_DRIVES; i++) {
         if (flpdrv[i].spinning) {           /* set motor bit if motor is on */
             val |= DOR_MOT0EN<<i;
         }
@@ -970,7 +876,7 @@ uint8_t floppy_dor_read(void) {
     return val;
 }
 
-uint8_t floppy_sra_read(void) {
+static uint8_t floppy_sra_read(void) {
     uint8_t val = flp.sra;
     if (!flpdrv[flp.sel].protected) {
         val|=SRA_WP_N;
@@ -978,8 +884,8 @@ uint8_t floppy_sra_read(void) {
     return val;
 }
 
-void floppy_ctrl_write(uint8_t val) {
-    if (ConfigureParams.System.nMachineType!=NEXT_CUBE030) {
+static void floppy_ctrl_write(uint8_t val) {
+    if (ConfigureParams.System.nMachineType != NEXT_CUBE030) {
         set_floppy_select(val&CTRL_82077,false);
     }
     if (val&CTRL_RESET) {
@@ -992,7 +898,7 @@ void floppy_ctrl_write(uint8_t val) {
     }
 }
 
-uint8_t floppy_stat_read(void) {
+static uint8_t floppy_stat_read(void) {
     flp.csr &= ~(CTRL_DRV_ID|CTRL_MEDIA_ID0|CTRL_MEDIA_ID1);
     
     if (flpdrv[flp.sel].connected) {
@@ -1204,7 +1110,7 @@ static void Floppy_Init(void) {
     Log_Printf(LOG_WARN, "Loading floppy disks:");
     int i;
     
-    for (i=0; i<FLP_MAX_DRIVES; i++) {
+    for (i = 0; i < FLP_MAX_DRIVES; i++) {
         flpdrv[i].spinning = false;
         /* Check if files exist. */
         if (ConfigureParams.Floppy.drive[i].bDriveConnected) {
@@ -1224,10 +1130,12 @@ static void Floppy_Init(void) {
 }
 
 static void Floppy_Uninit(void) {
-    flpdrv[0].dsk = File_Close(flpdrv[0].dsk);
-    flpdrv[1].dsk = File_Close(flpdrv[1].dsk);
+    int i;
     
-    flpdrv[0].inserted = flpdrv[1].inserted = false;
+    for (i = 0; i < FLP_MAX_DRIVES; i++) {
+        flpdrv[i].dsk = File_Close(flpdrv[i].dsk);
+        flpdrv[i].inserted = false;
+    }
 }
 
 static uint32_t Floppy_CheckSize(int drive) {
@@ -1284,7 +1192,7 @@ void Floppy_Eject(int drive) {
         Statusbar_AddMessage("Ejecting floppy disk", 0);
     }
     
-    Log_Printf(LOG_WARN, "Floppy disk %i: Eject",drive);
+    Log_Printf(LOG_WARN, "Floppy disk %i: Eject", drive);
     
     flpdrv[drive].dsk = File_Close(flpdrv[drive].dsk);
     flpdrv[drive].floppysize = 0;
@@ -1299,4 +1207,158 @@ void Floppy_Eject(int drive) {
 void Floppy_Reset(void) {
     Floppy_Uninit();
     Floppy_Init();
+}
+
+void set_floppy_select(uint8_t sel, bool osp) {
+    if (sel) {
+        Log_Printf(LOG_DEBUG,"[%s] Selecting floppy controller",osp?"OSP":"Floppy");
+        floppy_select = 1;
+    } else {
+        Log_Printf(LOG_FLP_REG_LEVEL,"[%s] Selecting SCSI controller",osp?"OSP":"Floppy");
+        floppy_select = 0;
+    }
+}
+
+static bool floppy_controller_present(int read) {
+    if (ConfigureParams.System.nMachineType == NEXT_CUBE030) {
+        int i;
+        for (i = 0; i < FLP_MAX_DRIVES; i++) {
+            if (ConfigureParams.Floppy.drive[i].bDriveConnected) {
+                return true;
+            }
+        }
+        Log_Printf(LOG_WARN,"[Floppy] Controller not present. Bus error at %08x.", IoAccessCurrentAddress);
+        M68000_BusError(IoAccessCurrentAddress, read, BUS_ERROR_SIZE_BYTE, BUS_ERROR_ACCESS_DATA, 0);
+        return false;
+    }
+    return true;
+}
+
+void FLP_StatA_Read(void) { /* 0x02014100 */
+    if (floppy_controller_present(BUS_ERROR_READ)) {
+        IoMem_WriteByte(IoAccessCurrentAddress, floppy_sra_read());
+        Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Status A read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
+    }
+}
+
+void FLP_StatB_Read(void) { /* 0x02014101 */
+    if (floppy_controller_present(BUS_ERROR_READ)) {
+        IoMem_WriteByte(IoAccessCurrentAddress, flp.srb|SRB_ALL1);
+        Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Status B read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
+    }
+}
+
+void FLP_DataOut_Read(void) { /* 0x02014102 */
+    if (floppy_controller_present(BUS_ERROR_READ)) {
+        IoMem_WriteByte(IoAccessCurrentAddress, floppy_dor_read());
+        Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Data out read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
+    }
+}
+
+void FLP_DataOut_Write(void) {
+    if (floppy_controller_present(BUS_ERROR_WRITE)) {
+        floppy_dor_write(IoMem_ReadByte(IoAccessCurrentAddress));
+        Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Data out write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
+    }
+}
+
+void FLP_MainStatus_Read(void) { /* 0x02014104 */
+    if (floppy_controller_present(BUS_ERROR_READ)) {
+        IoMem_WriteByte(IoAccessCurrentAddress, flp.msr);
+        Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Main status read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
+    }
+}
+
+void FLP_DataRate_Write(void) {
+    if (floppy_controller_present(BUS_ERROR_WRITE)) {
+        flp.dsr = IoMem_ReadByte(IoAccessCurrentAddress);
+        Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Data rate write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
+        
+        if (flp.dsr&DSR_RESET) {
+            Log_Printf(LOG_WARN,"[Floppy] Entering and leaving reset state.");
+            floppy_stop();
+            floppy_start();
+            flp.dsr&=~DSR_RESET;
+        }
+    }
+}
+
+void FLP_FIFO_Read(void) { /* 0x02014105 */
+    if (floppy_controller_present(BUS_ERROR_READ)) {
+        IoMem_WriteByte(IoAccessCurrentAddress, floppy_fifo_read());
+        Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] FIFO read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
+    }
+}
+
+void FLP_FIFO_Write(void) {
+    if (floppy_controller_present(BUS_ERROR_WRITE)) {
+        uint8_t val = IoMem_ReadByte(IoAccessCurrentAddress);
+        Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] FIFO write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
+        
+        floppy_fifo_write(val);
+    }
+}
+
+void FLP_DataIn_Read(void) { /* 0x02014107 */
+    if (floppy_controller_present(BUS_ERROR_READ)) {
+        IoMem_WriteByte(IoAccessCurrentAddress, flp.din);
+        Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Data in read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
+    }
+}
+
+void FLP_Configuration_Write(void) {
+    if (floppy_controller_present(BUS_ERROR_WRITE)) {
+        flp.ccr = IoMem_ReadByte(IoAccessCurrentAddress);
+        Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Configuration write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
+    }
+}
+
+void FLP_Reserved_Read(void) { /* 0x02014103 and 0x02014106 */
+    if (floppy_controller_present(BUS_ERROR_READ)) {
+        uint8_t val = 0;
+        switch (IoAccessCurrentAddress & 7) {
+            case 3:
+                if (ConfigureParams.System.bTurbo) {
+                    if (ConfigureParams.System.nMachineType == NEXT_STATION) {
+                        val = ConfigureParams.System.bColor ? 0x03 : 0x02;
+                    }
+                } else {
+                    val = 0x03;
+                }
+                break;
+            case 6:
+                if (ConfigureParams.System.bTurbo) {
+                    if (ConfigureParams.System.nMachineType == NEXT_STATION) {
+                        val = 0xc0;
+                    } else {
+                        val = 0xf0;
+                    }
+                } else {
+                    val = 0x41;
+                }
+                break;
+            default:
+                break;
+        }
+        IoMem_WriteByte(IoAccessCurrentAddress, val);
+        Log_Printf(LOG_WARN,"[Floppy] Reserved read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
+    }
+}
+
+void FLP_Reserved_Write(void) {
+    if (floppy_controller_present(BUS_ERROR_WRITE)) {
+        Log_Printf(LOG_WARN,"[Floppy] Reserved write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
+    }
+}
+
+void FLP_Status_Read(void) { /* 0x02014108 */
+    IoMem_WriteByte(IoAccessCurrentAddress, floppy_stat_read());
+    Log_Printf(LOG_FLP_REG_LEVEL,"[Floppy] Control read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
+}
+
+void FLP_Control_Write(void) {
+    uint8_t val = IoMem_ReadByte(IoAccessCurrentAddress);
+    Log_Printf(LOG_DEBUG,"[Floppy] Select write at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
+    
+    floppy_ctrl_write(val);
 }

@@ -107,7 +107,7 @@ void DlgFloppy_Main(void)
 	if (ConfigureParams.Floppy.drive[1].bDriveConnected && ConfigureParams.Floppy.drive[1].bDiskInserted) {
 		File_ShrinkName(dlgname_flp[1], ConfigureParams.Floppy.drive[1].szImageName,
 						flpdlg[FLPDLG_DISKNAME1].w);
-		snprintf(insrtejct1, sizeof(insrtejct1, "Eject");
+		snprintf(insrtejct1, sizeof(insrtejct1), "Eject");
 	} else {
 		dlgname_flp[1][0] = '\0';
 		snprintf(insrtejct1, sizeof(insrtejct1), "Insert");
@@ -149,7 +149,7 @@ void DlgFloppy_Main(void)
 			case FLPDLG_INSERT0:
 				if (!ConfigureParams.Floppy.drive[0].bDiskInserted) {
 					if (SDLGui_FileConfSelect(dlgname_flp[0], ConfigureParams.Floppy.drive[0].szImageName,
-										  flpdlg[FLPDLG_DISKNAME0].w, &ConfigureParams.Floppy.drive[0].bWriteProtected, false)) {
+											  flpdlg[FLPDLG_DISKNAME0].w, &ConfigureParams.Floppy.drive[0].bWriteProtected, false)) {
 						if (Floppy_Insert(0)) {
 							DlgAlert_Notice(FLPDLG_BADSIZE_ERROR);
 							ConfigureParams.Floppy.drive[0].bWriteProtected = false;
@@ -190,8 +190,8 @@ void DlgFloppy_Main(void)
 #if DUAL_FLOPPY_DRIVE
 			case FLPDLG_INSERT1:
 				if (!ConfigureParams.Floppy.drive[1].bDiskInserted) {
-					if (SDLGui_DiskSelect(dlgname_flp[1], ConfigureParams.Floppy.drive[1].szImageName,
-										  flpdlg[FLPDLG_DISKNAME1].w, &ConfigureParams.Floppy.drive[1].bWriteProtected)) {
+					if (SDLGui_FileConfSelect(dlgname_flp[1], ConfigureParams.Floppy.drive[1].szImageName,
+											  flpdlg[FLPDLG_DISKNAME1].w, &ConfigureParams.Floppy.drive[1].bWriteProtected, false)) {
 						if (Floppy_Insert(1)) {
 							DlgAlert_Notice(FLPDLG_BADSIZE_ERROR);
 							ConfigureParams.Floppy.drive[1].bWriteProtected = false;

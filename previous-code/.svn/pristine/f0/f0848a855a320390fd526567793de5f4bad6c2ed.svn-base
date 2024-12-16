@@ -14,9 +14,10 @@ const char DlgMouse_fileid[] = "Previous dlgMouse.c";
 #include "paths.h"
 
 
-#define DLGMOUSE_MAPTOKEY    15
-#define DLGMOUSE_AUTOLOCK    16
-#define DLGMOUSE_EXIT        17
+#define DLGMOUSE_CTRLCLCK    15
+#define DLGMOUSE_MAPTOKEY    16
+#define DLGMOUSE_AUTOLOCK    17
+#define DLGMOUSE_EXIT        18
 
 static char lin_normal[8];
 static char lin_locked[8];
@@ -45,7 +46,8 @@ static SGOBJ mousedlg[] =
 	{ SGTEXT, 0, 0, 25,15, 12,1, "Locked mode:" },
 	{ SGEDITFIELD, 0, 0, 38,15, 5,1, exp_locked },
 	
-	{ SGCHECKBOX, 0, 0, 2,18, 32,1, "Map scroll wheel to arrow keys" },
+	{ SGCHECKBOX, 0, 0, 2,18, 34,1, "Map control-click to right-click" },
+	{ SGCHECKBOX, 0, 0, 2,19, 32,1, "Map scroll wheel to arrow keys" },
 	{ SGCHECKBOX, 0, 0, 2,20, 21,1, "Enable auto-locking" },
 	
 	{ SGBUTTON, SG_DEFAULT, 0, 12,23, 21,1, "Back to main menu" },
@@ -110,7 +112,13 @@ void Dialog_MouseDlg(void)
 
 	/* Set up the dialog from actual values */
 	
+	mousedlg[DLGMOUSE_CTRLCLCK].state &= ~SG_SELECTED;
+	mousedlg[DLGMOUSE_MAPTOKEY].state &= ~SG_SELECTED;
 	mousedlg[DLGMOUSE_AUTOLOCK].state &= ~SG_SELECTED;
+	
+	if (ConfigureParams.Mouse.bEnableMacClick) {
+		mousedlg[DLGMOUSE_CTRLCLCK].state |= SG_SELECTED;
+	}
 	if (ConfigureParams.Mouse.bEnableMapToKey) {
 		mousedlg[DLGMOUSE_MAPTOKEY].state |= SG_SELECTED;
 	}
@@ -135,6 +143,7 @@ void Dialog_MouseDlg(void)
 	
 
 	/* Read values from dialog */
+	ConfigureParams.Mouse.bEnableMacClick = mousedlg[DLGMOUSE_CTRLCLCK].state&SG_SELECTED ? true : false;
 	ConfigureParams.Mouse.bEnableMapToKey = mousedlg[DLGMOUSE_MAPTOKEY].state&SG_SELECTED ? true : false;
 	ConfigureParams.Mouse.bEnableAutoGrab = mousedlg[DLGMOUSE_AUTOLOCK].state&SG_SELECTED ? true : false;
 	ConfigureParams.Mouse.fLinSpeedNormal = read_float_string(lin_normal, MOUSE_LIN_MIN, MOUSE_LIN_MAX, 1);

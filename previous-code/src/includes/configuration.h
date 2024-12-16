@@ -92,7 +92,6 @@ typedef enum {
   SHORTCUT_FULLSCREEN,
   SHORTCUT_MOUSEGRAB,
   SHORTCUT_COLDRESET,
-  SHORTCUT_CURSOREMU,
   SHORTCUT_SCREENSHOT,
   SHORTCUT_RECORD,
   SHORTCUT_SOUND,
@@ -122,6 +121,7 @@ typedef struct
 {
   bool bEnableAutoGrab;
   bool bEnableMapToKey;
+  bool bEnableMacClick;
   float fLinSpeedNormal;
   float fLinSpeedLocked;
   float fExpSpeedNormal;
@@ -216,7 +216,7 @@ typedef struct {
 
 
 /* Floppy disk drives configuration */
-#define FLP_MAX_DRIVES   2
+#define FLP_MAX_DRIVES   4
 typedef struct {
   char szImageName[FILENAME_MAX];
   bool bDriveConnected;

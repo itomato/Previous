@@ -49,6 +49,16 @@ char* Symbols_MatchCpuDataAddress(const char *text, int state)
 }
 
 /**
+ * Readline match callback to list matching CPU symbols & file names.
+ * STATE = 0 -> different text from previous one.
+ * Return next match or NULL if no matches.
+ */
+char *Symbols_MatchCpuAddrFile(const char *text, int state)
+{
+	return NULL;
+}
+
+/**
  * Readline match callback for DSP symbol name completion.
  * STATE = 0 -> different text from previous one.
  * Return next match or NULL if no matches.
@@ -110,11 +120,21 @@ void Symbols_LoadCurrentProgram(void)
 /* ---------------- command parsing ------------------ */
 
 /**
- * Readline match callback to list symbols subcommands.
+ * Readline match callback for CPU symbols command.
  * STATE = 0 -> different text from previous one.
  * Return next match or NULL if no matches.
  */
-char *Symbols_MatchCommand(const char *text, int state)
+char *Symbols_MatchCpuCommand(const char *text, int state)
+{
+	return NULL;
+}
+
+/**
+ * Readline match callback to list DSP symbols command.
+ * STATE = 0 -> different text from previous one.
+ * Return next match or NULL if no matches.
+ */
+char *Symbols_MatchDspCommand(const char *text, int state)
 {
 	return NULL;
 }

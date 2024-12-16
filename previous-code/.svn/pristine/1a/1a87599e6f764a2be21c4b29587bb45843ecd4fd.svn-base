@@ -196,13 +196,13 @@ const INTERCEPT_ACCESS_FUNC IoMemTable_Turbo[] =
 	{ 0x02014021, 0x0001e1ff, SIZE_BYTE, ESP_DMA_FIFO_STAT_Read, ESP_DMA_FIFO_STAT_Write },
 	
 	/* Floppy Controller (Intel 82077AA) */
-	{ 0x02014100, 0x0001e1ff, SIZE_BYTE, FLP_StatA_Read, IoMem_WriteWithoutInterceptionButTrace },
-	{ 0x02014101, 0x0001e1ff, SIZE_BYTE, FLP_StatB_Read, IoMem_WriteWithoutInterceptionButTrace },
+	{ 0x02014100, 0x0001e1ff, SIZE_BYTE, FLP_StatA_Read, FLP_Reserved_Write },
+	{ 0x02014101, 0x0001e1ff, SIZE_BYTE, FLP_StatB_Read, FLP_Reserved_Write },
 	{ 0x02014102, 0x0001e1ff, SIZE_BYTE, FLP_DataOut_Read, FLP_DataOut_Write },
-	{ 0x02014103, 0x0001e1ff, SIZE_BYTE, IoMem_ReadWithoutInterceptionButTrace, IoMem_WriteWithoutInterceptionButTrace },
+	{ 0x02014103, 0x0001e1ff, SIZE_BYTE, FLP_Reserved_Read, FLP_Reserved_Write },
 	{ 0x02014104, 0x0001e1ff, SIZE_BYTE, FLP_MainStatus_Read, FLP_DataRate_Write },
 	{ 0x02014105, 0x0001e1ff, SIZE_BYTE, FLP_FIFO_Read, FLP_FIFO_Write },
-	{ 0x02014106, 0x0001e1ff, SIZE_BYTE, IoMem_ReadWithoutInterceptionButTrace, IoMem_WriteWithoutInterceptionButTrace },
+	{ 0x02014106, 0x0001e1ff, SIZE_BYTE, FLP_Reserved_Read, FLP_Reserved_Write },
 	{ 0x02014107, 0x0001e1ff, SIZE_BYTE, FLP_DataIn_Read, FLP_Configuration_Write },
 	
 	/* Floppy External Control */

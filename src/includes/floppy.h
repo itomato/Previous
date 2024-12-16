@@ -18,6 +18,9 @@ extern void FLP_FIFO_Read(void);
 extern void FLP_FIFO_Write(void);
 extern void FLP_DataIn_Read(void);
 extern void FLP_Configuration_Write(void);
+extern void FLP_Reserved_Read(void);
+extern void FLP_Reserved_Write(void);
+
 extern void FLP_Status_Read(void);
 extern void FLP_Control_Write(void);
 

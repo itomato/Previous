@@ -89,6 +89,7 @@ static const struct Config_Tag configs_Mouse[] =
 {
 	{ "bEnableAutoGrab", Bool_Tag, &ConfigureParams.Mouse.bEnableAutoGrab },
 	{ "bEnableMapToKey", Bool_Tag, &ConfigureParams.Mouse.bEnableMapToKey },
+	{ "bEnableMacClick", Bool_Tag, &ConfigureParams.Mouse.bEnableMacClick },
 	{ "fLinSpeedNormal", Float_Tag, &ConfigureParams.Mouse.fLinSpeedNormal },
 	{ "fLinSpeedLocked", Float_Tag, &ConfigureParams.Mouse.fLinSpeedLocked },
 	{ "fExpSpeedNormal", Float_Tag, &ConfigureParams.Mouse.fExpSpeedNormal },
@@ -103,7 +104,6 @@ static const struct Config_Tag configs_ShortCutWithMod[] =
 	{ "kFullScreen",  Key_Tag, &ConfigureParams.Shortcut.withModifier[SHORTCUT_FULLSCREEN] },
 	{ "kMouseMode",   Key_Tag, &ConfigureParams.Shortcut.withModifier[SHORTCUT_MOUSEGRAB] },
 	{ "kColdReset",   Key_Tag, &ConfigureParams.Shortcut.withModifier[SHORTCUT_COLDRESET] },
-	{ "kCursorEmu",   Key_Tag, &ConfigureParams.Shortcut.withModifier[SHORTCUT_CURSOREMU] },
 	{ "kScreenshot",  Key_Tag, &ConfigureParams.Shortcut.withModifier[SHORTCUT_SCREENSHOT] },
 	{ "kRecord",      Key_Tag, &ConfigureParams.Shortcut.withModifier[SHORTCUT_RECORD] },
 	{ "kSound",       Key_Tag, &ConfigureParams.Shortcut.withModifier[SHORTCUT_SOUND] },
@@ -123,7 +123,6 @@ static const struct Config_Tag configs_ShortCutWithoutMod[] =
 	{ "kFullScreen",  Key_Tag, &ConfigureParams.Shortcut.withoutModifier[SHORTCUT_FULLSCREEN] },
 	{ "kMouseMode",   Key_Tag, &ConfigureParams.Shortcut.withoutModifier[SHORTCUT_MOUSEGRAB] },
 	{ "kColdReset",   Key_Tag, &ConfigureParams.Shortcut.withoutModifier[SHORTCUT_COLDRESET] },
-	{ "kCursorEmu",   Key_Tag, &ConfigureParams.Shortcut.withoutModifier[SHORTCUT_CURSOREMU] },
 	{ "kScreenshot",  Key_Tag, &ConfigureParams.Shortcut.withoutModifier[SHORTCUT_SCREENSHOT] },
 	{ "kRecord",      Key_Tag, &ConfigureParams.Shortcut.withoutModifier[SHORTCUT_RECORD] },
 	{ "kSound",       Key_Tag, &ConfigureParams.Shortcut.withoutModifier[SHORTCUT_SOUND] },
@@ -242,6 +241,16 @@ static const struct Config_Tag configs_Floppy[] =
 	{ "bDriveConnected1", Bool_Tag, &ConfigureParams.Floppy.drive[1].bDriveConnected },
 	{ "bDiskInserted1", Bool_Tag, &ConfigureParams.Floppy.drive[1].bDiskInserted },
 	{ "bWriteProtected1", Bool_Tag, &ConfigureParams.Floppy.drive[1].bWriteProtected },
+
+	{ "szImageName2", String_Tag, ConfigureParams.Floppy.drive[2].szImageName },
+	{ "bDriveConnected2", Bool_Tag, &ConfigureParams.Floppy.drive[2].bDriveConnected },
+	{ "bDiskInserted2", Bool_Tag, &ConfigureParams.Floppy.drive[2].bDiskInserted },
+	{ "bWriteProtected2", Bool_Tag, &ConfigureParams.Floppy.drive[2].bWriteProtected },
+
+	{ "szImageName3", String_Tag, ConfigureParams.Floppy.drive[3].szImageName },
+	{ "bDriveConnected3", Bool_Tag, &ConfigureParams.Floppy.drive[3].bDriveConnected },
+	{ "bDiskInserted3", Bool_Tag, &ConfigureParams.Floppy.drive[3].bDiskInserted },
+	{ "bWriteProtected3", Bool_Tag, &ConfigureParams.Floppy.drive[3].bWriteProtected },
 
 	{ NULL , Error_Tag, NULL }
 };
@@ -439,6 +448,7 @@ void Configuration_SetDefault(void)
 	ConfigureParams.Mouse.fExpSpeedLocked = 1.0;
 	ConfigureParams.Mouse.bEnableAutoGrab = true;
 	ConfigureParams.Mouse.bEnableMapToKey = false;
+	ConfigureParams.Mouse.bEnableMacClick = false;
 
 	/* Set defaults for Shortcuts */
 	ConfigureParams.Shortcut.withoutModifier[SHORTCUT_OPTIONS]    = SDLK_F12;
@@ -452,7 +462,6 @@ void Configuration_SetDefault(void)
 	ConfigureParams.Shortcut.withModifier[SHORTCUT_FULLSCREEN]    = SDLK_f;
 	ConfigureParams.Shortcut.withModifier[SHORTCUT_MOUSEGRAB]     = SDLK_m;
 	ConfigureParams.Shortcut.withModifier[SHORTCUT_COLDRESET]     = SDLK_c;
-	ConfigureParams.Shortcut.withModifier[SHORTCUT_CURSOREMU]     = SDLK_j;
 	ConfigureParams.Shortcut.withModifier[SHORTCUT_SCREENSHOT]    = SDLK_g;
 	ConfigureParams.Shortcut.withModifier[SHORTCUT_RECORD]        = SDLK_r;
 	ConfigureParams.Shortcut.withModifier[SHORTCUT_SOUND]         = SDLK_s;
@@ -566,10 +575,13 @@ void Configuration_Apply(bool bReset)
 	int i;
 
 	/* Mouse settings */
-	Configuration_CheckFloatMinMax(&ConfigureParams.Mouse.fLinSpeedNormal,MOUSE_LIN_MIN,MOUSE_LIN_MAX);
-	Configuration_CheckFloatMinMax(&ConfigureParams.Mouse.fLinSpeedLocked,MOUSE_LIN_MIN,MOUSE_LIN_MAX);
-	Configuration_CheckFloatMinMax(&ConfigureParams.Mouse.fExpSpeedNormal,MOUSE_EXP_MIN,MOUSE_EXP_MAX);
-	Configuration_CheckFloatMinMax(&ConfigureParams.Mouse.fExpSpeedLocked,MOUSE_EXP_MIN,MOUSE_EXP_MAX);
+	if (ConfigureParams.Mouse.bEnableMacClick) {
+		ConfigureParams.Mouse.bEnableAutoGrab = false;
+	}
+	Configuration_CheckFloatMinMax(&ConfigureParams.Mouse.fLinSpeedNormal, MOUSE_LIN_MIN, MOUSE_LIN_MAX);
+	Configuration_CheckFloatMinMax(&ConfigureParams.Mouse.fLinSpeedLocked, MOUSE_LIN_MIN, MOUSE_LIN_MAX);
+	Configuration_CheckFloatMinMax(&ConfigureParams.Mouse.fExpSpeedNormal, MOUSE_EXP_MIN, MOUSE_EXP_MAX);
+	Configuration_CheckFloatMinMax(&ConfigureParams.Mouse.fExpSpeedLocked, MOUSE_EXP_MIN, MOUSE_EXP_MAX);
 
 	/* Check/constrain CPU settings and change corresponding
 	 * cpu_model/cpu_compatible/cpu_cycle_exact/... variables
