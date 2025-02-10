@@ -956,7 +956,7 @@ static void Main_SetSignalHandlers(void) {
 int main(int argc, char *argv[])
 {
 	/* Generate random seed */
-	srand(time(NULL));
+	srand((unsigned)time(NULL));
 
 	/* Set signal handlers */
 	Main_SetSignalHandlers();

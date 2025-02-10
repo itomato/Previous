@@ -129,7 +129,7 @@ const uint8_t t_log[256] = {
 static uint32_t ecc_block(const uint8_t *s, int ss)
 {
 	int i;
-	uint32_t r = (s[0] << 24) | (s[ss] << 16) | (s[2*ss] << 8) | s[3*ss];
+	uint32_t r = ((uint32_t)s[0] << 24) | (s[ss] << 16) | (s[2*ss] << 8) | s[3*ss];
 	
 	s += 4*ss;
 	for(i=4; i<36; i++) {
@@ -156,7 +156,7 @@ static int rs_decode_string(uint8_t *sector, int off, int step)
 	int i;
 	uint32_t ecc = ecc_block(sector+off, step);
 	uint32_t ref_ecc =
-	(sector[off+32*step] << 24) |
+	((uint32_t)sector[off+32*step] << 24) |
 	(sector[off+33*step] << 16) |
 	(sector[off+34*step] << 8) |
 	sector[off+35*step];

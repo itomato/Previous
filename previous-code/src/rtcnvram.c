@@ -665,7 +665,7 @@ static void newrtc_put_clock(uint8_t addr, uint8_t val) {
 
 static void newrtc_check_alarm(void) {
     if (newrtc.control&NRTC_START) {
-        newrtc.timecntr = host_unix_time();
+        newrtc.timecntr = (uint32_t)host_unix_time();
     }
     if (newrtc.alarmcntr == newrtc.timecntr) {
         newrtc.status |= NRTC_INT_ALARM;
@@ -674,7 +674,7 @@ static void newrtc_check_alarm(void) {
 }
 
 static void newrtc_check_time(void) {
-    newrtc.timecntr = host_unix_time();
+    newrtc.timecntr = (uint32_t)host_unix_time();
     if (newrtc.timecntr >= NEXT_LIMIT_SEC || newrtc.timecntr < NEXT_MIN_SEC) {
         Log_Printf(LOG_WARN,"[RTC] Time %d beyond valid range. Setting to %d", newrtc.timecntr, NEXT_START_SEC);
         newrtc.timecntr = NEXT_START_SEC;
@@ -751,7 +751,7 @@ static int newrtc_interface_io(uint8_t rtdatabit) {
 /* Data sheet is wrong about when the time counter latch is loaded. But is this correct? */
 static void newrtc_interface_start(void) {
     if (newrtc.control&NRTC_START) {
-        newrtc.timecntr = host_unix_time();
+        newrtc.timecntr = (uint32_t)host_unix_time();
     }
 }
 

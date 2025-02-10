@@ -400,7 +400,7 @@ static void lp_interface_status(uint8_t changed_bits, bool set) {
     }
     
     if ((old_stat^lp.stat)&lp.statmask) {
-        lp_command_out(LP_CMD_GPI, (~lp.stat)<<24);
+        lp_command_out(LP_CMD_GPI, ~((uint32_t)lp.stat)<<24);
     }
 }
 
@@ -583,7 +583,7 @@ static void lp_gpo_access(uint8_t data) {
 }
 
 static void lp_gpi_request(void) {
-    lp_command_out(LP_CMD_GPI, (~lp.stat)<<24);
+    lp_command_out(LP_CMD_GPI, ~((uint32_t)lp.stat)<<24);
 }
 
 static void lp_gpo(uint8_t cmd) {

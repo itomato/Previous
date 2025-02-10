@@ -1,6 +1,6 @@
 
 
-                                  Previous 3.5
+                                  Previous 3.6
 
 
 
@@ -116,7 +116,7 @@ Don't forget to also install the header files of these libraries for compiling
 Previous (some Linux distributions use separate development packages for these
 header files)!
 
-For compiling Previous, you need C and C++ compilers and a working CMake (v3.3 
+For compiling Previous, you need C and C++ compilers and a working CMake (v3.12 
 or later) installation (see http://www.cmake.org/ for details).
 
 CMake can generate makefiles for various flavours of "Make" (like GNU-Make) and 
@@ -426,6 +426,10 @@ Previous v3.5:
   > Adds option for changing keyboard shortcuts from the keyboard dialog.
   > Improves accuracy of floppy controller memory map.
   > Fixes bug that could prevent the scroll wheel option from displaying.
+
+Previous v3.6:
+  > Improves accuracy of i860 fmlow instruction.
+  > Fixes bug that prevented setting write protection from the user interface.
 
 
  7) Running Previous

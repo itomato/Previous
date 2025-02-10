@@ -214,91 +214,85 @@ void MC::check_interrupt(void) {
         nd->send_msg(MSG_LOWER_INTR);
 }
 
-static const char* MC_RD_FORMAT   = "[ND] Memory controller %s read %08X at %08X";
-static const char* MC_RD_FORMAT_S = "[ND] Memory controller %s read (%s) at %08X";
-
 uint32_t MC::read(uint32_t addr) {
     switch (addr&0x3FFF) {
         case 0x0000:
-            Log_Printf(ND_LOG_IO_RD, MC_RD_FORMAT_S,"csr0", decodeBits(ND_CSR0_BITS, csr0),addr);
+            Log_Printf(ND_LOG_IO_RD, "[ND] Memory controller %s read (%s) at %08X", "csr0", decodeBits(ND_CSR0_BITS, csr0), addr);
             return csr0;
         case 0x0010:
-            Log_Printf(ND_LOG_IO_RD, MC_RD_FORMAT_S,"csr1", decodeBits(ND_CSR1_BITS, csr1),addr);
+            Log_Printf(ND_LOG_IO_RD, "[ND] Memory controller %s read (%s) at %08X", "csr1", decodeBits(ND_CSR1_BITS, csr1), addr);
             return csr1;
         case 0x0020:
-            Log_Printf(ND_LOG_IO_RD, MC_RD_FORMAT_S,"csr2", decodeBits(ND_CSR2_BITS, csr2),addr);
+            Log_Printf(ND_LOG_IO_RD, "[ND] Memory controller %s read (%s) at %08X", "csr2", decodeBits(ND_CSR2_BITS, csr2), addr);
             return csr2;
         case 0x0030:
-            Log_Printf(ND_LOG_IO_RD, MC_RD_FORMAT,"sid", sid,addr);
+            Log_Printf(ND_LOG_IO_RD, "[ND] Memory controller %s read %08X at %08X", "sid", sid, addr);
             return sid;
         case 0x1000:
-            Log_Printf(ND_LOG_IO_RD, MC_RD_FORMAT_S,"dma_csr", decodeBits(ND_DMA_CSR_BITS, dma_csr),addr);
+            Log_Printf(ND_LOG_IO_RD, "[ND] Memory controller %s read (%s) at %08X", "dma_csr", decodeBits(ND_DMA_CSR_BITS, dma_csr), addr);
             return dma_csr;
         case 0x1010:
-            Log_Printf(ND_LOG_IO_RD, MC_RD_FORMAT,"dma_start", dma_start,addr);
+            Log_Printf(ND_LOG_IO_RD, "[ND] Memory controller %s read %08X at %08X", "dma_start", dma_start, addr);
             return dma_start;
         case 0x1020:
-            Log_Printf(ND_LOG_IO_RD, MC_RD_FORMAT,"dma_width", dma_width,addr);
+            Log_Printf(ND_LOG_IO_RD, "[ND] Memory controller %s read %08X at %08X", "dma_width", dma_width, addr);
             return dma_width;
         case 0x1030:
-            Log_Printf(ND_LOG_IO_RD, MC_RD_FORMAT,"dma_pstart", dma_pstart,addr);
+            Log_Printf(ND_LOG_IO_RD, "[ND] Memory controller %s read %08X at %08X", "dma_pstart", dma_pstart, addr);
             return dma_pstart;
         case 0x1040:
-            Log_Printf(ND_LOG_IO_RD, MC_RD_FORMAT,"dma_pwidth", dma_pwidth,addr);
+            Log_Printf(ND_LOG_IO_RD, "[ND] Memory controller %s read %08X at %08X", "dma_pwidth", dma_pwidth, addr);
             return dma_pwidth;
         case 0x1050:
-            Log_Printf(ND_LOG_IO_RD, MC_RD_FORMAT,"dma_sstart", dma_sstart,addr);
+            Log_Printf(ND_LOG_IO_RD, "[ND] Memory controller %s read %08X at %08X", "dma_sstart", dma_sstart, addr);
             return dma_sstart;
         case 0x1060:
-            Log_Printf(ND_LOG_IO_RD, MC_RD_FORMAT,"dma_swidth", dma_swidth,addr);
+            Log_Printf(ND_LOG_IO_RD, "[ND] Memory controller %s read %08X at %08X", "dma_swidth", dma_swidth, addr);
             return dma_swidth;
         case 0x1070:
-            Log_Printf(ND_LOG_IO_RD, MC_RD_FORMAT,"dma_bsstart", dma_bsstart,addr);
+            Log_Printf(ND_LOG_IO_RD, "[ND] Memory controller %s read %08X at %08X", "dma_bsstart", dma_bsstart, addr);
             return dma_bsstart;
         case 0x1080:
-            Log_Printf(ND_LOG_IO_RD, MC_RD_FORMAT,"dma_bswidth", dma_bswidth,addr);
+            Log_Printf(ND_LOG_IO_RD, "[ND] Memory controller %s read %08X at %08X", "dma_bswidth", dma_bswidth, addr);
             return dma_bswidth;
         case 0x1090:
-            Log_Printf(ND_LOG_IO_RD, MC_RD_FORMAT,"dma_top", dma_top,addr);
+            Log_Printf(ND_LOG_IO_RD, "[ND] Memory controller %s read %08X at %08X", "dma_top", dma_top, addr);
             return dma_top;
         case 0x10A0:
-            Log_Printf(ND_LOG_IO_RD, MC_RD_FORMAT,"dma_bottom", dma_bottom,addr);
+            Log_Printf(ND_LOG_IO_RD, "[ND] Memory controller %s read %08X at %08X", "dma_bottom", dma_bottom, addr);
             return dma_bottom;
         case 0x10B0:
-            Log_Printf(ND_LOG_IO_RD, MC_RD_FORMAT,"dma_line_a", dma_line_a,addr);
+            Log_Printf(ND_LOG_IO_RD, "[ND] Memory controller %s read %08X at %08X", "dma_line_a", dma_line_a, addr);
             return dma_line_a;
         case 0x10C0:
-            Log_Printf(ND_LOG_IO_RD, MC_RD_FORMAT,"dma_curr_a", dma_curr_a,addr);
+            Log_Printf(ND_LOG_IO_RD, "[ND] Memory controller %s read %08X at %08X", "dma_curr_a", dma_curr_a, addr);
             return dma_curr_a;
         case 0x10D0:
-            Log_Printf(ND_LOG_IO_RD, MC_RD_FORMAT,"dma_line_a", dma_line_a,addr);
+            Log_Printf(ND_LOG_IO_RD, "[ND] Memory controller %s read %08X at %08X", "dma_line_a", dma_line_a, addr);
             return dma_line_a;
         case 0x10E0:
-            Log_Printf(ND_LOG_IO_RD, MC_RD_FORMAT,"dma_scurr_a", dma_scurr_a,addr);
+            Log_Printf(ND_LOG_IO_RD, "[ND] Memory controller %s read %08X at %08X", "dma_scurr_a", dma_scurr_a, addr);
             return dma_scurr_a;
         case 0x10F0:
-            Log_Printf(ND_LOG_IO_RD, MC_RD_FORMAT,"dma_out_a", dma_out_a,addr);
+            Log_Printf(ND_LOG_IO_RD, "[ND] Memory controller %s read %08X at %08X", "dma_out_a", dma_out_a, addr);
             return dma_out_a;
         case 0x2000:
-            Log_Printf(ND_LOG_IO_RD, MC_RD_FORMAT_S,"vram", decodeBits(ND_VRAM_BITS, vram),addr);
+            Log_Printf(ND_LOG_IO_RD, "[ND] Memory controller %s read (%s) at %08X", "vram", decodeBits(ND_VRAM_BITS, vram), addr);
             return vram;
         case 0x3000:
-            Log_Printf(ND_LOG_IO_RD, MC_RD_FORMAT_S,"dram", decodeBits(ND_DRAM_BITS, dram),addr);
+            Log_Printf(ND_LOG_IO_RD, "[ND] Memory controller %s read (%s) at %08X", "dram", decodeBits(ND_DRAM_BITS, dram), addr);
             return dram;
         default:
-            Log_Printf(LOG_WARN, "[ND] Memory controller UNKNOWN read at %08X",addr);
+            Log_Printf(LOG_WARN, "[ND] Memory controller UNKNOWN read at %08X", addr);
             break;
     }
     return 0;
 }
 
-static const char* MC_WR_FORMAT   = "[ND] Memory controller %s write %08X at %08X";
-static const char* MC_WR_FORMAT_S = "[ND] Memory controller %s write (%s) at %08X";
-
 void MC::write(uint32_t addr, uint32_t val) {
     switch (addr&0x3FFF) {
         case 0x0000:
-            Log_Printf(ND_LOG_IO_WR, MC_WR_FORMAT_S,"csr0", decodeBits(ND_CSR0_BITS, val), addr);
+            Log_Printf(ND_LOG_IO_WR, "[ND] Memory controller %s write (%s) at %08X", "csr0", decodeBits(ND_CSR0_BITS, val), addr);
             csr0 = val;
             if(csr0 & CSR0_i860PIN_RESET) {
                 nd->send_msg(MSG_I860_RESET);
@@ -307,7 +301,7 @@ void MC::write(uint32_t addr, uint32_t val) {
             check_interrupt();
             break;
         case 0x0010:
-            Log_Printf(ND_LOG_IO_WR, MC_WR_FORMAT_S,"csr1", decodeBits(ND_CSR1_BITS, val),addr);
+            Log_Printf(ND_LOG_IO_WR, "[ND] Memory controller %s write (%s) at %08X", "csr1", decodeBits(ND_CSR1_BITS, val), addr);
             csr1 = val;
             if (csr1 & CSR1_CPU_INT) {
                 nd->nbic.set_intstatus(true);
@@ -316,87 +310,87 @@ void MC::write(uint32_t addr, uint32_t val) {
             }
             break;
         case 0x0020:
-            Log_Printf(ND_LOG_IO_WR, MC_WR_FORMAT_S,"csr2", decodeBits(ND_CSR2_BITS, val),addr);
+            Log_Printf(ND_LOG_IO_WR, "[ND] Memory controller %s write (%s) at %08X", "csr2", decodeBits(ND_CSR2_BITS, val), addr);
             csr2 = val;
             break;
         case 0x0030:
-            Log_Printf(ND_LOG_IO_WR, MC_WR_FORMAT,"sid", val,addr);
+            Log_Printf(ND_LOG_IO_WR, "[ND] Memory controller %s write %08X at %08X", "sid", val, addr);
             sid = val;
             break;
         case 0x1000:
-            Log_Printf(ND_LOG_IO_WR, MC_WR_FORMAT_S,"dma_csr", decodeBits(ND_DMA_CSR_BITS, val),addr);
+            Log_Printf(ND_LOG_IO_WR, "[ND] Memory controller %s write (%s) at %08X", "dma_csr", decodeBits(ND_DMA_CSR_BITS, val), addr);
             dma_csr = val;
             break;
         case 0x1010:
-            Log_Printf(ND_LOG_IO_WR, MC_WR_FORMAT,"dma_start", val,addr);
+            Log_Printf(ND_LOG_IO_WR, "[ND] Memory controller %s write %08X at %08X", "dma_start", val, addr);
             dma_start = val;
             break;
         case 0x1020:
-            Log_Printf(ND_LOG_IO_WR, MC_WR_FORMAT,"dma_width", val,addr);
+            Log_Printf(ND_LOG_IO_WR, "[ND] Memory controller %s write %08X at %08X", "dma_width", val, addr);
             dma_width = val;
             break;
         case 0x1030:
-            Log_Printf(ND_LOG_IO_WR, MC_WR_FORMAT,"dma_pstart", val,addr);
+            Log_Printf(ND_LOG_IO_WR, "[ND] Memory controller %s write %08X at %08X", "dma_pstart", val, addr);
             dma_pstart = val;
             break;
         case 0x1040:
-            Log_Printf(ND_LOG_IO_WR, MC_WR_FORMAT,"dma_pwidth", val,addr);
+            Log_Printf(ND_LOG_IO_WR, "[ND] Memory controller %s write %08X at %08X", "dma_pwidth", val, addr);
             dma_pwidth = val;
             break;
         case 0x1050:
-            Log_Printf(ND_LOG_IO_WR, MC_WR_FORMAT,"dma_sstart", val,addr);
+            Log_Printf(ND_LOG_IO_WR, "[ND] Memory controller %s write %08X at %08X", "dma_sstart", val, addr);
             dma_sstart = val;
             break;
         case 0x1060:
-            Log_Printf(ND_LOG_IO_WR, MC_WR_FORMAT,"dma_swidth", val,addr);
+            Log_Printf(ND_LOG_IO_WR, "[ND] Memory controller %s write %08X at %08X", "dma_swidth", val, addr);
             dma_swidth = val;
             break;
         case 0x1070:
-            Log_Printf(ND_LOG_IO_WR, MC_WR_FORMAT,"dma_bsstart", val,addr);
+            Log_Printf(ND_LOG_IO_WR, "[ND] Memory controller %s write %08X at %08X", "dma_bsstart", val, addr);
             dma_bsstart = val;
             break;
         case 0x1080:
-            Log_Printf(ND_LOG_IO_WR, MC_WR_FORMAT,"dma_bswidth", val,addr);
+            Log_Printf(ND_LOG_IO_WR, "[ND] Memory controller %s write %08X at %08X", "dma_bswidth", val, addr);
             dma_bswidth = val;
             break;
         case 0x1090:
-            Log_Printf(ND_LOG_IO_WR, MC_WR_FORMAT,"dma_top", val,addr);
+            Log_Printf(ND_LOG_IO_WR, "[ND] Memory controller %s write %08X at %08X", "dma_top", val, addr);
             dma_top = val;
             break;
         case 0x10A0:
-            Log_Printf(ND_LOG_IO_WR, MC_WR_FORMAT,"dma_bottom", val,addr);
+            Log_Printf(ND_LOG_IO_WR, "[ND] Memory controller %s write %08X at %08X", "dma_bottom", val, addr);
             dma_bottom = val;
             break;
         case 0x10B0:
-            Log_Printf(ND_LOG_IO_WR, MC_WR_FORMAT,"dma_line_a", val,addr);
+            Log_Printf(ND_LOG_IO_WR, "[ND] Memory controller %s write %08X at %08X", "dma_line_a", val, addr);
             dma_line_a = val;
             break;
         case 0x10C0:
-            Log_Printf(ND_LOG_IO_WR, MC_WR_FORMAT,"dma_curr_a", val,addr);
+            Log_Printf(ND_LOG_IO_WR, "[ND] Memory controller %s write %08X at %08X", "dma_curr_a", val, addr);
             dma_curr_a = val;
             break;
         case 0x10D0:
-            Log_Printf(ND_LOG_IO_WR, MC_WR_FORMAT,"dma_line_a", val,addr);
+            Log_Printf(ND_LOG_IO_WR, "[ND] Memory controller %s write %08X at %08X", "dma_line_a", val, addr);
             dma_line_a = val;
             break;
         case 0x10E0:
-            Log_Printf(ND_LOG_IO_WR, MC_WR_FORMAT,"dma_scurr_a", val,addr);
+            Log_Printf(ND_LOG_IO_WR, "[ND] Memory controller %s write %08X at %08X", "dma_scurr_a", val, addr);
             dma_scurr_a = val;
             break;
         case 0x10F0:
-            Log_Printf(ND_LOG_IO_WR, MC_WR_FORMAT,"dma_out_a", val,addr);
+            Log_Printf(ND_LOG_IO_WR, "[ND] Memory controller %s write %08X at %08X", "dma_out_a", val, addr);
             dma_out_a = val;
             break;
         case 0x2000:
-            Log_Printf(ND_LOG_IO_WR, MC_WR_FORMAT_S,"vram", decodeBits(ND_VRAM_BITS, val),addr);
+            Log_Printf(ND_LOG_IO_WR, "[ND] Memory controller %s write (%s) at %08X", "vram", decodeBits(ND_VRAM_BITS, val), addr);
             vram = val;
             break;
         case 0x3000:
-            Log_Printf(ND_LOG_IO_WR, MC_WR_FORMAT_S,"dram", decodeBits(ND_DRAM_BITS, val),addr);
+            Log_Printf(ND_LOG_IO_WR, "[ND] Memory controller %s write (%s) at %08X", "dram", decodeBits(ND_DRAM_BITS, val), addr);
             dram = val;
             break;
         default:
-            Log_Printf(LOG_WARN, "[ND] Memory controller UNKNOWN write at %08X",addr);
+            Log_Printf(LOG_WARN, "[ND] Memory controller UNKNOWN write at %08X", addr);
             break;
     }
 }
@@ -453,7 +447,7 @@ uint32_t DP::lget(uint32_t addr) {
         case 0x364:
             return 0;
         default:
-            Log_Printf(LOG_WARN, "[ND] data path UNKNOWN read at %08X",addr);
+            Log_Printf(LOG_WARN, "[ND] data path UNKNOWN read at %08X", addr);
     }
     return 0;
 }
@@ -505,7 +499,7 @@ void DP::lput(uint32_t addr, uint32_t v) {
             iicmsg();
             break;
         default:
-            Log_Printf(LOG_WARN, "[ND] data path UNKNOWN write at %08X %08X",addr,v);
+            Log_Printf(LOG_WARN, "[ND] data path UNKNOWN write at %08X %08X", addr, v);
     }
 }
 

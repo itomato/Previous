@@ -254,7 +254,7 @@ void i860_cpu_device::run_cycle() {
         if(m_single_stepping) debugger(0,0);
 #endif
         
-        UINT32 insnLow = insn64;
+        UINT32 insnLow = (UINT32)insn64;
         if(insnLow == INSN_FNOP_DIM) {
             if(m_dim) m_flow |=  DIM_OP;
             else      m_flow &= ~DIM_OP;
@@ -549,7 +549,7 @@ error:
 }
 
 void i860_cpu_device::uninit() {
-	halt(true);
+    halt(true);
 
     if(m_thread) {
         nd->send_msg(MSG_I860_KILL);
@@ -631,7 +631,7 @@ const char* i860_cpu_device::reports(uint64_t realTime, uint64_t hostTime) {
 }
 
 offs_t i860_cpu_device::disasm(char* buffer, offs_t pc) {
-    return pc + i860_disassembler(pc, ifetch_notrap(pc), buffer);
+    return pc + i860_disassembler((UINT32)pc, ifetch_notrap((UINT32)pc), buffer);
 }
 
 /**************************************************************************

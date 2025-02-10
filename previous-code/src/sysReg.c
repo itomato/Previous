@@ -212,9 +212,9 @@ void SCR_Reset(void) {
         scr_have_dsp_memreset = 1;
         
         if (ConfigureParams.System.nMachineType==NEXT_STATION) {
-            scr1 |= 0xF<<28;
+            scr1 |= (uint32_t)0xF<<28;
         } else {
-            scr1 |= SLOT_ID<<28;
+            scr1 |= (uint32_t)SLOT_ID<<28;
         }
         scr1 |= TYPE_TURBO<<12;
         return;
@@ -629,7 +629,7 @@ void Hardclock_InterruptHandler ( void )
         Log_Printf(LOG_DEBUG, "[INT] throwing hardclock %lld", host_time_us());
         set_interrupt(INT_TIMER,SET_INT);
         uint64_t now = host_time_us();
-        host_hardclock(latch_hardclock, now - hardClockLastLatch);
+        host_hardclock(latch_hardclock, (int)(now - hardClockLastLatch));
         hardClockLastLatch = now;
         CycInt_AddRelativeInterruptUs(latch_hardclock, 0, INTERRUPT_HARDCLOCK);
     }

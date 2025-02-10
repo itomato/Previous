@@ -21,9 +21,9 @@ const char Scsi_fileid[] = "Previous scsi.c";
 #define LOG_SCSI_LEVEL  LOG_DEBUG    /* Print debugging messages */
 
 
-#define COMMAND_ReadInt16(a, i) (((unsigned) a[i] << 8) | a[i + 1])
-#define COMMAND_ReadInt24(a, i) (((unsigned) a[i] << 16) | ((unsigned) a[i + 1] << 8) | a[i + 2])
-#define COMMAND_ReadInt32(a, i) (((unsigned) a[i] << 24) | ((unsigned) a[i + 1] << 16) | ((unsigned) a[i + 2] << 8) | a[i + 3])
+#define COMMAND_ReadInt16(a, i) (((uint32_t) a[i] << 8) | a[i + 1])
+#define COMMAND_ReadInt24(a, i) (((uint32_t) a[i] << 16) | ((uint32_t) a[i + 1] << 8) | a[i + 2])
+#define COMMAND_ReadInt32(a, i) (((uint32_t) a[i] << 24) | ((uint32_t) a[i + 1] << 16) | ((uint32_t) a[i + 2] << 8) | a[i + 3])
 
 
 #define LUN_DISK 0 /* For now only LUN 0 is valid for our drives */
@@ -211,7 +211,7 @@ static int SCSI_GetTransferLength(uint8_t opcode, uint8_t *cdb)
     COMMAND_ReadInt16(cdb, 7);
 }
 
-static uint64_t SCSI_GetOffset(uint8_t opcode, uint8_t *cdb)
+static uint32_t SCSI_GetOffset(uint8_t opcode, uint8_t *cdb)
 {
     return opcode < 0x20?
     /* class 0 */
@@ -249,7 +249,7 @@ static void SCSI_GuessGeometry(SCSI_DEVTYPE type, uint32_t sectors, uint32_t *nc
         c = sectors / (h * s);
     }
     
-    if (sectors % (c * h * s)) {
+    if (s == 0 || c == 0 || sectors % (c * h * s)) {
         Log_Printf(LOG_WARN, "[SCSI] Disk geometry: No valid geometry found!");
         if (type == SD_FLOPPY) {
             s++;
@@ -323,7 +323,7 @@ static int SCSI_GetModePage(uint8_t* page, uint8_t pagecode) {
     
     uint32_t c, h, s;
     uint32_t blocksize = SCSIdisk[target].blocksize;
-    uint32_t sectors = SCSIdisk[target].size / blocksize;
+    uint32_t sectors = (uint32_t)(SCSIdisk[target].size / blocksize);
     SCSI_DEVTYPE type = SCSIdisk[target].devtype;
     
     int i = SCSIdisk[target].known;
@@ -443,7 +443,7 @@ static void SCSI_ReadCapacity(uint8_t *cdb) {
     uint8_t target = SCSIbus.target;
     
     uint32_t blocksize = SCSIdisk[target].blocksize;
-    uint32_t sectors = (SCSIdisk[target].size / blocksize) - 1; /* Last LBA */
+    uint32_t sectors = (uint32_t)((SCSIdisk[target].size / blocksize) - 1); /* Last LBA */
     
     Log_Printf(LOG_SCSI_LEVEL, "[SCSI] Read capacity: %d sectors (blocksize: %d)", sectors, blocksize);
     
@@ -487,7 +487,7 @@ static void scsi_write_sector(void) {
                     SCSIdisk[target].shadow[SCSIdisk[target].lba] = malloc(SCSIdisk[target].blocksize);
                 memcpy(SCSIdisk[target].shadow[SCSIdisk[target].lba], scsi_buffer.data, SCSIdisk[target].blocksize);
             } else {
-                uint32_t blocks = SCSIdisk[target].size / SCSIdisk[target].blocksize;
+                uint32_t blocks = (uint32_t)(SCSIdisk[target].size / SCSIdisk[target].blocksize);
                 SCSIdisk[target].shadow = malloc(sizeof(uint8_t*) * blocks);
                 for(int i = blocks; --i >= 0;)
                     SCSIdisk[target].shadow[i] = NULL;
@@ -773,7 +773,7 @@ static void SCSI_ModeSense(uint8_t *cdb) {
     int pagesize = 0;
     
     uint32_t blocksize = SCSIdisk[target].blocksize;
-    uint32_t sectors = SCSIdisk[target].size / blocksize;
+    uint32_t sectors = (uint32_t)(SCSIdisk[target].size / blocksize);
     
     uint8_t pagecontrol = (cdb[2] & 0xC0) >> 6;
     uint8_t pagecode = cdb[2] & 0x3F;

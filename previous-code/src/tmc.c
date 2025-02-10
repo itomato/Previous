@@ -362,12 +362,12 @@ uae_u32 tmc_lget(uaecptr addr) {
 	addr &= TMC_REGS_MASK;
 
 	if (addr<36) {
-		val = tmc_read_reg[addr]()<<24;
+		val = (uint32_t)tmc_read_reg[addr]()<<24;
 		val |= tmc_read_reg[addr+1]()<<16;
 		val |= tmc_read_reg[addr+2]()<<8;
 		val |= tmc_read_reg[addr+3]();
 	} else if (addr>=128 && addr<144) {
-		val = tmc_read_vid_reg[addr&0xF]()<<24;
+		val = (uint32_t)tmc_read_vid_reg[addr&0xF]()<<24;
 		val |= tmc_read_vid_reg[(addr+1)&0xF]()<<16;
 		val |= tmc_read_vid_reg[(addr+2)&0xF]()<<8;
 		val |= tmc_read_vid_reg[(addr+3)&0xF]();

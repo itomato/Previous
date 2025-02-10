@@ -820,7 +820,7 @@ static void cputracefunc2_x_do_cycles_post (int cycles, uae_u32 v)
 
 static void do_cycles_post (int cycles, uae_u32 v)
 {
-	do_cycles (cycles);
+	do_cycles(cycles);
 }
 static void do_cycles_ce_post (int cycles, uae_u32 v)
 {
@@ -3785,7 +3785,7 @@ static void ExceptionX (int nr, uaecptr address, uaecptr oldpc)
 #ifndef WINUAE_FOR_HATARI
 #ifdef DEBUGGER
 	if (debug_dma) {
-		record_dma_event_data(DMA_EVENT_CPUINS, current_hpos(), vpos, 0x20000);
+		record_dma_event_data(DMA_EVENT_CPUINS, 0x20000);
 	}
 #endif
 #endif
@@ -3907,7 +3907,7 @@ static void do_interrupt (int nr)
 #ifndef WINUAE_FOR_HATARI
 #ifdef DEBUGGER
 	if (debug_dma)
-		record_dma_event(DMA_EVENT_CPUIRQ, current_hpos (), vpos);
+		record_dma_event(DMA_EVENT_CPUIRQ);
 #endif
 	if (inputrecord_debug & 2) {
 		if (input_record > 0)
@@ -4798,8 +4798,6 @@ static bool haltloop_do(int vsynctimeline, frame_time_t rpt_end, int lines)
 			ppc_interrupt(intlev());
 			uae_ppc_execute_check();
 #endif
-			if (regs.spcflags & SPCFLAG_COPPER)
-				do_copper();
 			if (regs.spcflags & (SPCFLAG_BRK | SPCFLAG_MODE_CHANGE)) {
 				if (regs.spcflags & SPCFLAG_BRK) {
 					unset_special(SPCFLAG_BRK);
@@ -4858,8 +4856,6 @@ static bool haltloop(void)
 
 				event_wait = false;
 				for (i = 0; i < ev_max; i++) {
-					if (i == ev_hsync)
-						continue;
 					if (i == ev_audio)
 						continue;
 					if (!eventtab[i].active)
@@ -4901,9 +4897,6 @@ static bool haltloop(void)
 			if (vpos)
 				prevvpos = 1;
 			x_do_cycles(8 * CYCLE_UNIT);
-
-			if (regs.spcflags & SPCFLAG_COPPER)
-				do_copper();
 
 			if (regs.spcflags) {
 				if ((regs.spcflags & (SPCFLAG_BRK | SPCFLAG_MODE_CHANGE)))
@@ -5017,7 +5010,7 @@ static void update_ipl(int ipl)
 #ifndef WINUAE_FOR_HATARI
 #ifdef DEBUGGER
 	if (debug_dma) {
-		record_dma_ipl(current_hpos(), vpos);
+		record_dma_ipl();
 	}
 #endif
 #endif
@@ -5090,9 +5083,9 @@ static void debug_cpu_stop(void)
 {
 #ifndef WINUAE_FOR_HATARI
 #ifdef DEBUGGER
-	record_dma_event(DMA_EVENT_CPUSTOP, current_hpos(), vpos);
+	record_dma_event(DMA_EVENT_CPUSTOP);
 	if (time_for_interrupt()) {
-		record_dma_event(DMA_EVENT_CPUSTOPIPL, current_hpos(), vpos);
+		record_dma_event(DMA_EVENT_CPUSTOPIPL);
 	}
 #endif
 #endif
@@ -5517,7 +5510,7 @@ static void m68k_run_1_ce (void)
 #ifndef WINUAE_FOR_HATARI
 #ifdef DEBUGGER
 				if (debug_dma) {
-					record_dma_event_data(DMA_EVENT_CPUINS, current_hpos(), vpos, r->opcode);
+					record_dma_event_data(DMA_EVENT_CPUINS, r->opcode);
 				}
 #endif
 #endif
@@ -5843,10 +5836,6 @@ static void run_cpu_thread(void (*f)(void *))
 
 			do_cycles((maxhpos / 2) * CYCLE_UNIT);
 
-			if (regs.spcflags & SPCFLAG_COPPER) {
-				do_copper();
-			}
-
 			check_uae_int_request();
 			if (regs.spcflags & (SPCFLAG_INT | SPCFLAG_DOINT)) {
 				int intr = intlev();
@@ -5940,7 +5929,7 @@ void exec_nostats (void)
 		cpu_cycles = 4 * CYCLE_UNIT; // adjust_cycles(cpu_cycles);
 
 		if (!currprefs.cpu_thread) {
-			do_cycles (cpu_cycles);
+			do_cycles(cpu_cycles);
 
 #ifdef WITH_PPC
 			if (ppc_state)
@@ -5984,7 +5973,7 @@ void execute_normal(void)
 
 //		cpu_cycles = adjust_cycles(cpu_cycles);
 		if (!currprefs.cpu_thread) {
-			do_cycles (cpu_cycles);
+			do_cycles(cpu_cycles);
 		}
 		total_cycles += cpu_cycles;
 
@@ -6232,7 +6221,7 @@ static void m68k_run_mmu060 (void)
 				f.x = regflags.x;
 				regs.instruction_pc = m68k_getpc ();
 
-				do_cycles (cpu_cycles);
+				do_cycles(cpu_cycles);
 
 				mmu_opcode = -1;
 				mmu060_state = 0;
@@ -6314,7 +6303,7 @@ static void m68k_run_mmu040 (void)
 				mmu_restart = true;
 				regs.instruction_pc = m68k_getpc ();
 
-				do_cycles (cpu_cycles);
+				do_cycles(cpu_cycles);
 
 				mmu_opcode = -1;
 				mmu_opcode = regs.opcode = x_prefetch (0);
@@ -8080,10 +8069,10 @@ uae_u8 *restore_cpu (uae_u8 *src)
 		regs.read_buffer = restore_u16();
 		regs.write_buffer = restore_u16();
 		if (v & 1) {
-			regs.ipl[0] = restore_u8();
-			regs.ipl[1] = restore_u8();
-			regs.ipl_pin = (uae_s32)restore_u8();
-			regs.ipl_pin_p = (uae_s32)restore_u8();
+			regs.ipl[0] = restore_s8();
+			regs.ipl[1] = restore_s8();
+			regs.ipl_pin = restore_s8();
+			regs.ipl_pin_p = restore_s8();
 			regs.ipl_evt = restore_u64();
 			regs.ipl_evt_pre = restore_u64();
 			regs.ipl_pin_change_evt = restore_u64();
@@ -8531,10 +8520,10 @@ uae_u8 *save_cpu(size_t *len, uae_u8 *dstptr)
 		save_u16(regs.ird);
 		save_u16(regs.read_buffer);
 		save_u16(regs.write_buffer);
-		save_u8(regs.ipl[0]);
-		save_u8(regs.ipl[1]);
-		save_u8(regs.ipl_pin);
-		save_u8(regs.ipl_pin_p);
+		save_s8(regs.ipl[0]);
+		save_s8(regs.ipl[1]);
+		save_s8(regs.ipl_pin);
+		save_s8(regs.ipl_pin_p);
 		save_u64(regs.ipl_evt);
 		save_u64(regs.ipl_evt_pre);
 		save_u64(regs.ipl_pin_change_evt);
@@ -8838,7 +8827,7 @@ bool cpureset (void)
 		m68k_reset();
 		return true;
 	}
-	if ((currprefs.cpu_compatible || currprefs.cpu_memory_cycle_exact) && currprefs.cpu_model <= 68020) {
+	if (currprefs.cpu_compatible || currprefs.cpu_memory_cycle_exact) {
 		custom_reset_cpu(false, false);
 		return false;
 	}

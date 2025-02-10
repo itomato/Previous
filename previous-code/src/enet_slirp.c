@@ -109,8 +109,8 @@ static void slirp_rip_tick(void)
 
 static int tick_func(void *arg)
 {
-    uint32_t time = host_get_save_time();
-    uint32_t last_time = time;
+    uint64_t time = host_get_save_time();
+    uint64_t last_time = 0;
     uint64_t next_time = time + SLIRP_RIP_SEC;
 
     while(slirp_started)

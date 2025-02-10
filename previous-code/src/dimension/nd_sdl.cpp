@@ -51,7 +51,7 @@ void NDSDL::repaint(void) {
 
 void NDSDL::init(void) {
     int x, y, w, h;
-    char title[32], name[32];
+    char name[32];
     SDL_Rect r = {0,0,1120,832};
 
 #ifdef ENABLE_RENDERING_THREAD
@@ -64,8 +64,8 @@ void NDSDL::init(void) {
         SDL_GetWindowPosition(sdlWindow, &x, &y);
         SDL_GetWindowSize(sdlWindow, &w, &h);
         h = (w * 832) / 1120;
-        snprintf(title, sizeof(title), "NeXTdimension (Slot %i)", slot);
-        ndWindow = SDL_CreateWindow(title, x+14*slot, y+14*slot, w, h, SDL_WINDOW_HIDDEN | SDL_WINDOW_ALLOW_HIGHDPI);
+        snprintf(name, sizeof(name), "NeXTdimension (Slot %i)", slot);
+        ndWindow = SDL_CreateWindow(name, x+14*slot, y+14*slot, w, h, SDL_WINDOW_HIDDEN | SDL_WINDOW_ALLOW_HIGHDPI);
         
         if (!ndWindow) {
             fprintf(stderr,"[ND] Slot %i: Failed to create window! (%s)\n", slot, SDL_GetError());

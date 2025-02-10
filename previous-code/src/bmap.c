@@ -217,7 +217,7 @@ void bmap_bput(uaecptr addr, uae_u32 b) {
     shift = (3 - (addr&3)) * 8;
     
     val = NEXTbmap[addr>>2];
-    val &= ~(0xFF << shift);
+    val &= ~((uint32_t)0xFF << shift);
     val |= b << shift;
     
     bmap_put(addr>>2, val);

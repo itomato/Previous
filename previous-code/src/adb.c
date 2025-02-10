@@ -276,8 +276,8 @@ static void adb_write_data(uint8_t* data, uint32_t len) {
 		Log_Printf(LOG_WARN, "[ADB] Data: Lengh of data is too big (%d)", len);
 		len = 8;
 	}
-	adb.data0 = (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
-	adb.data1 = (data[4] << 24) | (data[5] << 16) | (data[6] << 8) | data[7];
+	adb.data0 = ((uint32_t)data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
+	adb.data1 = ((uint32_t)data[4] << 24) | (data[5] << 16) | (data[6] << 8) | data[7];
 	
 	adb.bitcount = len << 3;
 	adb.status |= ADB_STAT_DATAPEND;

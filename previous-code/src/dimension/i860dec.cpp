@@ -128,7 +128,7 @@ UINT32 i860_cpu_device::ifetch_notrap(const UINT32 pc) {
 }
 
 UINT32 i860_cpu_device::ifetch(const UINT32 pc) {
-    return pc & 4 ? ifetch64(pc) >> 32 : ifetch64(pc);
+    return (UINT32)(pc & 4 ? ifetch64(pc) >> 32 : ifetch64(pc));
 }
 
 UINT64 i860_cpu_device::ifetch64(const UINT32 pc, const UINT32 vaddr, int const cidx) {
@@ -529,7 +529,7 @@ inline INT32 sign_ext (UINT32 x, int n)
 {
 	INT32 t;
 	t = x >> (n - 1);
-	t = ((-t) << n) | x;
+	t = ((UINT32)(-t) << n) | x;
 	return t;
 }
 
@@ -1764,7 +1764,7 @@ void i860_cpu_device::insn_bte (UINT32 insn)
 
 	/* Compute the target address from the sbroff field.  */
 	sbroff = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
-	target_addr = (INT32)m_pc + 4 + (sbroff << 2);
+	target_addr = (INT32)m_pc + 4 + (sbroff * 4);
 
 	/* Determine comparison result.  */
 	res = (src1val == get_iregval (isrc2));
@@ -1792,7 +1792,7 @@ void i860_cpu_device::insn_bte_imm (UINT32 insn)
 
 	/* Compute the target address from the sbroff field.  */
 	sbroff = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
-	target_addr = (INT32)m_pc + 4 + (sbroff << 2);
+	target_addr = (INT32)m_pc + 4 + (sbroff * 4);
 
 	/* Determine comparison result.  */
 	res = (src1val == get_iregval (isrc2));
@@ -1820,7 +1820,7 @@ void i860_cpu_device::insn_btne (UINT32 insn)
 
 	/* Compute the target address from the sbroff field.  */
 	sbroff = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
-	target_addr = (INT32)m_pc + 4 + (sbroff << 2);
+	target_addr = (INT32)m_pc + 4 + (sbroff * 4);
 
 	/* Determine comparison result.  */
 	res = (src1val != get_iregval (isrc2));
@@ -1848,7 +1848,7 @@ void i860_cpu_device::insn_btne_imm (UINT32 insn)
 
 	/* Compute the target address from the sbroff field.  */
 	sbroff = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
-	target_addr = (INT32)m_pc + 4 + (sbroff << 2);
+	target_addr = (INT32)m_pc + 4 + (sbroff * 4);
 
 	/* Determine comparison result.  */
 	res = (src1val != get_iregval (isrc2));
@@ -1872,7 +1872,7 @@ void i860_cpu_device::insn_bc (UINT32 insn)
 
 	/* Compute the target address from the lbroff field.  */
 	lbroff = sign_ext ((insn & 0x03ffffff), 26);
-	target_addr = (INT32)m_pc + 4 + (lbroff << 2);
+	target_addr = (INT32)m_pc + 4 + (lbroff * 4);
 
 	/* Determine comparison result.  */
     res = m_dim_cc_valid ? m_dim_cc : (GET_PSR_CC () == 1);
@@ -1896,7 +1896,7 @@ void i860_cpu_device::insn_bnc (UINT32 insn)
 
 	/* Compute the target address from the lbroff field.  */
 	lbroff = sign_ext ((insn & 0x03ffffff), 26);
-	target_addr = (INT32)m_pc + 4 + (lbroff << 2);
+	target_addr = (INT32)m_pc + 4 + (lbroff * 4);
 
 	/* Determine comparison result.  */
     res = m_dim_cc_valid ? !(m_dim_cc) : (GET_PSR_CC () == 0);
@@ -1922,7 +1922,7 @@ void i860_cpu_device::insn_bct (UINT32 insn)
 
 	/* Compute the target address from the lbroff field.  */
 	lbroff = sign_ext ((insn & 0x03ffffff), 26);
-	target_addr = (INT32)m_pc + 4 + (lbroff << 2);
+	target_addr = (INT32)m_pc + 4 + (lbroff * 4);
 
 	/* Determine comparison result.  */
 	res = (GET_PSR_CC () == 1);
@@ -1964,7 +1964,7 @@ void i860_cpu_device::insn_bnct (UINT32 insn)
 
 	/* Compute the target address from the lbroff field.  */
 	lbroff = sign_ext ((insn & 0x03ffffff), 26);
-	target_addr = (INT32)m_pc + 4 + (lbroff << 2);
+	target_addr = (INT32)m_pc + 4 + (lbroff * 4);
 
 	/* Determine comparison result.  */
     res = (GET_PSR_CC () == 0);
@@ -2004,7 +2004,7 @@ void i860_cpu_device::insn_call (UINT32 insn)
 
 	/* Compute the target address from the lbroff field.  */
 	lbroff = sign_ext ((insn & 0x03ffffff), 26);
-	target_addr = (INT32)m_pc + 4 + (lbroff << 2);
+	target_addr = (INT32)m_pc + 4 + (lbroff * 4);
 
 	/* Execute the delay slot instruction.  */
     DELAY_SLOT();
@@ -2034,7 +2034,7 @@ void i860_cpu_device::insn_br (UINT32 insn)
 
 	/* Compute the target address from the lbroff field.  */
 	lbroff = sign_ext ((insn & 0x03ffffff), 26);
-	target_addr = (INT32)m_pc + 4 + (lbroff << 2);
+	target_addr = (INT32)m_pc + 4 + (lbroff * 4);
 
 	/* Execute the delay slot instruction.  */
     DELAY_SLOT();
@@ -2159,7 +2159,7 @@ void i860_cpu_device::insn_bla (UINT32 insn)
 
 	/* Compute the target address from the sbroff field.  */
 	sbroff = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
-	target_addr = (INT32)m_pc + 4 + (sbroff << 2);
+	target_addr = (INT32)m_pc + 4 + (sbroff * 4);
 
 	/* Determine comparison result based on opcode.  */
 	lcc_tmp = ((INT32)get_iregval (isrc2) >= -(INT32)get_iregval (isrc1));
@@ -2373,9 +2373,9 @@ void i860_cpu_device::insn_fmlow (UINT32 insn)
 
 	FLOAT64 v1 = get_fregval_d (fsrc1);
 	FLOAT64 v2 = get_fregval_d (fsrc2);
-	INT64 i1 = *(UINT64 *)&v1;
-	INT64 i2 = *(UINT64 *)&v2;
-	INT64 tmp = 0;
+	UINT64 i1 = *(UINT64 *)&v1;
+	UINT64 i2 = *(UINT64 *)&v2;
+	UINT64 tmp = 0;
 
 #if TRACE_UNDEFINED_I860
 	/* Only .dd is valid for fmlow.  */
@@ -2392,9 +2392,9 @@ void i860_cpu_device::insn_fmlow (UINT32 insn)
 	   to be undefined in the same way as the real i860 if possible.  */
 
 	/* Keep lower 53 bits of multiply.  */
-    tmp = i1 * i2;
+	tmp = i1 * i2;
 	tmp &= 0x001fffffffffffffULL;
-	tmp |= (i1 & 0x8000000000000000LL) ^ (i2 & 0x8000000000000000LL);
+	tmp |= ((i1 & 0x8000000000000000ULL) ^ (i2 & 0x8000000000000000ULL)) >> 10;
 	set_fregval_d (fdest, *(FLOAT64 *)&tmp);
 }
 

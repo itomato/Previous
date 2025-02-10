@@ -114,7 +114,7 @@ static SGOBJ fsdlg[] =
 	{ SGCHECKBOX, SG_EXIT, 0, 2,24, 18,1, "Show hidden files" },
 	{ SGBUTTON, SG_DEFAULT, 0, 32,24, 8,1, "Okay" },
 	{ SGBUTTON, SG_CANCEL, 0, 50,24, 8,1, "Cancel" },
-	{ SGCHECKBOX, 0, 0, 46,3, 17,1, dlgreadonly },
+	{ SGCHECKBOX, SG_EXIT, 0, 46,3, 17,1, dlgreadonly },
 #if WIN32
 	/* Drive selection */
 	{ SGBUTTON,   0, 0, 44,5, 1,1, "\x04", SG_SHORTCUT_LEFT },
@@ -964,7 +964,9 @@ char* SDLGui_FileSelect(const char *title, const char *path_and_name, char **zip
 			switch(retbut)
 			{
 			case SGFSDLG_READONLY:              /* Change disk protection */
-				*pReadOnly = !*pReadOnly;
+				if (pReadOnly) {
+					*pReadOnly = !*pReadOnly;
+				}
 				break;
 
 			case SGFSDLG_UPDIR:                 /* Change path to parent directory */

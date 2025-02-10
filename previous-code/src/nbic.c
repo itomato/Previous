@@ -65,22 +65,22 @@ static uint8_t nbic_control_read3(uint32_t addr) {
 static void nbic_control_write0(uint32_t addr, uint8_t val) {
 	Log_Printf(LOG_NBIC_LEVEL, "[NBIC] Control (byte 0) write %02X at %08X",val,addr);
 	nbic.control &= 0x00FFFFFF;
-	nbic.control |= (val&0xFF)<<24;
+	nbic.control |= (uint32_t)val<<24;
 }
 static void nbic_control_write1(uint32_t addr, uint8_t val) {
 	Log_Printf(LOG_NBIC_LEVEL, "[NBIC] Control (byte 1) write %02X at %08X",val,addr);
 	nbic.control &= 0xFF00FFFF;
-	nbic.control |= (val&0xFF)<<16;
+	nbic.control |= val<<16;
 }
 static void nbic_control_write2(uint32_t addr, uint8_t val) {
 	Log_Printf(LOG_NBIC_LEVEL, "[NBIC] Control (byte 2) write %02X at %08X",val,addr);
 	nbic.control &= 0xFFFF00FF;
-	nbic.control |= (val&0xFF)<<8;
+	nbic.control |= val<<8;
 }
 static void nbic_control_write3(uint32_t addr, uint8_t val) {
 	Log_Printf(LOG_NBIC_LEVEL, "[NBIC] Control (byte 3) write %02X at %08X",val,addr);
 	nbic.control &= 0xFFFFFF00;
-	nbic.control |= val&0xFF;
+	nbic.control |= val;
 }
 
 
@@ -104,22 +104,22 @@ static uint8_t nbic_id_read3(uint32_t addr) {
 static void nbic_id_write0(uint32_t addr, uint8_t val) {
 	Log_Printf(LOG_NBIC_LEVEL, "[NBIC] ID (byte 0) write %02X at %08X",val,addr);
 	nbic.id &= 0x00FFFFFF;
-	nbic.id |= (val&0xFF)<<24;
+	nbic.id |= (uint32_t)val<<24;
 }
 static void nbic_id_write1(uint32_t addr, uint8_t val) {
 	Log_Printf(LOG_NBIC_LEVEL, "[NBIC] ID (byte 1) write %02X at %08X",val,addr);
 	nbic.id &= 0xFF00FFFF;
-	nbic.id |= (val&0xFF)<<16;
+	nbic.id |= val<<16;
 }
 static void nbic_id_write2(uint32_t addr, uint8_t val) {
 	Log_Printf(LOG_NBIC_LEVEL, "[NBIC] ID (byte 2) write %02X at %08X",val,addr);
 	nbic.id &= 0xFFFF00FF;
-	nbic.id |= (val&0xFF)<<8;
+	nbic.id |= val<<8;
 }
 static void nbic_id_write3(uint32_t addr, uint8_t val) {
 	Log_Printf(LOG_NBIC_LEVEL, "[NBIC] ID (byte 3) write %02X at %08X",val,addr);
 	nbic.id &= 0xFFFFFF00;
-	nbic.id |= val&0xFF;
+	nbic.id |= val;
 }
 
 static uint8_t nbic_intstatus_read(uint32_t addr) {
@@ -288,7 +288,7 @@ uint32_t nb_cpu_slot_lget(uint32_t addr) {
     if ((addr&0x00FFFFFF)<0x00FFFFE8) {
         nbic_bus_error_read(addr);
     } else {
-        val = nbic_read_cpu_slot[addr&0x1F](addr)<<24;
+        val = (uint32_t)nbic_read_cpu_slot[addr&0x1F](addr)<<24;
         val |= nbic_read_cpu_slot[(addr&0x1F)+1](addr+1)<<16;
         val |= nbic_read_cpu_slot[(addr&0x1F)+2](addr+2)<<8;
         val |= nbic_read_cpu_slot[(addr&0x1F)+3](addr+3);

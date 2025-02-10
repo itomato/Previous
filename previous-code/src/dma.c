@@ -93,7 +93,7 @@ uint8_t modma_buf[DMA_BURST_SIZE];
 
 
 static inline uint32_t dma_getlong(uint8_t *buf, uint32_t pos) {
-    return (buf[pos] << 24) | (buf[pos+1] << 16) | (buf[pos+2] << 8) | buf[pos+3];
+    return ((uint32_t)buf[pos] << 24) | (buf[pos+1] << 16) | (buf[pos+2] << 8) | buf[pos+3];
 }
 
 static inline void dma_putlong(uint32_t val, uint8_t *buf, uint32_t pos) {

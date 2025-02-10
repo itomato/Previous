@@ -60,7 +60,7 @@ int rom_load(uint8_t* buf, int len) {
         return 1;
     }
     
-    size = fread(buf, 1, len, romfile);
+    size = (int)fread(buf, 1, len, romfile);
     
     File_Close(romfile);
     

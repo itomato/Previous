@@ -37,14 +37,42 @@ set(ENABLE_DSP_EMU 1
 set(ENABLE_TRACING 1
     CACHE BOOL "Enable tracing messages for debugging")
 
+# Run-time checks with GCC / LLVM (Clang) AddressSanitizer:
+# - stack protection
+# - checking of pointer accesses
+#
+# Configure Previous with AddressSanitizer:
+#   cd build; make clean; cmake -D ENABLE_ASAN:BOOL=1 -D ..
+# If everything's fine, CMake output should include:
+#   Performing Test ASAN_AVAILABLE - Success"
+#
+# After (re-)building Previous, run it as following to see
+# available AddressSanitizer options (and that it works):
+#   ASAN_OPTIONS=help=true src/previous
+#
+# For more info:
+#   https://github.com/google/sanitizers/wiki/AddressSanitizer
+#
+CHECK_C_COMPILER_FLAG("-fsanitize=address" ASAN_AVAILABLE)
+if(ASAN_AVAILABLE)
+	set(ENABLE_ASAN 0
+	    CACHE BOOL "Enable GCC/LLVM run-time stack/pointer debugging (~2x slowdown)")
+endif(ASAN_AVAILABLE)
+
+CHECK_C_COMPILER_FLAG("-fsanitize=undefined" UBSAN_AVAILABLE)
+if(UBSAN_AVAILABLE)
+	set(ENABLE_UBSAN 0
+	    CACHE BOOL "Enable GCC/LLVM run-time undefined behavior debugging")
+endif(UBSAN_AVAILABLE)
+
 if(APPLE)
 	set(ENABLE_RENDERING_THREAD 1
-		CACHE BOOL "Enable rendering threads")
+	    CACHE BOOL "Enable rendering threads")
 	set(ENABLE_OSX_BUNDLE 1
 	    CACHE BOOL "Built Previous as macOS application bundle")
 else()
 	set(ENABLE_RENDERING_THREAD 0
-		CACHE BOOL "Enable rendering threads")
+	    CACHE BOOL "Enable rendering threads")
 	set(ENABLE_OSX_BUNDLE 0
 	    CACHE BOOL "Built Previous as macOS application bundle")
 endif(APPLE)
@@ -158,6 +186,22 @@ check_struct_has_member("struct dirent" d_namelen
 # Other CFLAGS:
 # #############
 
+# GCC/Clang stack/pointer debugging (~2x slowdown)
+if(ENABLE_ASAN)
+	# better backtraces
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -fno-omit-frame-pointer")
+	# enable stack protection
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fstack-protector-all")
+	# enable AddressSanitizer with global variable tracking
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fno-common")
+endif(ENABLE_ASAN)
+
+# GCC/Clang undefined behavior debugging
+if(ENABLE_UBSAN)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=undefined")
+	add_definitions(-DENABLE_UBSAN=1)
+endif(ENABLE_UBSAN)
+
 # GCC/Clang specific flags:
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
 	# We want to allow ‘for’-loop initial declarations a la for(int i=0; ...)
@@ -171,8 +215,9 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
 	# Enable and disable some warnings and flags for Previous:
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -D__USE_MINGW_ANSI_STDIO=1")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-conversion -Wno-unused -Wno-sign-compare")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wtautological-compare -Wno-unused-parameter")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-sign-compare -Wno-conversion -Wno-unused")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wtautological-compare")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-sign-compare -Wno-conversion")
+ 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter")
 endif()
 
 CHECK_C_COMPILER_FLAG("-Wimplicit-fallthrough=2" WARN_FALLTRHOUGH_AVAILABLE)
@@ -201,7 +246,7 @@ endif(ENABLE_WERROR)
 
 # -Wpointer-bool-conversion is not in GCC yet (as of 10.2)
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wpointer-bool-conversion -Wtautological-compare -Wno-unused-parameter ${CMAKE_CXX_FLAGS}")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpointer-bool-conversion")
 endif()
 
 # Silence warnings in DiskImage.cpp

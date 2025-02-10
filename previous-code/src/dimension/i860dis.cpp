@@ -41,7 +41,7 @@ static INT32 sign_ext(UINT32 x, int n)
 {
 	INT32 t;
 	t = x >> (n - 1);
-	t = ((-t) << n) | x;
+	t = ((UINT32)(-t) << n) | x;
 	return t;
 }
 
@@ -209,7 +209,7 @@ static void flop_fxfr(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 static void int_12S(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 {
 	INT32 sbroff = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
-	INT32 rel = (INT32)pc + (sbroff << 2) + 4;
+	INT32 rel = (INT32)pc + (sbroff * 4) + 4;
 
 	snprintf(buf, DISASM_BUF_SIZE, "  %s\t%%r%d,%%r%d,0x%08x", mnemonic, get_isrc1 (insn),
 		get_isrc2 (insn), (UINT32)rel);
@@ -221,7 +221,7 @@ static void int_12S(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 static void int_i2S(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 {
 	INT32 sbroff = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
-	INT32 rel = (INT32)pc + (sbroff << 2) + 4;
+	INT32 rel = (INT32)pc + (sbroff * 4) + 4;
 
 	snprintf(buf, DISASM_BUF_SIZE, "  %s\t%d,%%r%d,0x%08x", mnemonic, ((insn >> 11) & 0x1f),
 		get_isrc2 (insn), (UINT32)rel);
@@ -233,7 +233,7 @@ static void int_i2S(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 static void int_L(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 {
 	INT32 lbroff =  sign_ext ((insn & 0x03ffffff), 26);
-	INT32 rel = (INT32)pc + (lbroff << 2) + 4;
+	INT32 rel = (INT32)pc + (lbroff * 4) + 4;
 
 	snprintf(buf, DISASM_BUF_SIZE, "  %s\t0x%08x", mnemonic, (UINT32)rel);
 }

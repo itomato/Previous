@@ -79,7 +79,7 @@ public:
     void                      remove(NetInfoNode* node);
     NetInfoNode*              find(struct ni_id& ni_id, ni_status& status, bool forWrite = false) const;
     std::vector<NetInfoNode*> find(const std::string& key, const std::string& value) const;
-    int                       checksum(void);
+    unsigned int              checksum(void);
     std::string               getPath(void);
     std::string               getPropValue(const std::string& key) const;
     std::vector<std::string>  getPropNames();
