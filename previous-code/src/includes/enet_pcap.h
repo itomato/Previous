@@ -12,5 +12,6 @@ extern void enet_pcap_queue_poll(void);
 extern void enet_pcap_input(uint8_t *pkt, int pkt_len);
 extern void enet_pcap_stop(void);
 extern void enet_pcap_start(uint8_t *mac);
+extern void enet_pcap_uninit(void);
 
 #endif /* PREV_ENET_PCAP_H */

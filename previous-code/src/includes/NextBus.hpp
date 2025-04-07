@@ -19,6 +19,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 extern void nextbus_init(void);
+extern void nextbus_uninit(void);
 
 extern uae_u32 nextbus_slot_lget(uaecptr addr);
 extern uae_u32 nextbus_slot_wget(uaecptr addr);

@@ -41,8 +41,8 @@
 #include <stdlib.h>
 #include <slirp.h>
 #include "ip_icmp.h"
-#include "nfs/nfsd.h"
-#include "nfs/VDNS.h"
+#include "rpc/rpc.h"
+#include "rpc/dns.h"
 
 struct udpstat udpstat;
 
@@ -146,9 +146,9 @@ udp_input(register struct mbuf *m, int iphlen)
     struct in_addr dst_addr = ip->ip_dst; /* Do not use pointers to packed structure. */
     u_int16_t      dst_port = uh->uh_dport;
     
-    if(nfsd_match_addr(ntohl(save_ip.ip_dst.s_addr))) {
-        nfsd_udp_map_to_local_port(&dst_addr, &dst_port);
-    } else if(vdns_match(m, ntohl(save_ip.ip_dst.s_addr), dport)) {
+    if (rpc_match_addr(ntohl(save_ip.ip_dst.s_addr))) {
+        rpc_udp_map_to_local_port(&dst_addr, &dst_port);
+    } else if (vdns_match(m, ntohl(save_ip.ip_dst.s_addr), dport)) {
         vdns_udp_map_to_local_port(&dst_addr, &dst_port);
     }
     
@@ -332,8 +332,9 @@ int udp_output(struct socket *so, struct mbuf *m,
             saddr.sin_addr.s_addr = alias_addr.s_addr;
     }
     
-    if(so->so_faddr.s_addr == loopback_addr.s_addr)
-        udp_map_from_local_port(ntohs(so->so_fport), &saddr.sin_addr, &saddr.sin_port);
+    if (so->so_faddr.s_addr == loopback_addr.s_addr) {
+        rpc_udp_map_from_local_port(ntohs(so->so_fport), &saddr.sin_addr, &saddr.sin_port);
+    }
     
     daddr.sin_addr = so->so_laddr;
     daddr.sin_port = so->so_lport;

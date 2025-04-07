@@ -14,7 +14,7 @@
 #include <sys/filio.h>
 #endif
 
-#include "nfs/VDNS.h"
+#include "rpc/dns.h"
 
 #ifdef _WIN32
 #define IS_EAGAIN(e) ((e) == WSAEINTR || (e) == EAGAIN)

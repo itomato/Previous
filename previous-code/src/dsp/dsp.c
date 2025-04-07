@@ -748,7 +748,7 @@ bool DSP_Disasm_SetRegister(const char *arg, uint32_t value)
 {
 #if ENABLE_DSP_EMU
 	uint32_t *addr, mask, sp_value;
-	int bits;
+	int width;
 
 	/* first check registers needing special handling... */
 	if (arg[0]=='S' || arg[0]=='s') {
@@ -785,8 +785,8 @@ bool DSP_Disasm_SetRegister(const char *arg, uint32_t value)
 	}
 
 	/* ...then registers where address & mask are enough */
-	bits = DSP_GetRegisterAddress(arg, &addr, &mask);
-	switch (bits) {
+	width = DSP_GetRegisterAddress(arg, &addr, &mask);
+	switch (width) {
 	case 32:
 		*addr = value & mask;
 		return true;

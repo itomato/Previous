@@ -1215,6 +1215,8 @@ int memory_init (void)
  */
 void memory_uninit (void)
 {
+	nextbus_uninit();
+	
 	free(NEXTRom);
 	free(NEXTVideo);
 	free(NEXTRam);

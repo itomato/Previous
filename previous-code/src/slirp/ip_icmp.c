@@ -32,7 +32,7 @@
 
 #include "slirp.h"
 #include "ip_icmp.h"
-#include "nfs/VDNS.h"
+#include "rpc/dns.h"
 
 struct icmpstat icmpstat;
 

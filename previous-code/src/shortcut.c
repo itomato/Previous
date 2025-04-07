@@ -71,7 +71,7 @@ static void ShortCut_SoundOnOff(void)
 
 /*-----------------------------------------------------------------------*/
 /**
- * Shorcut to M68K debug interface
+ * Shortcut to M68K debug interface
  */
 static void ShortCut_Debug_M68K(void)
 {
@@ -86,7 +86,7 @@ static void ShortCut_Debug_M68K(void)
 
 /*-----------------------------------------------------------------------*/
 /**
- * Shorcut to I860 debug interface
+ * Shortcut to I860 debug interface
  */
 static void ShortCut_Debug_I860(void)
 {
@@ -101,9 +101,8 @@ static void ShortCut_Debug_I860(void)
 	nd_start_debugger();
 }
 
-/*-----------------------------------------------------------------------*/
 /**
- * Shorcut to pausing
+ * Shortcut to pausing
  */
 static void ShortCut_Pause(void)
 {
@@ -112,7 +111,7 @@ static void ShortCut_Pause(void)
 }
 
 /**
- * Shorcut to switch monochrome and dimension screen
+ * Shortcut to switch monochrome and dimension screen
  */
 static void ShortCut_Dimension(void)
 {
@@ -142,7 +141,7 @@ static void ShortCut_Dimension(void)
 }
 
 /**
- * Shorcut to show/hide statusbar
+ * Shortcut to show/hide statusbar
  */
 static void ShortCut_StatusBar(void)
 {

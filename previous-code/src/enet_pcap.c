@@ -8,17 +8,17 @@
 */
 const char Enet_pcap_fileid[] = "Previous enet_pcap.c";
 
-#include "m68000.h"
+#include "main.h"
+
+#if HAVE_PCAP
+#include <pcap.h>
+
+#include "configuration.h"
+#include "log.h"
 #include "ethernet.h"
 #include "enet_pcap.h"
 #include "queue.h"
 #include "host.h"
-
-#if HAVE_PCAP
-#if defined _WIN32
-#undef mkdir
-#endif
-#include <pcap.h>
 
 #define LOG_EN_PCAP_LEVEL LOG_DEBUG
 
@@ -111,6 +111,10 @@ void enet_pcap_stop(void) {
         QueueDestroy(pcapq);
         pcap_close(pcap_handle);
     }
+}
+
+void enet_pcap_uninit(void) {
+    enet_pcap_stop();
 }
 
 void enet_pcap_start(uint8_t *mac) {

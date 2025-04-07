@@ -362,6 +362,7 @@ public:
 /* Illegal access functions */
 
 ND_Addrbank::ND_Addrbank(NextDimension* nd) : nd(nd) {}
+ND_Addrbank::~ND_Addrbank() {}
 
 uint32_t ND_Addrbank::lget(uint32_t addr) const {
     Log_Printf(LOG_ND_MEM, "[ND] Slot %i: Illegal lget at %08X\n",nd->slot,addr);
@@ -450,14 +451,12 @@ public:
 
 void NextDimension::map_banks (ND_Addrbank *bank, int start, int size) {
     for (int bnr = start; bnr < start + size; bnr++)
-        nd_put_mem_bank (bnr << 16, bank);
-    return;
+        nd_put_mem_bank(bnr << 16, bank);
 }
 
 void NextDimension::init_mem_banks(void) {
-    ND_Addrbank* nd_illegal_bank = new ND_Addrbank(this);
     for (int i = 0; i < 65536; i++)
-        nd_put_mem_bank(i<<16, nd_illegal_bank);
+        nd_put_mem_bank(i << 16, illegal_bank);
 }
 
 void NextDimension::mem_init(void) {
@@ -465,6 +464,7 @@ void NextDimension::mem_init(void) {
                Configuration_CheckDimensionMemory(ConfigureParams.Dimension.board[ND_NUM(slot)].nMemoryBankSize));
 
     /* Initialize banks with error memory */
+    illegal_bank = new ND_Addrbank(this);
     init_mem_banks();
 
     /* Clear at least first 4k of main memory for m68k ROM polling code */
@@ -480,12 +480,14 @@ void NextDimension::mem_init(void) {
     for(int bank = 0; bank < 4; bank++) {
         if (ConfigureParams.Dimension.board[ND_NUM(slot)].nMemoryBankSize[bank]) {
             bankmask[bank] = ND_RAM_BANKMASK|((ConfigureParams.Dimension.board[ND_NUM(slot)].nMemoryBankSize[bank]<<20)-1);
-            map_banks(new ND_RAM(this, bank), (ND_RAM_START+(bank*ND_RAM_BANKSIZE))>>16, ND_RAM_BANKSIZE >> 16);
+            ram_bank[bank] = new ND_RAM(this, bank);
+            map_banks(ram_bank[bank], (ND_RAM_START+(bank*ND_RAM_BANKSIZE))>>16, ND_RAM_BANKSIZE >> 16);
             Log_Printf(LOG_WARN, "[ND] Slot %i: Mapping main memory bank%d at $%08x: %iMB\n", slot, bank,
                        (ND_RAM_START+(bank*ND_RAM_BANKSIZE)), ConfigureParams.Dimension.board[ND_NUM(slot)].nMemoryBankSize[bank]);
         } else {
             bankmask[bank] = 0;
-            map_banks(new ND_Empty(this), (ND_RAM_START+(bank*ND_RAM_BANKSIZE))>>16, ND_RAM_BANKSIZE >> 16);
+            ram_bank[bank] = new ND_Empty(this);
+            map_banks(ram_bank[bank], (ND_RAM_START+(bank*ND_RAM_BANKSIZE))>>16, ND_RAM_BANKSIZE >> 16);
             Log_Printf(LOG_WARN, "[ND] Slot %i: Mapping main memory bank%d at $%08x: empty\n", slot, bank,
                        (ND_RAM_START+(bank*ND_RAM_BANKSIZE)));
         }
@@ -493,23 +495,44 @@ void NextDimension::mem_init(void) {
 
     Log_Printf(LOG_WARN, "[ND] Slot %i: Mapping video memory at $%08x: %iMB\n", slot,
                ND_VRAM_START, ND_VRAM_SIZE>>20);
-    map_banks(new ND_VRAM(this), ND_VRAM_START>>16, (4*ND_VRAM_SIZE)>>16);
+    vram_bank = new ND_VRAM(this);
+    map_banks(vram_bank, ND_VRAM_START>>16, (4*ND_VRAM_SIZE)>>16);
 
     Log_Printf(LOG_WARN, "[ND] Slot %i: Mapping ROM at $%08x: %ikB\n", slot,
                ND_EEPROM_START, ND_EEPROM_SIZE>>10);
-    map_banks(new ND_ROM(this), ND_EEPROM_START>>16, (ND_EEPROM_SIZE*8)>>16);
+    rom_bank = new ND_ROM(this);
+    map_banks(rom_bank, ND_EEPROM_START>>16, (ND_EEPROM_SIZE*8)>>16);
 
     Log_Printf(LOG_WARN, "[ND] Slot %i: Mapping dither memory and data path at $%08x: %ibyte\n", slot,
                ND_DMEM_START, ND_DMEM_SIZE);
-    map_banks(new ND_DMEM(this), ND_DMEM_START>>16, 1);
+    dmem_bank = new ND_DMEM(this);
+    map_banks(dmem_bank, ND_DMEM_START>>16, 1);
 
     Log_Printf(LOG_WARN, "[ND] Slot %i: Mapping IO memory at $%08x\n", slot, ND_IO_START);
-    map_banks(new ND_IO(this), ND_IO_START>>16, 1);
+    io_bank = new ND_IO(this);
+    map_banks(io_bank, ND_IO_START>>16, 1);
 
     Log_Printf(LOG_WARN, "[ND] Slot %i: Mapping RAMDAC registers at $%08x\n", slot, ND_RAMDAC_START);
-    map_banks(new ND_RAMDAC(this), ND_RAMDAC_START>>16, 1);
+    ramdac_bank = new ND_RAMDAC(this);
+    map_banks(ramdac_bank, ND_RAMDAC_START>>16, 1);
 #if ND_STEP
     Log_Printf(LOG_WARN, "[ND] Slot %i: Mapping board CSR at $%08x\n", slot, ND_CSR_START);
-    map_banks(new ND_CSR(this), ND_CSR_START>>16, 1);
+    csr_bank = new ND_CSR(this);
+    map_banks(csr_bank, ND_CSR_START>>16, 1);
+#endif
+}
+
+void NextDimension::mem_uninit(void) {
+    for (int i = 0; i < 4; i++) {
+        delete ram_bank[i];
+    }
+    delete illegal_bank;
+    delete vram_bank;
+    delete rom_bank;
+    delete dmem_bank;
+    delete io_bank;
+    delete ramdac_bank;
+#if ND_STEP
+    delete csr_bank;
 #endif
 }

@@ -27,11 +27,10 @@ add_library(Slirp
             mbuf.c misc.c ntp.c rip.c sbuf.c slirp.c slirpdebug.c socket.c 
             tcp_input.c tcp_output.c tcp_subr.c tcp_timer.c tftp.c udp.c
 
-            nfs/compat.cpp
-            nfs/XDRStream.cpp nfs/CSocket.cpp nfs/TCPServerSocket.cpp nfs/UDPServerSocket.cpp
-            nfs/nfsd.cpp nfs/RPCServer.cpp nfs/VDNS.cpp
-            nfs/RPCProg.cpp nfs/PortmapProg.cpp nfs/MountProg.cpp nfs/NFSProg.cpp nfs/NFS2Prog.cpp nfs/BootparamProg.cpp nfs/NetInfoProg.cpp nfs/NetInfoBindProg.cpp
-            nfs/FileTableNFSD.cpp ../ditool/DiskImage.cpp ../ditool/Partition.cpp ../ditool/UFS.cpp ../ditool/VirtualFS.cpp
-			)
+            rpc/xdr.c rpc/rpc.c rpc/portmap.c rpc/bootparam.c rpc/mount.c 
+            rpc/nfs.c rpc/netinfo.c rpc/netinfobind.c rpc/dns.c 
+            rpc/csocket.c rpc/udpsocket.c rpc/tcpsocket.c 
+            rpc/filetable.c rpc/vfs.c
+            )
 
 target_link_libraries(Slirp PRIVATE ${SDL2_LIBRARIES})

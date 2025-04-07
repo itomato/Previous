@@ -68,6 +68,7 @@ NextDimension::~NextDimension() {
     i860.uninit();
     sdl.destroy();
     
+    mem_uninit();
     delete[] mem_banks;
     free(ram);
     free(vram);

@@ -89,10 +89,11 @@ struct {
 void enet_reset(void);
 bool new_enet_buserror(void);
 
-void (*enet_output)(void);
-void (*enet_input)(uint8_t *pkt, int len);
-void (*enet_start)(uint8_t *mac);
-void (*enet_stop)(void);
+static void (*enet_output)(void);
+static void (*enet_input)(uint8_t *pkt, int len);
+static void (*enet_start)(uint8_t *mac);
+static void (*enet_stop)(void);
+static void (*enet_uninit)(void);
 
 void print_packet(uint8_t *pkt, int len, int out);
 
@@ -774,6 +775,9 @@ void Ethernet_Reset(bool hard) {
     if (init_done) {
         /* Stop SLIRP/PCAP */
         enet_stop();
+        if (hard) {
+            enet_uninit();
+        }
     }
 #if HAVE_PCAP
     if (ConfigureParams.Ethernet.nHostInterface == ENET_PCAP) {
@@ -781,6 +785,7 @@ void Ethernet_Reset(bool hard) {
         enet_input  = enet_pcap_input;
         enet_start  = enet_pcap_start;
         enet_stop   = enet_pcap_stop;
+        enet_uninit = enet_pcap_uninit;
     } else
 #endif
     {
@@ -788,12 +793,18 @@ void Ethernet_Reset(bool hard) {
         enet_input  = enet_slirp_input;
         enet_start  = enet_slirp_start;
         enet_stop   = enet_slirp_stop;
+        enet_uninit = enet_slirp_uninit;
     }
     init_done = 1;
     
     enet_reset();
 }
 
+void Ethernet_UnInit(void) {
+    if (enet_uninit) {
+        enet_uninit();
+    }
+}
 
 /* Packet printer and analyzer */
 

@@ -1,6 +1,6 @@
 
 
-                                  Previous 3.6
+                                  Previous 3.7
 
 
 
@@ -430,6 +430,10 @@ Previous v3.5:
 Previous v3.6:
   > Improves accuracy of i860 fmlow instruction.
   > Fixes bug that prevented setting write protection from the user interface.
+
+Previous v3.7:
+  > Improves accuracy and reliability of internal NFS and NetInfo server.
+  > Fixes bugs that caused memory leaks and orphaned threads on quit.
 
 
  7) Running Previous

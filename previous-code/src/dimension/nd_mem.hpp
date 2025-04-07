@@ -55,6 +55,7 @@ public:
     virtual void bput(uint32_t addr, uint32_t val) const;
     
     ND_Addrbank(NextDimension* nd);
+    virtual ~ND_Addrbank();
 };
 
 #endif /* __cplusplus */

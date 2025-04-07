@@ -132,6 +132,15 @@ class NextDimension : public NextBusBoard {
     atomic_int      m_port;
 public:
     ND_Addrbank**   mem_banks;
+    ND_Addrbank*    illegal_bank;
+    ND_Addrbank*    ram_bank[4];
+    ND_Addrbank*    vram_bank;
+    ND_Addrbank*    rom_bank;
+    ND_Addrbank*    dmem_bank;
+    ND_Addrbank*    io_bank;
+    ND_Addrbank*    ramdac_bank;
+    ND_Addrbank*    csr_bank;
+    
     uint8_t*        ram;
     uint8_t*        vram;
     uint8_t*        rom;
@@ -156,6 +165,7 @@ public:
     
     NextDimension(int slot);
     void mem_init(void);
+    void mem_uninit(void);
     void init_mem_banks(void);
     void map_banks (ND_Addrbank *bank, int start, int size);
 

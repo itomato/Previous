@@ -42,8 +42,8 @@
 #include <stdlib.h>
 #include <slirp.h>
 
-#include "nfs/nfsd.h"
-#include "nfs/VDNS.h"
+#include "rpc/rpc.h"
+#include "rpc/dns.h"
 
 /* patchable/settable parameters for tcp */
 int 	tcp_mssdflt = TCP_MSS;
@@ -408,8 +408,8 @@ int tcp_fconnect(struct socket *so)
         addr.sin_addr = so->so_faddr;
       
       addr.sin_port = so->so_fport;
-      if(nfsd_match_addr(ntohl(so->so_faddr.s_addr))) {
-          nfsd_tcp_map_to_local_port(ntohs(so->so_fport), &addr.sin_port);
+      if(rpc_match_addr(ntohl(so->so_faddr.s_addr))) {
+          rpc_tcp_map_to_local_port(ntohs(so->so_fport), &addr.sin_port);
       }
 
 	char addrstr[INET_ADDRSTRLEN];

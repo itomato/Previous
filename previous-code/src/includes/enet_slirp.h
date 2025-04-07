@@ -12,5 +12,6 @@ extern void enet_slirp_queue_poll(void);
 extern void enet_slirp_input(uint8_t *pkt, int pkt_len);
 extern void enet_slirp_stop(void);
 extern void enet_slirp_start(uint8_t *mac);
+extern void enet_slirp_uninit(void);
 
 #endif /* PREV_ENET_SLIRP_H */

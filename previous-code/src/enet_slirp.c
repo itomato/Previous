@@ -8,21 +8,14 @@
 */
 const char Enet_slirp_fileid[] = "Previous enet_slirp.c";
 
-#include "m68000.h"
+#include "main.h"
+#include "log.h"
 #include "ethernet.h"
 #include "enet_slirp.h"
 #include "queue.h"
 #include "host.h"
 #include "libslirp.h"
-#include "nfs/nfsd.h"
-
-#ifndef _WIN32
-#include <arpa/inet.h>
-#else
-#undef TCHAR
-#include <winsock2.h>
-int inet_aton(const char *cp, struct in_addr *addr);
-#endif
+#include "rpc/rpc.h"
 
 #define LOG_EN_SLIRP_LEVEL LOG_DEBUG
 
@@ -168,6 +161,11 @@ void enet_slirp_stop(void) {
     }
 }
 
+void enet_slirp_uninit(void) {
+    enet_slirp_stop();
+    rpc_uninit();
+}
+
 void enet_slirp_start(uint8_t *mac) {
     struct in_addr guest_addr;
     
@@ -192,5 +190,5 @@ void enet_slirp_start(uint8_t *mac) {
     }
     
     /* (re)start local nfs deamon */
-    nfsd_start();
+    rpc_reset();
 }

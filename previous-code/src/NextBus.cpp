@@ -186,6 +186,12 @@ extern "C" {
         }
     }
     
+    void nextbus_uninit(void) {
+        for (int i = 0; i < ND_MAX_BOARDS; i++) {
+            remove_board(ND_SLOT(i));
+        }
+    }
+    
     void NextBus_Reset(void) {
         for(int slot = 0; slot < 16; slot++)
             nextbus[slot]->reset();

@@ -542,11 +542,11 @@ bool NextDimension::dbg_cmd(const char* buf) {
     switch(buf[0]) {
         case 'w': {
             FILE* fp = fopen(nd_dump_path, "wb");
-            size_t size  = ConfigureParams.Dimension.board[ND_NUM(slot)].nMemoryBankSize[0];
-            size        += ConfigureParams.Dimension.board[ND_NUM(slot)].nMemoryBankSize[1];
-            size        += ConfigureParams.Dimension.board[ND_NUM(slot)].nMemoryBankSize[2];
-            size        += ConfigureParams.Dimension.board[ND_NUM(slot)].nMemoryBankSize[3];
-            fprintf(stderr, "Writing %" FMT_zu "MB to '%s'...", size, nd_dump_path);
+            int size = ConfigureParams.Dimension.board[ND_NUM(slot)].nMemoryBankSize[0];
+            size    += ConfigureParams.Dimension.board[ND_NUM(slot)].nMemoryBankSize[1];
+            size    += ConfigureParams.Dimension.board[ND_NUM(slot)].nMemoryBankSize[2];
+            size    += ConfigureParams.Dimension.board[ND_NUM(slot)].nMemoryBankSize[3];
+            fprintf(stderr, "Writing %d MB to '%s'...", size, nd_dump_path);
             size <<= 20;
             fwrite(ram, sizeof(uint8_t), size, fp);
             fclose(fp);

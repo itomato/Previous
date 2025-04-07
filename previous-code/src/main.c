@@ -27,6 +27,7 @@ const char Main_fileid[] = "Previous main.c";
 #include "sdlgui.h"
 #include "shortcut.h"
 #include "snd.h"
+#include "ethernet.h"
 #include "statusbar.h"
 #include "str.h"
 #include "video.h"
@@ -870,6 +871,7 @@ static void Main_UnInit(void) {
 	SDL_WaitThread(nextThread, &d);
 	SDL_DestroySemaphore(pauseFlag);
 #endif
+	Ethernet_UnInit();
 	IoMem_UnInit();
 	SDLGui_UnInit();
 	Screen_UnInit();

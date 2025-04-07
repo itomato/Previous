@@ -117,6 +117,7 @@ static void int_0(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
  *   mnemonic %fs1,%fs2,%fd  */
 static void flop_12d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 {
+	char newname[256];
 	const char *const suffix[4] = { "ss", "sd", "ds", "dd" };
 	const char *prefix_d, *prefix_p;
 	prefix_p = (insn & 0x400) ? "p" : "";
@@ -130,7 +131,6 @@ static void flop_12d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 		int is_pfam = insn & 0x400;
 		if (!is_pfam)
 		{
-			char newname[256];
 			char *op = mnemonic;
 			char *np = newname + 1;
 			newname[0] = 'm';
