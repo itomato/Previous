@@ -30,7 +30,7 @@
 
 static int proc_getport(struct rpc_t* rpc) {
     uint32_t port;
-    struct rpc_prog_t* prog = rpc_prog_list;
+    struct rpc_prog_t* prog = rpc->prog_list;
     
     struct xdr_t* m_in  = rpc->m_in;
     struct xdr_t* m_out = rpc->m_out;
@@ -59,7 +59,7 @@ static int proc_getport(struct rpc_t* rpc) {
 }
 
 static int proc_dump(struct rpc_t* rpc) {
-    struct rpc_prog_t* prog = rpc_prog_list;
+    struct rpc_prog_t* prog = rpc->prog_list;
 
     struct xdr_t* m_out = rpc->m_out;
     
@@ -83,7 +83,7 @@ static int proc_callit(struct rpc_t* rpc) {
     int result;
     int before;
     uint8_t* size_ptr;
-    struct rpc_prog_t* prog = rpc_prog_list;
+    struct rpc_prog_t* prog = rpc->prog_list;
     
     struct xdr_t* m_in  = rpc->m_in;
     struct xdr_t* m_out = rpc->m_out;

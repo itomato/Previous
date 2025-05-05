@@ -22,8 +22,6 @@
  * THE SOFTWARE.
  */
 #include <slirp.h>
-#include <unistd.h>
-#include "ctl.h"
 
 #define    JAN_1970    2208988800
 
@@ -75,8 +73,8 @@ static void ntp_reply(struct ntp_t *np)
     rnp->drift[0] = htons(0x0000);
     rnp->drift[1] = htons(0x0008);
 
-    rnp->reftime[0] = htonl(ntohl(rnp->rec[0])-4); /* 4 seconds and some  */
-    rnp->reftime[1] = ~(rnp->rec[0]^rnp->rec[1]);  /* random fraction ago */
+    rnp->reftime[0] = htonl(ntohl(now[0])-4); /* 4 seconds and some  */
+    rnp->reftime[1] = ~(now[1]^rnp->xmt[1]);  /* random fraction ago */
 
     rnp->org[0] = np->xmt[0];
     rnp->org[1] = np->xmt[1];
@@ -98,7 +96,7 @@ void ntp_input(struct mbuf *m)
 {
     struct ntp_t *np = mtod(m, struct ntp_t *);
 
-    if (np->ip.ip_dst.s_addr == htonl(CTL_NET | CTL_NFSD) && ((np->status>>3)&7) == NTP_VERSION) {
+    if (np->ip.ip_dst.s_addr == alias_addr.s_addr && ((np->status>>3)&7) == NTP_VERSION) {
         ntp_reply(np);
     }
 }

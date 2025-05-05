@@ -871,6 +871,7 @@ static void Main_UnInit(void) {
 	SDL_WaitThread(nextThread, &d);
 	SDL_DestroySemaphore(pauseFlag);
 #endif
+	Sound_Pause(true);
 	Ethernet_UnInit();
 	IoMem_UnInit();
 	SDLGui_UnInit();

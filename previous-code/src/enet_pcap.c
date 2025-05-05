@@ -108,6 +108,10 @@ void enet_pcap_stop(void) {
         pcap_started=0;
         host_thread_wait(pcap_tick_func_handle);
         host_mutex_destroy(pcap_mutex);
+        while (QueuePeek(pcapq)>0) {
+            Log_Printf(LOG_WARN, "Flushing PCAP queue");
+            free(QueueDelete(pcapq));
+        }
         QueueDestroy(pcapq);
         pcap_close(pcap_handle);
     }

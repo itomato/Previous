@@ -78,20 +78,20 @@ static void host_report_limits(void) {
     cycleCounterLimit /= cycleDivisor;
     cycleCounterLimit /= DAY_TO_US;
     
-    Log_Printf(LOG_WARN, "[Hosttime] Cycle counter value: %lld", nCyclesMainCounter);
-    Log_Printf(LOG_WARN, "[Hosttime] Cycle counter frequency: %lld MHz", cycleDivisor);
-    Log_Printf(LOG_WARN, "[Hosttime] Cycle timer will overflow in %lld days", cycleCounterLimit);
+    Log_Printf(LOG_WARN, "[Hosttime] Cycle counter value: %"PRId64, nCyclesMainCounter);
+    Log_Printf(LOG_WARN, "[Hosttime] Cycle counter frequency: %"PRId64" MHz", cycleDivisor);
+    Log_Printf(LOG_WARN, "[Hosttime] Cycle timer will overflow in %"PRIu64" days", cycleCounterLimit);
     
     perfCounter        = SDL_GetPerformanceCounter();
     perfCounterLimit   = UINT64_MAX - perfCounter;
-    Log_Printf(LOG_WARN, "[Hosttime] Realtime counter value: %lld", perfCounter);
+    Log_Printf(LOG_WARN, "[Hosttime] Realtime counter value: %"PRIu64, perfCounter);
     if (perfCounterFreqInt) {
         perfCounterLimit /= perfDivisor;
         if (perfCounterLimit > INT64_MAX)
             perfCounterLimit = INT64_MAX;
         perfCounterLimit /= DAY_TO_US;
-        Log_Printf(LOG_WARN, "[Hosttime] Realtime counter frequency: %lld MHz", perfDivisor);
-        Log_Printf(LOG_WARN, "[Hosttime] Realtime timer will overflow in %lld days", perfCounterLimit);
+        Log_Printf(LOG_WARN, "[Hosttime] Realtime counter frequency: %"PRIu64" MHz", perfDivisor);
+        Log_Printf(LOG_WARN, "[Hosttime] Realtime timer will overflow in %"PRIu64" days", perfCounterLimit);
     } else {
         if (perfCounterLimit > (1ULL<<DBL_MANT_DIG)-1)
             perfCounterLimit = (1ULL<<DBL_MANT_DIG)-1;
@@ -101,7 +101,7 @@ static void host_report_limits(void) {
             Log_Printf(LOG_WARN, "[Hosttime] Warning: Realtime counter cannot resolve microseconds.");
         perfCounterLimit /= DAY_TO_US;
         Log_Printf(LOG_WARN, "[Hosttime] Realtime counter frequency: %f MHz", 1.0/perfMultiplicator);
-        Log_Printf(LOG_WARN, "[Hosttime] Realtime timer will start losing precision in %lld days", perfCounterLimit);
+        Log_Printf(LOG_WARN, "[Hosttime] Realtime timer will start losing precision in %"PRIu64" days", perfCounterLimit);
     }
 }
 
@@ -375,10 +375,10 @@ int host_num_cpus(void) {
     return SDL_GetCPUCount();
 }
 
-static uint64_t lastVT;
-static char report[512];
-
 const char* host_report(uint64_t realTime, uint64_t hostTime) {
+    static uint64_t lastVT;
+    static char report[512];
+    
     int    nBlank    = 0;
     char*  r         = report;
     double dVT       = hostTime - lastVT;
@@ -387,14 +387,14 @@ const char* host_report(uint64_t realTime, uint64_t hostTime) {
     dVT       /= 1000000.0;
     hardClock /= hardClockActual == 0 ? 1 : hardClockActual;
     
-    r += sprintf(r, "[%s] hostTime:%llu hardClock:%.3fMHz", enableRealtime ? "Variable" : "CycleTime", hostTime, hardClock);
-
+    r += sprintf(r, "[%s] hostTime:%"PRIu64" hardClock:%.3fMHz", enableRealtime ? "Variable" : "CycleTime", hostTime, hardClock);
+    
     for(int i = NUM_BLANKS; --i >= 0;) {
         nBlank = host_reset_blank_counter(i);
         r += sprintf(r, " %s:%.1fHz", BLANKS[i], (double)nBlank/dVT);
     }
     
     lastVT = hostTime;
-
+    
     return report;
 }

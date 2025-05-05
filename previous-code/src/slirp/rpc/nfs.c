@@ -212,15 +212,15 @@ static int write_fattr(struct ft_t* ft, struct xdr_t* m_out, const struct path_t
     }
     
     xdr_write_long(m_out, type);
-    xdr_write_long(m_out, fstat.st_mode & 0xFFFF);
-    xdr_write_long(m_out, fstat.st_nlink);
-    xdr_write_long(m_out, fstat.st_uid);
-    xdr_write_long(m_out, fstat.st_gid);
+    xdr_write_long(m_out, (uint32_t)(fstat.st_mode & 0xFFFF));
+    xdr_write_long(m_out, (uint32_t)(fstat.st_nlink));
+    xdr_write_long(m_out, (uint32_t)(fstat.st_uid));
+    xdr_write_long(m_out, (uint32_t)(fstat.st_gid));
     xdr_write_long(m_out, (uint32_t)(fstat.st_size));
-    xdr_write_long(m_out, fstat.st_blksize);
-    xdr_write_long(m_out, fstat.st_rdev);
+    xdr_write_long(m_out, (uint32_t)(fstat.st_blksize));
+    xdr_write_long(m_out, (uint32_t)(fstat.st_rdev));
     xdr_write_long(m_out, (uint32_t)(fstat.st_blocks));
-    xdr_write_long(m_out, fstat.st_dev); /* fsid */
+    xdr_write_long(m_out, (uint32_t)(fstat.st_dev)); /* fsid */
     xdr_write_long(m_out, vfs_file_id(fstat.st_ino));
     xdr_write_long(m_out, (uint32_t)(fstat.st_atimespec.tv_sec));
     xdr_write_long(m_out, (uint32_t)(fstat.st_atimespec.tv_nsec / 1000));

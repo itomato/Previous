@@ -175,8 +175,8 @@ void Dialog_CheckFiles(void) {
 	}
 	
 	/* Check if NFS shared direcory and printer output directory exist. */
-	while (!bQuitProgram && !File_DirExists(ConfigureParams.Ethernet.szNFSroot)) {
-		DlgMissing_Dir("NFS shared", ConfigureParams.Ethernet.szNFSroot, Paths_GetUserHome());
+	while (!bQuitProgram && !File_DirExists(ConfigureParams.Ethernet.nfs[0].szPathName)) {
+		DlgMissing_Dir("NFS shared", ConfigureParams.Ethernet.nfs[0].szPathName, Paths_GetUserHome());
 	}
 	while (!bQuitProgram && !File_DirExists(ConfigureParams.Printer.szPrintToFileName)) {
 		DlgMissing_Dir("Printer output", ConfigureParams.Printer.szPrintToFileName, Paths_GetUserHome());

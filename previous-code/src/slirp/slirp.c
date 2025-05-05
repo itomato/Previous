@@ -1,6 +1,6 @@
 #include "configuration.h"
 #include "slirp.h"
-#include "nfs/nfsd.h"
+#include "rpc/rpc.h"
 
 /* host address */
 struct in_addr our_addr;
@@ -575,7 +575,7 @@ static void arp_input(const uint8_t *pkt, int pkt_len)
     switch(ar_op) {
     case ARPOP_REQUEST:
         if (!memcmp(ah->ar_tip, &special_addr, 3)) {
-            if (ah->ar_tip[3] == CTL_DNS || ah->ar_tip[3] == CTL_ALIAS || ah->ar_tip[3] == CTL_NFSD) 
+            if (ah->ar_tip[3] == CTL_DNS || ah->ar_tip[3] == CTL_ALIAS || rpc_match_arp(ah->ar_tip[3])) 
                 goto arp_ok;
             for (ex_ptr = exec_list; ex_ptr; ex_ptr = ex_ptr->ex_next) {
                 if (ex_ptr->ex_addr == ah->ar_tip[3])

@@ -35,16 +35,22 @@ typedef void recv_data_t;
 #endif
 
 
-static int ThreadProc(void *lpParameter)
-{
-    struct csocket_t *cs;
-    
-    cs = (struct csocket_t*)lpParameter;
-    csocket_run(cs);
+void sock_close(sock_t socket) {
+#ifdef _WIN32
+    shutdown(socket, SD_BOTH);
+    closesocket(socket);
+#else
+    shutdown(socket, SHUT_RDWR);
+    close(socket);
+#endif
+}
+
+static int ThreadProc(void *lpParameter) {
+    csocket_run((struct csocket_t*)lpParameter);
     return 0;
 }
 
-struct csocket_t* csocket_init(int nType, int serverPort) {
+struct csocket_t* csocket_init(int nType, int serverPort, void* server) {
     struct csocket_t* cs = (struct csocket_t*)malloc(sizeof(struct csocket_t));
     cs->m_nType  = nType;
     cs->m_Socket = INVALID_SOCKET;
@@ -52,6 +58,7 @@ struct csocket_t* csocket_init(int nType, int serverPort) {
     cs->m_nActive = 0;
     cs->m_hThread = NULL;
     cs->m_serverPort = serverPort;
+    cs->m_pServer = server;
     memset(&cs->m_RemoteAddr, 0, sizeof(cs->m_RemoteAddr));
     cs->m_Input  = xdr_init();
     cs->m_Output = xdr_init();
@@ -73,8 +80,7 @@ void csocket_open(struct csocket_t* cs, sock_t socket, socket_listener_t* pListe
     cs->m_pListener = pListener;
     if (pRemoteAddr != NULL)
         cs->m_RemoteAddr = *pRemoteAddr;
-    if (cs->m_Socket != INVALID_SOCKET)
-    {
+    if (cs->m_Socket != INVALID_SOCKET) {
         cs->m_nActive = 1;
         cs->m_hThread = host_thread_create(ThreadProc, "CSocket", (void*)cs);
     }
@@ -82,7 +88,7 @@ void csocket_open(struct csocket_t* cs, sock_t socket, socket_listener_t* pListe
 
 void csocket_close(struct csocket_t* cs) {
     if (cs->m_Socket != INVALID_SOCKET) {
-        closesocket(cs->m_Socket);
+        sock_close(cs->m_Socket);
         cs->m_Socket = INVALID_SOCKET;
     }
     if (cs->m_hThread) {
@@ -92,10 +98,11 @@ void csocket_close(struct csocket_t* cs) {
 }
 
 void csocket_send(struct csocket_t* cs) {
+    ssize_t nBytes = 0;
+    
     if (cs->m_Socket == INVALID_SOCKET)
         return;
     
-    ssize_t nBytes = 0;
     if (cs->m_nType == SOCK_STREAM) {
         xdr_write_long_at(cs->m_Output->head, 0x80000000 | cs->m_Output->size); /* output header */
         cs->m_Output->size += 4;

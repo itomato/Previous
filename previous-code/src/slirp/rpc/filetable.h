@@ -3,7 +3,6 @@
 #ifndef _FILETABLE_H_
 #define _FILETABLE_H_
 
-#include "host.h"
 #include "vfs.h"
 
 #define HASH_BITS  8
@@ -17,7 +16,6 @@ struct ft_entry_t {
 };
 
 struct ft_t {
-    mutex_t* mutex;
     struct ft_entry_t* table[HASH_SIZE];
     struct vfs_t* vfs;
 };
@@ -32,7 +30,7 @@ void ft_move(struct ft_t* ft, uint64_t fhandle_from, struct path_t* path_to);
 void ft_remove(struct ft_t* ft, uint64_t fhandle);
 
 int ft_is_inited(struct ft_t* ft);
-int ft_path_changed(struct ft_t* ft, char* host_path);
+int ft_path_changed(struct ft_t* ft, const char* host_path);
 
 struct ft_t* ft_init(const char* host_path, const char* base_path_alias);
 struct ft_t* ft_uninit(struct ft_t* ft);

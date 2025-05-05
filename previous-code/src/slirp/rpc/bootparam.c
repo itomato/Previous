@@ -104,9 +104,9 @@ static int proc_getfile(struct rpc_t* rpc) {
     }
     
     if (strlen(path)) {
-        xdr_write_string(m_out, NAME_NFSD, sizeof(NAME_NFSD));
+        xdr_write_string(m_out, rpc->hostname, MAXNAMELEN);
         xdr_write_long(m_out, IP_ADDR_TYPE);
-        write_in_addr(m_out, ntohl(special_addr.s_addr) | CTL_NFSD);
+        write_in_addr(m_out, rpc->ip_addr);
         xdr_write_string(m_out, path, sizeof(path));
         return RPC_SUCCESS;
     } else {

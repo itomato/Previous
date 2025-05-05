@@ -6,7 +6,6 @@
 */
 const char DlgOpticalDisk_fileid[] = "Previous dlgOpticalDisk.c";
 
-#include <assert.h>
 #include "main.h"
 #include "configuration.h"
 #include "dialog.h"

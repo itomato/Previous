@@ -1,6 +1,6 @@
 
 
-                                  Previous 3.7
+                                  Previous 3.8
 
 
 
@@ -28,10 +28,7 @@ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
-this program; if not, write to the
-  Free Software Foundation, Inc.,
-  51 Franklin Street, Fifth Floor, 
-  Boston, MA 02110-1301, USA
+this program; if not, see <https://www.gnu.org/licenses/>.
 
 
  2) About Previous
@@ -434,6 +431,13 @@ Previous v3.6:
 Previous v3.7:
   > Improves accuracy and reliability of internal NFS and NetInfo server.
   > Fixes bugs that caused memory leaks and orphaned threads on quit.
+
+Previous v3.8:
+  > Adds support for multiple internal NFS servers.
+  > Adds missing MOUNT procedures to make showmount work as expected.
+  > Adds LISTREG procedure to the internal NetInfo server.
+  > Fixes bug that could cause memory leaks when stopping SLIRP thread.
+  > Fixes bug in internal network time server that caused bad reference time. 
 
 
  7) Running Previous

@@ -55,6 +55,7 @@ struct vdns_record_t {
 
 struct vdns_entry_t {
     struct vdns_record_t* rec;
+    uint32_t addr;
     struct vdns_entry_t* next;
 };
 
@@ -63,9 +64,10 @@ static struct vdns_t {
     struct vdns_record_t errNoSuchName;
     mutex_t*             mutex;
     struct udpsocket_t*  udp;
+    uint16_t             local_port;
 } vdns;
 
-static void vdns_add_record(struct vdns_record_t* rec) {
+static void vdns_add_record(struct vdns_record_t* rec, uint32_t addr) {
     struct vdns_entry_t** entry = &vdns.db;
 
     while (*entry) {
@@ -77,12 +79,31 @@ static void vdns_add_record(struct vdns_record_t* rec) {
         printf("[DNS] Duplicate record (%d) %s\n", rec->type, rec->key);
         free((*entry)->rec->key);
         free((*entry)->rec);
-        (*entry)->rec = rec;
+        (*entry)->rec  = rec;
+        (*entry)->addr = addr;
         return;
     }
     *entry = (struct vdns_entry_t*)malloc(sizeof(struct vdns_entry_t));
-    (*entry)->rec = rec;
+    (*entry)->rec  = rec;
+    (*entry)->addr = addr;
     (*entry)->next = NULL;
+}
+
+static void vdns_remove_records(uint32_t addr) {
+    struct vdns_entry_t** entry = &vdns.db;
+    struct vdns_entry_t* next = NULL;
+
+    while (*entry) {
+        if ((*entry)->addr == addr) {
+            next = (*entry)->next;
+            free((*entry)->rec->key);
+            free((*entry)->rec);
+            free(*entry);
+            *entry = next;
+        } else {
+            entry = &(*entry)->next;
+        }
+    }
 }
 
 static struct vdns_record_t* vdns_find_record(char* key, vdns_rec_type type) {
@@ -163,7 +184,7 @@ static void addRecord(uint32_t addr, const char* name) {
     rec->key    = alloc_ip_addr_str(addr, ".");
     rec->size = 4;
     memcpy(rec->data, &inaddr, rec->size);
-    vdns_add_record(rec);
+    vdns_add_record(rec, addr);
     
     rec = (struct vdns_record_t*)malloc(sizeof(struct vdns_record_t));
     rec->type   = REC_A;
@@ -172,14 +193,14 @@ static void addRecord(uint32_t addr, const char* name) {
     inaddr = htonl(addr);
     rec->size = 4;
     memcpy(rec->data, &inaddr, rec->size);
-    vdns_add_record(rec);
+    vdns_add_record(rec, addr);
     
     rec = (struct vdns_record_t*)malloc(sizeof(struct vdns_record_t));
     rec->type   = REC_PTR;
     rec->inaddr = addr;
     rec->key    = alloc_ip_addr_str(swap_uint32(addr), ".in-addr.arpa.");
     rec->size   = domain_name(rec->data , name);
-    vdns_add_record(rec);
+    vdns_add_record(rec, addr);
 }
 
 static vdns_rec_type to_dot(char* dst, const uint8_t* src, size_t size) {
@@ -350,62 +371,62 @@ static void vdns_input(struct csocket_t* pSocket) {
 
 
 void vdns_init(void) {
-    uint32_t port;
+    if (vdns.local_port) return;
     vdns.mutex = host_mutex_create();
-    vdns.udp   = udpsocket_init(vdns_input);
+    vdns.udp   = udpsocket_init(vdns_input, NULL);
     if (vdns.udp) {
-        port = udpsocket_open(vdns.udp, PORT_DNS);
-        if (port) {
-            printf("[DNS] started (UDP: %d -> %d).\n", port, udpsocket_toLocalPort(port));
+        vdns.local_port = udpsocket_open(vdns.udp, PORT_DNS);
+        if (vdns.local_port) {
+            printf("[DNS] started (UDP: %d -> %d).\n", PORT_DNS, vdns.local_port);
         } else {
             printf("[DNS] start failed.\n");
-            udpsocket_close(vdns.udp);
-            vdns.udp = udpsocket_uninit(vdns.udp);
+            vdns_uninit();
         }
     } else {
-        printf("[DNS] Socket initialisation failed.");
+        printf("[DNS] Socket initialisation failed.\n");
+        host_mutex_destroy(vdns.mutex);
     }
-#if 0
-    vector<NetInfoNode*> machines = netInfoBind->m_Network.mRoot.find("name", "machines")[0]->mChildren;
-    string domain(NAME_DOMAIN);
-    for(size_t i = 0; i < machines.size(); i++) {
-        string name = machines[i]->getPropValue("name");
-        if(name.size() <= domain.size() || name.compare(name.size() - domain.size(), domain.size(), domain))
-            name += domain;
-        string ip   = machines[i]->getPropValues(machines[i]->mProps, "ip_address")[0];
-        in_addr addr;
-#ifdef _WIN32
-        inet_pton(AF_INET, ip.c_str(), &addr);
-#else
-        inet_aton(ip.c_str(), &addr);
-#endif
-        addRecord(ntohl(addr.s_addr), name);
-    }
-#else
-    {
+
+    if (vdns.local_port) {
         char hostname[NAME_HOST_MAX];
-        memset(hostname, 0, sizeof(hostname));
         gethostname(hostname, sizeof(hostname));
-        strcat(hostname, NAME_DOMAIN);
+        hostname[NAME_HOST_MAX-1] = '\0';
+        vfscat(hostname, NAME_DOMAIN, sizeof(hostname));
         
+        printf("[DNS] Creating database.\n");
+        
+        addRecord(0x7F000001,        "localhost");
         addRecord(CTL_NET|CTL_ALIAS, hostname);
         addRecord(CTL_NET|CTL_HOST,  FQDN_HOST);
         addRecord(CTL_NET|CTL_DNS,   FQDN_DNS);
-        addRecord(CTL_NET|CTL_NFSD,  FQDN_NFSD);
     }
-#endif
-    addRecord(0x7F000001, "localhost");
 }
 
 void vdns_uninit(void) {
     if (vdns.udp) {
+        vdns.local_port = 0;
         udpsocket_close(vdns.udp);
         vdns.udp = udpsocket_uninit(vdns.udp);
         host_mutex_destroy(vdns.mutex);
     }
+    printf("[DNS] Deleting database.\n");
     vdns_delete_db();
 }
 
+void vdns_add_rec(const char* name, uint32_t addr) {
+    char hostname[NAME_HOST_MAX];
+    printf("[DNS] Adding record for %d.%d.%d.%d: '%s'.\n", (addr>>24)&0xff, 
+           (addr>>16)&0xff, (addr>>8)&0xff, addr&0xff, name);
+    vfscpy(hostname, name, sizeof(hostname));
+    vfscat(hostname, NAME_DOMAIN, sizeof(hostname));
+    addRecord(addr, hostname);
+}
+
+void vdns_remove_rec(uint32_t addr) {
+    printf("[DNS] Removing record for %d.%d.%d.%d.\n", (addr>>24)&0xff, 
+           (addr>>16)&0xff, (addr>>8)&0xff, addr&0xff);
+    vdns_remove_records(addr);
+}
 
 int vdns_match(struct mbuf *m, uint32_t addr, int dport) {
     if(m->m_len > 40 &&
@@ -420,10 +441,17 @@ void vdns_udp_map_to_local_port(struct in_addr* ipNBO, uint16_t* dportNBO) {
     switch(ntohs(*dportNBO)) {
         case PORT_DNS:
             /* map port and address for virtual DNS */
-            *dportNBO = htons(udpsocket_toLocalPort(PORT_DNS));
+            *dportNBO = htons(vdns.local_port);
             *ipNBO    = loopback_addr;
             break;
         default:
             break;
+    }
+}
+
+void vdns_udp_map_from_local_port(uint16_t port, struct in_addr* saddrNBO, uint16_t* sin_portNBO) {
+    if (port == vdns.local_port) {
+        *sin_portNBO = htons(PORT_DNS);
+        saddrNBO->s_addr = special_addr.s_addr | htonl(CTL_DNS);
     }
 }

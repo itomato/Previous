@@ -18,6 +18,6 @@
 
 int mount_prog(struct rpc_t* rpc);
 
-void mount_uninit(void);
+void mount_uninit(struct rpc_t* rpc);
 
 #endif /* _MOUNT_H_ */

@@ -114,7 +114,6 @@ struct ft_t* ft_init(const char* host_path, const char* vfs_path_alias) {
             for (i = 0; i < HASH_SIZE; i++) {
                 ft->table[i] = NULL;
             }
-            ft->mutex = host_mutex_create();
             ft->vfs = vfs;
         } else {
             vfs_uninit(vfs);
@@ -129,7 +128,6 @@ struct ft_t* ft_uninit(struct ft_t* ft) {
         for (i = 0; i < HASH_SIZE; i++) {
             ft_delete(ft, i);
         }
-        host_mutex_destroy(ft->mutex);
         ft->vfs = vfs_uninit(ft->vfs);
         free(ft);
     }
@@ -143,7 +141,7 @@ int ft_is_inited(struct ft_t* ft) {
     return 0;
 }
 
-int ft_path_changed(struct ft_t* ft, char* host_path) {
+int ft_path_changed(struct ft_t* ft, const char* host_path) {
     if (strcmp(ft->vfs->host_base_path, host_path)) {
         return 1;
     }
@@ -152,29 +150,19 @@ int ft_path_changed(struct ft_t* ft, char* host_path) {
 
 int ft_get_canonical_path(struct ft_t* ft, uint64_t fhandle, char* vfs_path) {
     char* result;
-    int retval = 0;
-    host_mutex_lock(ft->mutex);
     
     result = ft_find(ft, fhandle);
     if (result == NULL) {
         strcpy(vfs_path, "");
-        retval = 0;
+        return 0;
     } else {
         vfscpy(vfs_path, result, MAXPATHLEN);
-        retval = 1;
+        return 1;
     }
-    host_mutex_unlock(ft->mutex);
-    return retval;
 }
 
 int ft_stat(struct ft_t* ft, const struct path_t* path, struct stat* fstat) {
-    int retval = 0;
-    host_mutex_lock(ft->mutex);
-    
-    retval = vfs_get_fstat(ft->vfs, path, fstat);
-    
-    host_mutex_unlock(ft->mutex);
-    return retval;
+    return vfs_get_fstat(ft->vfs, path, fstat);
 }
 
 void ft_move(struct ft_t* ft, uint64_t fhandle_from, struct path_t* path_to) {
@@ -183,20 +171,12 @@ void ft_move(struct ft_t* ft, uint64_t fhandle_from, struct path_t* path_to) {
     vfscpy(vfs_path, path_to->vfs, sizeof(vfs_path));
     vfs_path_canonicalize(vfs_path);
     
-    host_mutex_lock(ft->mutex);
-    
     ft_erase(ft, fhandle_from);
     ft_add(ft, vfs_get_fhandle(path_to), vfs_path);
-    
-    host_mutex_unlock(ft->mutex);
 }
 
 void ft_remove(struct ft_t* ft, uint64_t fhandle) {
-    host_mutex_lock(ft->mutex);
-    
     ft_erase(ft, fhandle);
-    
-    host_mutex_unlock(ft->mutex);
 }
 
 uint64_t ft_get_fhandle(struct ft_t* ft, const struct path_t* path) {
@@ -205,28 +185,17 @@ uint64_t ft_get_fhandle(struct ft_t* ft, const struct path_t* path) {
     
     vfscpy(vfs_path, path->vfs, sizeof(vfs_path));
     vfs_path_canonicalize(vfs_path);
-
-    host_mutex_lock(ft->mutex);
     
     fhandle = vfs_get_fhandle(path);
     ft_add(ft, fhandle, vfs_path);
     
-    host_mutex_unlock(ft->mutex);
     return fhandle;
 }
 
 void ft_set_sattr(struct ft_t* ft, struct path_t* path, struct sattr_t* sattr) {
-    host_mutex_lock(ft->mutex);
-    
     vfs_set_sattr(ft->vfs, path, sattr);
-    
-    host_mutex_unlock(ft->mutex);
 }
 
 void ft_get_sattr(struct ft_t* ft, struct path_t* path, struct sattr_t* sattr) {
-    host_mutex_lock(ft->mutex);
-    
     vfs_get_sattr(ft->vfs, path, sattr);
-    
-    host_mutex_unlock(ft->mutex);
 }

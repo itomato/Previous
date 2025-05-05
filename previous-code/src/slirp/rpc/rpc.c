@@ -25,6 +25,7 @@
 #include <slirp.h>
 #include <stdlib.h>
 
+#include "host.h"
 #include "rpc.h"
 #include "portmap.h"
 #include "mount.h"
@@ -41,22 +42,16 @@
 
 #define DBG 0
 
-struct ft_t* nfsd_fts[1];
-
-struct rpc_prog_t* rpc_prog_list;
-
 const struct rpc_prog_t rpc_prog_table_template[] = 
 {
-    { BOOTPARAMPROG, BOOTPARAMVERS, IPPROTO_UDP, 0,        bootparam_prog, 1, "BOOTPARAM"  , NULL, NULL, NULL },
-    { BOOTPARAMPROG, BOOTPARAMVERS, IPPROTO_TCP, 0,        bootparam_prog, 1, "BOOTPARAM"  , NULL, NULL, NULL },
-    { MOUNTPROG,     MOUNTVERS,     IPPROTO_UDP, 0,        mount_prog,     1, "MOUNT"      , NULL, NULL, NULL },
-    { MOUNTPROG,     MOUNTVERS,     IPPROTO_TCP, 0,        mount_prog,     1, "MOUNT"      , NULL, NULL, NULL },
-    { PORTMAPPROG,   PORTMAPVERS,   IPPROTO_UDP, PORT_RPC, portmap_prog,   1, "PORTMAP"    , NULL, NULL, NULL },
-    { PORTMAPPROG,   PORTMAPVERS,   IPPROTO_TCP, PORT_RPC, portmap_prog,   1, "PORTMAP"    , NULL, NULL, NULL },
-    { NFSPROG,       NFSVERS,       IPPROTO_UDP, PORT_NFS, nfs_prog,       1, "NFS"        , NULL, NULL, NULL },
-    { NFSPROG,       NFSVERS,       IPPROTO_TCP, PORT_NFS, nfs_prog,       1, "NFS"        , NULL, NULL, NULL },
-    { NIBINDPROG,    NIBINDVERS,    IPPROTO_UDP, 0,        nibind_prog,    1, "NETINFOBIND", NULL, NULL, NULL },
-    { NIBINDPROG,    NIBINDVERS,    IPPROTO_TCP, 0,        nibind_prog,    1, "NETINFOBIND", NULL, NULL, NULL }
+    { PORTMAPPROG,   PORTMAPVERS,   IPPROTO_UDP, PORT_RPC, portmap_prog,   1, "PORTMAP"    , NULL, NULL },
+    { PORTMAPPROG,   PORTMAPVERS,   IPPROTO_TCP, PORT_RPC, portmap_prog,   1, "PORTMAP"    , NULL, NULL },
+    { BOOTPARAMPROG, BOOTPARAMVERS, IPPROTO_UDP, 0,        bootparam_prog, 1, "BOOTPARAM"  , NULL, NULL },
+    { MOUNTPROG,     MOUNTVERS,     IPPROTO_UDP, 0,        mount_prog,     1, "MOUNT"      , NULL, NULL },
+    { NFSPROG,       NFSVERS,       IPPROTO_UDP, PORT_NFS, nfs_prog,       1, "NFS"        , NULL, NULL },
+    { NFSPROG,       NFSVERS,       IPPROTO_TCP, PORT_NFS, nfs_prog,       1, "NFS"        , NULL, NULL },
+    { NIBINDPROG,    NIBINDVERS,    IPPROTO_UDP, 0,        nibind_prog,    1, "NETINFOBIND", NULL, NULL },
+    { NIBINDPROG,    NIBINDVERS,    IPPROTO_TCP, 0,        nibind_prog,    1, "NETINFOBIND", NULL, NULL },
 };
 
 
@@ -76,7 +71,6 @@ int rpc_match_prog(struct rpc_t* rpc, struct rpc_prog_t* prog) {
     if (prog->prog == rpc->prog && prog->prot == rpc->prot) {
         rpc->name = prog->name;
         rpc->log  = prog->log;
-        rpc->ft   = prog->ft;
         if (prog->vers == 0 || prog->vers == rpc->vers) {
             return 1;
         }
@@ -85,16 +79,16 @@ int rpc_match_prog(struct rpc_t* rpc, struct rpc_prog_t* prog) {
     return 0;
 }
 
-static int rpc_call(struct csocket_t* cs, struct rpc_t* rpc) {
+static int rpc_call(struct rpc_t* rpc) {
     int result, mismatch;
-    struct rpc_prog_t* prog = rpc_prog_list;
+    struct rpc_prog_t* prog = rpc->prog_list;
     
     mismatch  = 0;
     rpc->low = ~0;
     rpc->high = 0;
     
     while (prog) {
-        if (prog->port == cs->m_serverPort) {
+        if (prog->port == rpc->port) {
             result = rpc_match_prog(rpc, prog);
             if (result > 0) {
                 rpc_set_cred(rpc);
@@ -135,8 +129,7 @@ static void rpc_read_auth_unix(struct rpc_t* rpc, struct auth_unix_t* auth) {
     auth->gid  = xdr_read_long(m_in);
     auth->len  = xdr_read_long(m_in);
     len -= auth->len * 4;
-    if (auth->len > NUM_GROUPS) auth->len = NUM_GROUPS;
-    for (i = 0; i < auth->len; i++) {
+    for (i = 0; i < auth->len && i < NUM_GROUPS; i++) {
         auth->gids[i] = xdr_read_long(m_in);
     }
 #if DBG
@@ -158,7 +151,6 @@ static void rpc_read_auth_unix(struct rpc_t* rpc, struct auth_unix_t* auth) {
 }
 
 static void rpc_input(struct csocket_t* cs) {
-    struct rpc_t rpc;
     struct auth_unix_t auth_unix;
     uint32_t status;
     uint8_t* status_ptr;
@@ -166,12 +158,14 @@ static void rpc_input(struct csocket_t* cs) {
     struct xdr_t* m_in;
     struct xdr_t* m_out;
     
-    m_in  = rpc.m_in  = cs->m_Input;
-    m_out = rpc.m_out = cs->m_Output;
+    struct rpc_t* rpc = (struct rpc_t*)cs->m_pServer;
     
-    rpc.port        = cs->m_serverPort;
-    rpc.prot        = (cs->m_nType == SOCK_STREAM) ? IPPROTO_TCP : IPPROTO_UDP;
-    rpc.remote_addr = cs->m_RemoteAddr.sin_addr;
+    host_mutex_lock(rpc->lock);
+    
+    rpc->m_in  = m_in  = cs->m_Input;
+    rpc->m_out = m_out = cs->m_Output;
+    rpc->port  = cs->m_serverPort;
+    rpc->prot  = (cs->m_nType == SOCK_STREAM) ? IPPROTO_TCP : IPPROTO_UDP;
     
 #if DBG
     printf("RPC LEN = %d, DATA:\n", m_in->size);
@@ -181,86 +175,85 @@ static void rpc_input(struct csocket_t* cs) {
     printf("\n");
 #endif
     
-    rpc.xid = xdr_read_long(m_in);
-    rpc.msg = xdr_read_long(m_in);
-    if (rpc.msg == RPC_CALL) {
-        xdr_write_long(m_out, rpc.xid);
+    rpc->xid = xdr_read_long(m_in);
+    rpc->msg = xdr_read_long(m_in);
+    if (rpc->msg == RPC_CALL) {
+        xdr_write_long(m_out, rpc->xid);
         xdr_write_long(m_out, RPC_REPLY); /* Message type */
-    } else {
-        printf("[RPC] %s received\n", rpc.msg == RPC_REPLY ? "Reply" : "Unknown message");
-        return;
-    }
-    rpc.rpcvers = xdr_read_long(m_in);
-    if (rpc.rpcvers == RPCVERS) {
-        rpc.prog = xdr_read_long(m_in);
-        rpc.vers = xdr_read_long(m_in);
-        rpc.proc = xdr_read_long(m_in);
-        rpc.auth.flavor = xdr_read_long(m_in);
-        rpc.auth.length = xdr_read_long(m_in);
+        rpc->rpcvers = xdr_read_long(m_in);
+        if (rpc->rpcvers == RPCVERS) {
+            rpc->prog = xdr_read_long(m_in);
+            rpc->vers = xdr_read_long(m_in);
+            rpc->proc = xdr_read_long(m_in);
+            rpc->auth.flavor = xdr_read_long(m_in);
+            rpc->auth.length = xdr_read_long(m_in);
 #if DBG
-        printf("RPC XID:     %08x\n", rpc.xid);
-        printf("RPC MSG:     %d\n",   rpc.msg);
-        printf("RPC VERSION: %d\n",   rpc.rpcvers);
-        printf("RPC PROG:    %d\n",   rpc.prog);
-        printf("RPC PROGVER: %d\n",   rpc.vers);
-        printf("RPC PROC:    %d\n",   rpc.proc);
-        printf("RPC AUTH:    %d\n",   rpc.auth.flavor);
-        printf("RPC AUTHLEN: %d\n",   rpc.auth.length);
+            printf("RPC XID:     %08x\n", rpc->xid);
+            printf("RPC MSG:     %d\n",   rpc->msg);
+            printf("RPC VERSION: %d\n",   rpc->rpcvers);
+            printf("RPC PROG:    %d\n",   rpc->prog);
+            printf("RPC PROGVER: %d\n",   rpc->vers);
+            printf("RPC PROC:    %d\n",   rpc->proc);
+            printf("RPC AUTH:    %d\n",   rpc->auth.flavor);
+            printf("RPC AUTHLEN: %d\n",   rpc->auth.length);
 #endif
-        if (rpc.auth.flavor == RPC_AUTH_UNIX) {
-            rpc_read_auth_unix(&rpc, &auth_unix);
-        } else {
-            xdr_read_skip(m_in, rpc.auth.length);
-        }
-        rpc.verif.flavor = xdr_read_long(m_in);
-        rpc.verif.length = xdr_read_long(m_in);
-        xdr_read_skip(m_in, rpc.verif.length);
+            if (rpc->auth.flavor == RPC_AUTH_UNIX) {
+                rpc_read_auth_unix(rpc, &auth_unix);
+            } else {
+                xdr_read_skip(m_in, rpc->auth.length);
+            }
+            rpc->verif.flavor = xdr_read_long(m_in);
+            rpc->verif.length = xdr_read_long(m_in);
+            xdr_read_skip(m_in, rpc->verif.length);
 #if DBG
-        printf("RPC VERIF:   %d\n", rpc.verif.flavor);
-        printf("RPC VERLEN:  %d\n", rpc.verif.length);
+            printf("RPC VERIF:   %d\n", rpc->verif.flavor);
+            printf("RPC VERLEN:  %d\n", rpc->verif.length);
 #endif
-        /* RPC Reply */    
-        xdr_write_long(m_out, RPC_MSG_ACCEPTED); /* Message */
-        xdr_write_long(m_out, rpc.verif.flavor);
-        xdr_write_long(m_out, rpc.verif.length);
-        xdr_write_zero(m_out, rpc.verif.length);
-        status_ptr = xdr_get_pointer(m_out);
-        xdr_write_skip(m_out, 4); /* Status will be updated later */
-        
-        status = rpc_call(cs, &rpc);
-        
-        xdr_write_long_at(status_ptr, status); /* Status */
-        
-        if (status == RPC_PROG_MISMATCH) {
-            rpc_log(&rpc, "[RPC] Version mismatch: req %d, min %d, max %d", rpc.vers, rpc.low, rpc.high);
-            xdr_write_long(m_out, rpc.low);
-            xdr_write_long(m_out, rpc.high);
-        } else if (status == RPC_PROG_UNAVAIL) {
-            printf("[RPC:%d:%d] Program not registered\n", rpc.prog, rpc.proc);
-        } else if (status == RPC_GARBAGE_ARGS) {
-            rpc_log(&rpc, "[RPC] Procedure cannot decode input (garbage args)");
-        } else if (status == RPC_PROC_UNAVAIL) {
-            rpc_log(&rpc, "[RPC] Procedure not available");
-        } else if (m_in->size > 0) {
-            rpc_log(&rpc, "[RPC] Unused data in buffer (%d bytes)", m_in->size);
+            /* RPC Reply */    
+            xdr_write_long(m_out, RPC_MSG_ACCEPTED); /* Message */
+            xdr_write_long(m_out, rpc->verif.flavor);
+            xdr_write_long(m_out, rpc->verif.length);
+            xdr_write_zero(m_out, rpc->verif.length);
+            status_ptr = xdr_get_pointer(m_out);
+            xdr_write_skip(m_out, 4); /* Status will be updated later */
+            
+            status = rpc_call(rpc);
+            
+            xdr_write_long_at(status_ptr, status); /* Status */
+            
+            if (status == RPC_PROG_MISMATCH) {
+                rpc_log(rpc, "Version mismatch: req %d, min %d, max %d", rpc->vers, rpc->low, rpc->high);
+                xdr_write_long(m_out, rpc->low);
+                xdr_write_long(m_out, rpc->high);
+            } else if (status == RPC_PROG_UNAVAIL) {
+                printf("[%s:RPC:%d:%d] Program not registered\n", rpc->hostname, rpc->prog, rpc->proc);
+            } else if (status == RPC_GARBAGE_ARGS) {
+                rpc_log(rpc, "Procedure cannot decode input (garbage args)");
+            } else if (status == RPC_PROC_UNAVAIL) {
+                rpc_log(rpc, "Procedure not available");
+            } else if (m_in->size > 0) {
+                rpc_log(rpc, "Unused data in buffer (%d bytes)", m_in->size);
+            }
+        } else { /* RPC version is not 2 */
+            printf("[%s:RPC] Version mismatch (%d)\n", rpc->hostname, rpc->rpcvers);
+            xdr_write_long(m_out, RPC_MSG_DENIED); /* Message */
+            xdr_write_long(m_out, RPC_MISMATCH); /* Status */
+            xdr_write_long(m_out, 2); /* Min version */
+            xdr_write_long(m_out, 2); /* Max version */
         }
-    } else { /* RPC version is not 2 */
-        printf("[RPC] Version mismatch (%d)\n", rpc.rpcvers);
-        xdr_write_long(m_out, RPC_MSG_DENIED); /* Message */
-        xdr_write_long(m_out, RPC_MISMATCH); /* Status */
-        xdr_write_long(m_out, 2); /* Min version */
-        xdr_write_long(m_out, 2); /* Max version */
+#if DBG
+        printf("RPC OUT = %d, DATA:\n", m_out->size);
+        for (int i = 0; i < m_out->size; i++) {
+            printf("%02x ", (m_out->data - m_out->size)[i]);
+        }
+        printf("\n");
+#endif
+        csocket_send(cs);
+    } else { /* Do not reply if message type is not CALL */
+        printf("[%s:RPC] %s received\n", rpc->hostname, rpc->msg == RPC_REPLY ? "Reply" : "Unknown message");
     }
     
-#if DBG
-    printf("RPC OUT = %d, DATA:\n", m_out->size);
-    for (int i = 0; i < m_out->size; i++) {
-        printf("%02x ", (m_out->data - m_out->size)[i]);
-    }
-    printf("\n");
-#endif
-    
-    csocket_send(cs);
+    host_mutex_unlock(rpc->lock);
 }
 
 int proc_null(struct rpc_t* rpc) {
@@ -269,10 +262,50 @@ int proc_null(struct rpc_t* rpc) {
 }
 
 
+static void rpc_udp_port_map(struct rpc_t* rpc, uint16_t src, uint16_t local) {
+    rpc->udp_to_local[src] = local;
+    rpc->udp_from_local[local] = src;
+}
+
+static void rpc_udp_port_unmap(struct rpc_t* rpc, uint16_t src) {
+    uint16_t local = rpc->udp_to_local[src];
+    rpc->udp_to_local[src] = 0;
+    rpc->udp_from_local[local] = 0;
+}
+
+static uint16_t rpc_udp_to_local(struct rpc_t* rpc, uint16_t src) {
+    return rpc ? rpc->udp_to_local[src] : 0;
+}
+
+static uint16_t rpc_udp_from_local(struct rpc_t* rpc, uint16_t local) {
+    return rpc ? rpc->udp_from_local[local] : 0;
+}
+
+static void rpc_tcp_port_map(struct rpc_t* rpc, uint16_t src, uint16_t local) {
+    rpc->tcp_to_local[src] = local;
+    rpc->tcp_from_local[local] = src;
+}
+
+static void rpc_tcp_port_unmap(struct rpc_t* rpc, uint16_t src) {
+    uint16_t local = rpc->tcp_to_local[src];
+    rpc->tcp_to_local[src] = 0;
+    rpc->tcp_from_local[local] = 0;
+}
+
+static uint16_t rpc_tcp_to_local(struct rpc_t* rpc, uint16_t src) {
+    return rpc ? rpc->tcp_to_local[src] : 0;
+}
+
+
 static void print_about(void) {
     static int show = 1;
     
     if (show) {
+        char hostname[NAME_HOST_MAX];
+        gethostname(hostname, sizeof(hostname));
+        hostname[NAME_HOST_MAX-1] = '\0';
+        printf("[NFSD] Starting local NFS daemon on '%s':\n", hostname);
+        
         printf("[NFSD] Network File System server\n");
         printf("[NFSD] Copyright (C) 2005 Ming-Yang Kao\n");
         printf("[NFSD] Edited in 2011 by ZeWaren\n");
@@ -285,8 +318,9 @@ static void print_about(void) {
     show = 0;
 }
 
-void rpc_add_program(struct rpc_prog_t* prog) {
-    struct rpc_prog_t** entry = &rpc_prog_list;
+void rpc_add_program(struct rpc_t* rpc, struct rpc_prog_t* prog) {
+    uint16_t local_port = 0;
+    struct rpc_prog_t** entry = &rpc->prog_list;
     
     while (*entry) {
         entry = &(*entry)->next;
@@ -296,12 +330,20 @@ void rpc_add_program(struct rpc_prog_t* prog) {
     (*entry)->next = NULL;
     
     if (prog->prot == IPPROTO_TCP) {
-        prog->sock = tcpsocket_init(rpc_input);
+        prog->sock = tcpsocket_init(rpc_input, rpc);
         if (prog->sock) {
-            prog->port = tcpsocket_open(prog->sock, prog->port);
-            if (prog->port) {
-                printf("[RPC] %s daemon started (TCP: %d -> %d).\n", prog->name, prog->port, 
-                       tcpsocket_toLocalPort(prog->port));
+            local_port = rpc_tcp_to_local(rpc, prog->port);
+            if (local_port) {
+                printf("[RPC] %s daemon stopping (TCP: %d -> %d).\n", prog->name, prog->port, local_port);
+                rpc_tcp_port_unmap(rpc, prog->port);
+            }
+            local_port = tcpsocket_open(prog->sock, prog->port);
+            if (local_port) {
+                if (prog->port == 0) {
+                    prog->port = local_port;
+                }
+                rpc_tcp_port_map(rpc, prog->port, local_port);
+                printf("[RPC] %s daemon started (TCP: %d -> %d).\n", prog->name, prog->port, local_port);
             } else {
                 printf("[RPC] %s daemon start failed.\n", prog->name);
                 tcpsocket_close(prog->sock);
@@ -311,12 +353,20 @@ void rpc_add_program(struct rpc_prog_t* prog) {
             printf("[RPC] Socket initialisation failed.");
         }
     } else {
-        prog->sock = udpsocket_init(rpc_input);
+        prog->sock = udpsocket_init(rpc_input, rpc);
         if (prog->sock) {
-            prog->port = udpsocket_open(prog->sock, prog->port);
-            if (prog->port) {
-                printf("[RPC] %s daemon started (UDP: %d -> %d).\n", prog->name, prog->port, 
-                       udpsocket_toLocalPort(prog->port));
+            local_port = rpc_udp_to_local(rpc, prog->port);
+            if (local_port) {
+                printf("[RPC] %s daemon stopping (UDP: %d -> %d).\n", prog->name, prog->port, local_port);
+                rpc_udp_port_unmap(rpc, prog->port);
+            }
+            local_port = udpsocket_open(prog->sock, prog->port);
+            if (local_port) {
+                if (prog->port == 0) {
+                    prog->port = local_port;
+                }
+                rpc_udp_port_map(rpc, prog->port, local_port);
+                printf("[RPC] %s daemon started (UDP: %d -> %d).\n", prog->name, prog->port, local_port);
             } else {
                 printf("[RPC] %s daemon start failed.\n", prog->name);
                 udpsocket_close(prog->sock);
@@ -328,138 +378,274 @@ void rpc_add_program(struct rpc_prog_t* prog) {
     }
 }
 
-static void rpc_remove_all_programs(void) {
-    struct rpc_prog_t** entry = &rpc_prog_list;
+static void rpc_remove_all_programs(struct rpc_t* rpc) {
     struct rpc_prog_t* next;
     
-    while (*entry) {
-        if ((*entry)->sock) {
-            if ((*entry)->prot == IPPROTO_TCP) {
-                (*entry)->sock = tcpsocket_uninit((*entry)->sock);
+    while (rpc->prog_list) {
+        if (rpc->prog_list->sock) {
+            if (rpc->prog_list->prot == IPPROTO_TCP) {
+                rpc_tcp_port_unmap(rpc, rpc->prog_list->port);
+                rpc->prog_list->sock = tcpsocket_uninit(rpc->prog_list->sock);
             } else {
-                (*entry)->sock = udpsocket_uninit((*entry)->sock);
+                rpc_udp_port_unmap(rpc, rpc->prog_list->port);
+                rpc->prog_list->sock = udpsocket_uninit(rpc->prog_list->sock);
             }
         }
-        next = (*entry)->next;
-        free(*entry);
-        *entry = next;
+        next = rpc->prog_list->next;
+        free(rpc->prog_list);
+        rpc->prog_list = next;
     }
 }
 
-static int inited = 0;
+static int char_is_ascii_lower(char c) {
+    return c >= 'a' && c <= 'z';
+}
 
-void rpc_reset(void) {
-    if (access(ConfigureParams.Ethernet.szNFSroot, F_OK | R_OK | W_OK) < 0) {
-        printf("[RPC] can not access directory '%s'. NFS startup canceled.\n", ConfigureParams.Ethernet.szNFSroot);
-        rpc_uninit();
-        nfsd_fts[0] = ft_uninit(nfsd_fts[0]);
+static int char_is_ascii_upper(char c) {
+    return c >= 'A' && c <= 'Z';
+}
+
+static int char_is_ascii_other(char c) {
+    return (c >= '0' && c <= '9') || c == '-';
+}
+
+static int rpc_copy_hostname(char* dst, const char* src, int maxlen) {
+    int len = 0;
+    
+    while (*src && len + 1 < maxlen) {
+        if (char_is_ascii_other(*src) && len > 0) {
+            dst[len++] = *src;
+        } else if (char_is_ascii_lower(*src)) {
+            dst[len++] = *src;
+        } else if (char_is_ascii_upper(*src)) {
+            dst[len++] = *src + 32;
+        }
+        src++;
+    }
+    if (len > 0 && dst[len - 1] == '-') {
+        len--;
+    }
+    dst[len] = '\0';
+    return len;
+}
+
+static struct rpc_t* rpc_server[EN_MAX_SHARES];
+
+static void rpc_start_server(struct rpc_t* rpc, const char* path, const char* name, uint32_t addr) {
+    if (rpc->ft) {
+        printf("[RPC] '%s' already running.\n", rpc->hostname);
+        return;
+    }
+    if (rpc_copy_hostname(rpc->hostname, name, sizeof(rpc->hostname)) == 0) {
+        printf("[RPC] Startup failed for '%s' (no valid host name).\n", name);
         return;
     }
     
-    if (ft_is_inited(nfsd_fts[0])) {
-        if (ft_path_changed(nfsd_fts[0], ConfigureParams.Ethernet.szNFSroot)) {
-            rpc_uninit();
-            nfsd_fts[0] = ft_init(ConfigureParams.Ethernet.szNFSroot, "/");
+    rpc->ip_addr  = addr;
+    
+    rpc->ft = ft_init(path, "/");
+    if (rpc->ft) {
+        int i;
+        struct rpc_prog_t* prog;
+        
+        printf("[RPC] Starting '%s' at %d.%d.%d.%d, exporting '%s'.\n", rpc->hostname, 
+               (addr>>24)&0xFF, (addr>>16)&0xFF, (addr>>8)&0xFF, addr&0xFF, path);
+        
+        rpc->lock = host_mutex_create();
+        netinfo_add_host(rpc->hostname, rpc->ip_addr);
+        vdns_add_rec(rpc->hostname, rpc->ip_addr);
+        
+        for (i = 0; i < TBL_SIZE(rpc_prog_table_template); i++) {
+            prog = (struct rpc_prog_t*)malloc(sizeof(struct rpc_prog_t));
+            memcpy(prog, &rpc_prog_table_template[i], sizeof(struct rpc_prog_t));
+            rpc_add_program(rpc, prog);
         }
+        nibind_init(rpc);
     } else {
-        nfsd_fts[0] = ft_init(ConfigureParams.Ethernet.szNFSroot, "/");
-    }
-    if (nfsd_fts[0]) {
-        rpc_init(nfsd_fts[0]);
+        printf("[RPC] Startup failed for '%s', exporting '%s'.\n", rpc->hostname, path);
     }
 }
 
-void rpc_init(struct ft_t* ft) {
+static void rpc_stop_server(struct rpc_t* rpc) {
+    if (rpc) {
+        if (rpc->ft) {
+            printf("[RPC] Stopping '%s'.\n", rpc->hostname);
+
+            rpc_remove_all_programs(rpc);
+            nibind_uninit(rpc);
+            mount_uninit(rpc);
+            
+            netinfo_remove_host(rpc->hostname);
+            vdns_remove_rec(rpc->ip_addr);
+            host_mutex_destroy(rpc->lock);
+            rpc->ft = ft_uninit(rpc->ft);
+        }
+    }
+}
+
+static int rpc_check_nfs(struct rpc_t* rpc, const char* path, const char* name) {
+    if (access(path, F_OK | R_OK | W_OK) < 0) {
+        printf("[RPC] Cannot access directory '%s'. NFS startup canceled for '%s'.\n", path, name);
+        return -1;
+    } else if (ft_is_inited(rpc->ft)) {
+        if (ft_path_changed(rpc->ft, path)) {
+            return 1;
+        }
+    } else {
+        return 1;
+    }
+    return 0;
+}
+
+void rpc_reset(void) {
     int i;
-    struct rpc_prog_t* prog;
-    char hostname[NAME_HOST_MAX];
-    
-    if (inited) return;
-    
-    memset(hostname, 0, sizeof(hostname));
-    gethostname(hostname, sizeof(hostname));
     
     print_about();
-    printf("[RPC] starting local NFS daemon on '%s', exporting '%s'\n", hostname, ConfigureParams.Ethernet.szNFSroot);
     
-    vdns_uninit();
-    rpc_remove_all_programs();
-    
-    for (i = 0; i < TBL_SIZE(rpc_prog_table_template); i++) {
-        prog = (struct rpc_prog_t*)malloc(sizeof(struct rpc_prog_t));
-        *prog = rpc_prog_table_template[i];
-        prog->ft = ft;
-        rpc_add_program(prog);
-    }
-    
-    nibind_init();
+    netinfo_build_nidb();
     vdns_init();
     
-    inited = 1;
+    for (i = 0; i < EN_MAX_SHARES; i++) {
+        int needreset;
+        const char* name = i ? ConfigureParams.Ethernet.nfs[i].szHostName : NAME_NFSD;
+        const char* path = ConfigureParams.Ethernet.nfs[i].szPathName;
+        
+        if (strlen(name) > 0 && strlen(path) > 0) {
+            if (rpc_server[i] == NULL) {
+                rpc_server[i] = calloc(1, sizeof(struct rpc_t));
+            }
+            needreset = rpc_check_nfs(rpc_server[i], path, name);
+            if (needreset != 0) {
+                rpc_stop_server(rpc_server[i]);
+            }
+            if (needreset > 0) {
+                rpc_start_server(rpc_server[i], path, name, ntohl(special_addr.s_addr) | (CTL_NFSD - i));
+            }
+            if (rpc_server[i]->ft) {
+                continue;
+            }
+        }
+        rpc_stop_server(rpc_server[i]);
+        free(rpc_server[i]);
+        rpc_server[i] = NULL;
+    }
 }
 
 void rpc_uninit(void) {
-    if (inited) {
-        rpc_remove_all_programs();
-        
-        nfsd_fts[0] = ft_uninit(nfsd_fts[0]);
-        nibind_uninit();
-        vdns_uninit();
-        mount_uninit();
-        
-        inited = 0;
+    int i;
+    
+    for (i = 0; i < EN_MAX_SHARES; i++) {
+        if (rpc_server[i]) {
+            rpc_stop_server(rpc_server[i]);
+            free(rpc_server[i]);
+            rpc_server[i] = NULL;
+        }
     }
+    
+    netinfo_delete_nidb();
+    vdns_uninit();
+}
+
+static struct rpc_t* rpc_find_server(uint32_t addr, uint16_t port) {
+    int i;
+    for (i = 0; i < EN_MAX_SHARES; i++) {
+        if (rpc_server[i] && rpc_server[i]->ft) {
+            if (rpc_server[i]->ip_addr == addr) {
+                return rpc_server[i];
+            } else if ((addr & 0xFF) == 0xFF) {
+                printf("[RPC] Warning: Broadcast to %d.%d.%d.%d, port %d only received by %s\n", 
+                       (addr>>24)&0xFF, (addr>>16)&0xFF, (addr>>8)&0xFF, addr&0xFF, port, 
+                       rpc_server[i]->hostname);
+                return rpc_server[i];
+            }
+        }
+    }
+    return NULL;
+}
+
+static struct rpc_t* rpc_find_server_by_port(uint16_t local_port) {
+    int i;
+    for (i = 0; i < EN_MAX_SHARES; i++) {
+        if (rpc_server[i] && rpc_server[i]->ft) {
+            if (rpc_udp_from_local(rpc_server[i], local_port)) {
+                return rpc_server[i];
+            }
+        }
+    }
+    return NULL;
 }
 
 int rpc_read_file(const char* vfs_path, size_t offset, uint8_t* data, size_t len) {
-    if (inited) {
+    if (rpc_server[0] && rpc_server[0]->ft) {
         struct path_t path;
         vfscpy(path.vfs, vfs_path, sizeof(path.vfs));
-        vfs_to_host_path(nfsd_fts[0]->vfs, &path);
+        vfs_to_host_path(rpc_server[0]->ft->vfs, &path);
         return vfs_read(&path, offset, data, len);
     }
     return -1;
 }
 
+int rpc_match_arp(uint8_t byte) {
+    int i;
+    for (i = 0; i < EN_MAX_SHARES; i++) {
+        if (rpc_server[i] && rpc_server[i]->ft) {
+            if ((rpc_server[i]->ip_addr & 0xFF) == byte) {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+int rpc_match_icmp(uint32_t addr) {
+    int i;
+    for (i = 0; i < EN_MAX_SHARES; i++) {
+        if (rpc_server[i] && rpc_server[i]->ft) {
+            if (rpc_server[i]->ip_addr == addr) {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
 int rpc_match_addr(uint32_t addr) {
-    if ((addr == (ntohl(special_addr.s_addr) | CTL_NFSD)) ||
-        (addr == (ntohl(special_addr.s_addr) | ~(uint32_t)CTL_NET_MASK))) {
+    if ((addr &  CTL_NET_MASK) == CTL_NET && 
+        (addr & ~CTL_NET_MASK) > (CTL_NFSD - EN_MAX_SHARES)) {
         return 1;
     }
-    /* NS kernel to broadcasts on 10.255.255.255 */
-    if (addr == (ntohl(special_addr.s_addr) | ~(uint32_t)CTL_CLASS_MASK(CTL_NET))) {
+    /* NS kernel broadcasts on 10.255.255.255 */
+    if (addr == (CTL_NET | ~(uint32_t)CTL_CLASS_MASK(CTL_NET))) {
         return 1;
     }
     return 0;
 }
 
 void rpc_udp_map_to_local_port(struct in_addr* ipNBO, uint16_t* dportNBO) {
+    struct rpc_t* rpc = rpc_find_server(htonl(ipNBO->s_addr), htons(*dportNBO));
+    
     uint16_t dport = ntohs(*dportNBO);
-    uint16_t port  = udpsocket_toLocalPort(dport);
-    if(port) {
+    uint16_t port  = rpc_udp_to_local(rpc, dport);
+    if (port) {
         *dportNBO = htons(port);
         *ipNBO    = loopback_addr;
     }
 }
 
-void rpc_tcp_map_to_local_port(uint16_t port, uint16_t* sin_portNBO) {
-    uint16_t localPort = tcpsocket_toLocalPort(port);
-    if(localPort)
+void rpc_tcp_map_to_local_port(uint32_t addr, uint16_t port, uint16_t* sin_portNBO) {
+    struct rpc_t* rpc = rpc_find_server(addr, port);
+    
+    uint16_t localPort = rpc_tcp_to_local(rpc, port);
+    if (localPort)
         *sin_portNBO = htons(localPort);
 }
 
 void rpc_udp_map_from_local_port(uint16_t port, struct in_addr* saddrNBO, uint16_t* sin_portNBO) {
-    uint16_t localPort = udpsocket_fromLocalPort(port);
-    if(localPort) {
-        *sin_portNBO = htons(localPort);
-        switch(localPort) {
-            case PORT_DNS:
-                saddrNBO->s_addr = special_addr.s_addr | htonl(CTL_DNS);
-                break;
-            default:
-                saddrNBO->s_addr = special_addr.s_addr | htonl(CTL_NFSD);
-                break;
-        }
+    struct rpc_t* rpc = rpc_find_server_by_port(port);
+    uint16_t srcPort = rpc_udp_from_local(rpc, port);
+    if (srcPort) {
+        *sin_portNBO = htons(srcPort);
+        saddrNBO->s_addr = htonl(rpc->ip_addr);
     }
 }
 
@@ -469,7 +655,7 @@ void rpc_log(struct rpc_t* rpc, const char *format, ...) {
     if (rpc->log)
     {
         va_start(vargs, format);
-        printf("[RPC:%s:%d] ", rpc->name, rpc->proc);
+        printf("[%s:RPC:%s:%d] ", rpc->hostname, rpc->name, rpc->proc);
         vprintf(format, vargs);
         printf("\n");
         va_end(vargs);

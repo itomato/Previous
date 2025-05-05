@@ -249,27 +249,32 @@ void Change_CopyChangedParamsToConfiguration(CNF_PARAMS *current, CNF_PARAMS *ch
 
 	/* Note: SCSI, MO and floppy disk insert/eject called from GUI */
 
-	/* Do we need to change Ethernet connection? */
-	if (!NeedReset &&
-		(current->Ethernet.bEthernetConnected != changed->Ethernet.bEthernetConnected ||
-		 strcmp(current->Ethernet.szInterfaceName, changed->Ethernet.szInterfaceName) ||
-		 strcmp(current->Ethernet.szNFSroot, changed->Ethernet.szNFSroot))) {
-		bReInitEnetEmu = true;
-	}
+	if (!NeedReset) {
+		int i;
 
-	/* Do we need to change Sound configuration? */
-	if (!NeedReset &&
-		(current->Sound.bEnableSound != changed->Sound.bEnableSound ||
-		 current->Sound.bEnableMicrophone != changed->Sound.bEnableMicrophone)) {
-		bReInitSoundEmu = true;
-	}
+		/* Do we need to change Ethernet configuration? */
+		for (i = 0; i < EN_MAX_SHARES; i++) {
+			if (current->Ethernet.bEthernetConnected != changed->Ethernet.bEthernetConnected ||
+				strcmp(current->Ethernet.szInterfaceName, changed->Ethernet.szInterfaceName) ||
+				strcmp(current->Ethernet.nfs[i].szHostName, changed->Ethernet.nfs[i].szHostName) ||
+				strcmp(current->Ethernet.nfs[i].szPathName, changed->Ethernet.nfs[i].szPathName)) {
+				bReInitEnetEmu = true;
+				break;
+			}
+		}
 
-	/* Do we need to change Screen configuration? */
-	if (!NeedReset &&
-		current->Screen.nMonitorType != changed->Screen.nMonitorType &&
-		(current->Screen.nMonitorType == MONITOR_TYPE_DUAL ||
-		 changed->Screen.nMonitorType == MONITOR_TYPE_DUAL)) {
-		bScreenModeChange = true;
+		/* Do we need to change Sound configuration? */
+		if (current->Sound.bEnableSound != changed->Sound.bEnableSound ||
+			current->Sound.bEnableMicrophone != changed->Sound.bEnableMicrophone) {
+			bReInitSoundEmu = true;
+		}
+
+		/* Do we need to change Screen configuration? */
+		if (current->Screen.nMonitorType != changed->Screen.nMonitorType &&
+			(current->Screen.nMonitorType == MONITOR_TYPE_DUAL ||
+			 changed->Screen.nMonitorType == MONITOR_TYPE_DUAL)) {
+			bScreenModeChange = true;
+		}
 	}
 
 	/* Copy details to configuration,

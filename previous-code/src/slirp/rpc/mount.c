@@ -24,6 +24,7 @@
  */
 #include <slirp.h>
 #include <stdlib.h>
+#include <inttypes.h>
 
 #include "rpc.h"
 #include "mount.h"
@@ -45,32 +46,28 @@ struct mount_t {
     struct mount_t* next;
 };
 
-static struct mount_t* rmtab = NULL;
 
-static int mnt_add(char* name, char* path) {
-    struct mount_t** entry = &rmtab;
-    
+static void mnt_add(struct mount_t** entry, char* name, char* path) {    
     while (*entry) {
-        if (strncmp((*entry)->name, name, INET_ADDRSTRLEN) || 
+        if (strncmp((*entry)->name, name, MAXNAMELEN) || 
             strncmp((*entry)->path, path, MAXPATHLEN)) {
             entry = &(*entry)->next;
             continue;
         }
-        return 1;
+        printf("[RPC] Note: rmtab duplicate entry for '%s' from %s.\n", path, name);
+        return;
     }
     *entry = (struct mount_t*)malloc(sizeof(struct mount_t));
     (*entry)->name = strdup(name);
     (*entry)->path = strdup(path);
     (*entry)->next = NULL;
-    return 0;
 }
 
-static int mnt_remove(char* name, char* path) {
-    struct mount_t** entry = &rmtab;
+static void mnt_remove(struct mount_t** entry, char* name, char* path) {
     struct mount_t* next = NULL;
     
     while (*entry) {
-        if (strncmp((*entry)->name, name, INET_ADDRSTRLEN) || 
+        if (strncmp((*entry)->name, name, MAXNAMELEN) || 
             strncmp((*entry)->path, path, MAXPATHLEN)) {
             entry = &(*entry)->next;
             continue;
@@ -80,13 +77,26 @@ static int mnt_remove(char* name, char* path) {
         next = (*entry)->next;
         free((*entry));
         *entry = next;
-        return 1;
     }
-    return 0;
 }
 
-static void mnt_delete(void) {
-    struct mount_t** entry = &rmtab;
+static void mnt_remove_all(struct mount_t** entry, char* name) {
+    struct mount_t* next = NULL;
+    
+    while (*entry) {
+        if (strncmp((*entry)->name, name, MAXNAMELEN)) {
+            entry = &(*entry)->next;
+        } else {
+            free((*entry)->name);
+            free((*entry)->path);
+            next = (*entry)->next;
+            free((*entry));
+            *entry = next;
+        }
+    }
+}
+
+static void mnt_delete(struct mount_t** entry) {
     struct mount_t* next = NULL;
 
     while (*entry) {
@@ -101,91 +111,116 @@ static void mnt_delete(void) {
 
 static int proc_mnt(struct rpc_t* rpc) {
     struct path_t path;
-    char name[INET_ADDRSTRLEN];
+    char name[MAXNAMELEN+1];
     uint64_t handle;
-    
-    inet_ntop(AF_INET, &rpc->remote_addr, name, INET_ADDRSTRLEN);
     
     struct xdr_t* m_in  = rpc->m_in;
     struct xdr_t* m_out = rpc->m_out;
     
+    vfscpy(name, NAME_HOST, sizeof(name));
+    
     if (xdr_read_string(m_in, path.vfs, sizeof(path.vfs)) < 0) return RPC_GARBAGE_ARGS;
     vfs_to_host_path(rpc->ft->vfs, &path);
     
-    rpc_log(rpc, "MNT from %s for '%s'", name, path.vfs);
-    
     handle = ft_get_fhandle(rpc->ft, &path);
     if (handle) {
-        uint64_t data[8] = {handle, 0, 0, 0, 0, 0, 0, 0};
+        struct stat fstat;
         
-        xdr_write_long(m_out, MNT_OK);
-        
-        if (rpc->vers == 1 || rpc->vers == 2) {
+        ft_stat(rpc->ft, &path, &fstat);
+        if (S_ISDIR(fstat.st_mode)) {
+            uint64_t data[4] = {handle, 0, 0, 0};
+            
+            rpc_log(rpc, "MNT from %s for '%s' = %"PRIu64" (OK)", name, path.vfs, handle);
+            
+            xdr_write_long(m_out, MNT_OK);
             xdr_write_data(m_out, data, FHSIZE);
+            
+            mnt_add(&rpc->rmtab, name, path.vfs);
         } else {
-            xdr_write_long(m_out, FHSIZE_NFS3);
-            xdr_write_data(m_out, data, FHSIZE_NFS3);
-            xdr_write_long(m_out, 0);  /* flavor */
-        }
-        
-        if (mnt_add(name, path.vfs)) {
-            rpc_log(rpc, "MNT '%s' already mounted from %s", path, name);
+            rpc_log(rpc, "MNT '%s' is not a directory (NOTDIR)", path.vfs);
+            xdr_write_long(m_out, MNTERR_NOTDIR);
         }
     } else {
-        xdr_write_long(m_out, MNTERR_ACCESS);  /* Permission denied */
+        rpc_log(rpc, "MNT '%s' not found (NOENT)", path.vfs);
+        xdr_write_long(m_out, MNTERR_NOENT);
     }
+    
+    return RPC_SUCCESS;
+}
+
+static int proc_dump(struct rpc_t* rpc) {
+    struct mount_t* entry = rpc->rmtab;
+    
+    struct xdr_t* m_out = rpc->m_out;
+    
+    rpc_log(rpc, "DUMP");
+    
+    while (entry) {
+        xdr_write_long(m_out, 1);
+        xdr_write_string(m_out, entry->name, MAXNAMELEN);
+        xdr_write_string(m_out, entry->path, MAXPATHLEN);
+        entry = entry->next;
+    }
+    
+    xdr_write_long(m_out, 0);
     
     return RPC_SUCCESS;
 }
 
 static int proc_umnt(struct rpc_t* rpc) {
     char path[MAXPATHLEN];
-    char name[INET_ADDRSTRLEN];
-    
-    inet_ntop(AF_INET, &rpc->remote_addr, name, INET_ADDRSTRLEN);
-    
-    int found = 0;
+    char name[MAXNAMELEN+1];
     
     struct xdr_t* m_in  = rpc->m_in;
-    struct xdr_t* m_out = rpc->m_out;
-
+    
+    vfscpy(name, NAME_HOST, sizeof(name));
+    
     if (xdr_read_string(m_in, path, sizeof(path)) < 0) return RPC_GARBAGE_ARGS;
     
-    rpc_log(rpc, "UNMT from %s for '%s'", name, path);
+    rpc_log(rpc, "UMNT from %s for '%s'", name, path);
     
-    found = mnt_remove(name, path);
+    mnt_remove(&rpc->rmtab, name, path);
     
-    if (!found) {
-        rpc_log(rpc, "UMNT '%s' not mounted from %s", path, name);
-    }
+    return RPC_SUCCESS;
+}
+
+static int proc_umntall(struct rpc_t* rpc) {
+    char name[MAXNAMELEN+1];
     
-    xdr_write_long(m_out, found ? MNT_OK : MNTERR_NOTDIR);
+    vfscpy(name, NAME_HOST, sizeof(name));
+    
+    rpc_log(rpc, "UMNTALL from %s", name);
+    
+    mnt_remove_all(&rpc->rmtab, name);
     
     return RPC_SUCCESS;
 }
 
 static int proc_export(struct rpc_t* rpc) {
     char path[MAXPATHLEN];
-    uint8_t group[4] = { '*', '.', '.', '.' }; /* "*..." */
     
     struct xdr_t* m_out = rpc->m_out;
     
     rpc_log(rpc, "EXPORT");
     
+    /* root filesystem */
     vfs_get_basepath_alias(rpc->ft->vfs, path, sizeof(path));
     
-    /* dirpath */
     xdr_write_long(m_out, 1);
     xdr_write_string(m_out, path, sizeof(path));
+    xdr_write_long(m_out, 0); /* groups (no group entry means everyone) */
+    
+    /* private filesystem */
+    if (strlen(path) > 0 && path[strlen(path)-1] != '/') {
+        vfscat(path, "/", sizeof(path));
+    }
+    vfscat(path, "private", sizeof(path));
 
-    /* groups */
     xdr_write_long(m_out, 1);
-    xdr_write_long(m_out, 1);
-    xdr_write_data(m_out, group, 4);
+    xdr_write_string(m_out, path, sizeof(path));
     xdr_write_long(m_out, 0);
     
-    xdr_write_long(m_out, 0);
-    xdr_write_long(m_out, 0);
+    xdr_write_long(m_out, 0); /* no more filesystems */
     
     return RPC_SUCCESS;
 }
@@ -200,23 +235,20 @@ int mount_prog(struct rpc_t* rpc) {
             return proc_mnt(rpc);
             
         case MOUNTPROC_DUMP:
-            rpc_log(rpc, "DUMP unimplemented");
-            return RPC_PROC_UNAVAIL;
+            return proc_dump(rpc);
             
         case MOUNTPROC_UMNT:
             return proc_umnt(rpc);
             
         case MOUNTPROC_UMNTALL:
-            rpc_log(rpc, "UMNTALL unimplemented");
-            return RPC_PROC_UNAVAIL;
+            return proc_umntall(rpc);
             
         case MOUNTPROC_EXPORT:
             return proc_export(rpc);
             
         case MOUNTPROC_EXPORTALL:
-            rpc_log(rpc, "EXPORTALL unimplemented");
-            return RPC_PROC_UNAVAIL;
-
+            return proc_export(rpc);
+            
         default:
             break;
     }
@@ -224,6 +256,6 @@ int mount_prog(struct rpc_t* rpc) {
     return RPC_PROC_UNAVAIL;
 }
 
-void mount_uninit(void) {
-    mnt_delete();
+void mount_uninit(struct rpc_t* rpc) {
+    mnt_delete(&rpc->rmtab);
 }

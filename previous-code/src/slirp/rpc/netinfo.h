@@ -93,7 +93,7 @@ struct ni_id_map_t {
 
 struct ni_node_t {
     struct ni_id_t       id;
-    struct ni_id_map_t*  id_map;
+    struct ni_id_map_t** id_map;
     struct ni_node_t*    parent;
     struct ni_prop_t*    props;
     struct ni_node_t*    children;
@@ -101,10 +101,14 @@ struct ni_node_t {
     struct ni_node_t*    next;
 };
 
-struct ni_prog_t {
+struct nidb_t {
     const char* tag;
     struct ni_id_map_t* id_map;
     struct ni_node_t*   root;
+};
+
+struct nireg_t {
+    const char* tag;
     
     uint32_t udp_port;
     uint32_t tcp_port;
@@ -112,11 +116,13 @@ struct ni_prog_t {
     struct rpc_prog_t* udp_prog;
     struct rpc_prog_t* tcp_prog;
     
-    struct ni_prog_t* next;
+    struct nireg_t* next;
 };
 
 void netinfo_build_nidb(void);
 void netinfo_delete_nidb(void);
+void netinfo_add_host(const char* name, uint32_t ip_addr);
+void netinfo_remove_host(const char* name);
 
 int netinfo_prog(struct rpc_t* rpc);
 

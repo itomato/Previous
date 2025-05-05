@@ -6,7 +6,6 @@
 */
 const char DlgSCSI_fileid[] = "Previous dlgSCSI.c";
 
-#include <assert.h>
 #include "main.h"
 #include "configuration.h"
 #include "dialog.h"

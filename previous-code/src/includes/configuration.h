@@ -230,6 +230,12 @@ typedef struct {
 
 
 /* Ethernet configuration */
+#define EN_MAX_SHARES 4
+typedef struct {
+  char szPathName[FILENAME_MAX];
+  char szHostName[64];
+} EN_NFS;
+
 typedef enum
 {
   ENET_SLIRP,
@@ -241,8 +247,8 @@ typedef struct {
   bool bTwistedPair;
   ENET_INTERFACE nHostInterface;
   char szInterfaceName[FILENAME_MAX];
-  char szNFSroot[FILENAME_MAX];
   bool bNetworkTime;
+  EN_NFS nfs[EN_MAX_SHARES];
 } CNF_ENET;
 
 typedef enum

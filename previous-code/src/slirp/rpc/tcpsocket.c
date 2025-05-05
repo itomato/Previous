@@ -24,9 +24,7 @@
  */
 #include <slirp.h>
 #include <stdlib.h>
-#include <assert.h>
 
-#include "host.h"
 #include "tcpsocket.h"
 
 
@@ -37,10 +35,11 @@ static int ThreadProc(void *lpParameter) {
     return 0;
 }
 
-struct tcpsocket_t* tcpsocket_init(socket_listener_t* pListener) {
+struct tcpsocket_t* tcpsocket_init(socket_listener_t* pListener, void* pServer) {
     struct tcpsocket_t* ts = (struct tcpsocket_t*)malloc(sizeof(struct tcpsocket_t));
     if (ts) {
         ts->m_nPort        = 0;
+        ts->m_Server       = pServer;
         ts->m_ServerSocket = 0;
         ts->m_pSockets     = NULL;
         ts->m_nClosed      = 1;
@@ -68,33 +67,32 @@ uint16_t tcpsocket_open(struct tcpsocket_t* ts, uint16_t nPort) {
     
     memset(&localAddr, 0, sizeof(localAddr));
     localAddr.sin_family = AF_INET;
-    localAddr.sin_port = htons(nPort ? tcpsocket_toLocalPort(nPort) : nPort);
+    localAddr.sin_port = 0;
     localAddr.sin_addr = loopback_addr;
     if (bind(ts->m_ServerSocket, (struct sockaddr *)&localAddr, sizeof(localAddr)) < 0) {
-        closesocket(ts->m_ServerSocket);
+        sock_close(ts->m_ServerSocket);
         return 0;
     }
     
     socklen_t size = sizeof(localAddr);
     if(getsockname(ts->m_ServerSocket,  (struct sockaddr *)&localAddr, &size) < 0) {
-        closesocket(ts->m_ServerSocket);
+        sock_close(ts->m_ServerSocket);
         return 0;
     }
-    ts->m_nPort = nPort == 0 ? ntohs(localAddr.sin_port) : nPort;
-    tcpsocket_portMap(ts->m_nPort, ntohs(localAddr.sin_port));
+    ts->m_nPort = nPort ? nPort : ntohs(localAddr.sin_port);
     
     if (listen(ts->m_ServerSocket, BACKLOG) < 0) {
-        closesocket(ts->m_ServerSocket);
+        sock_close(ts->m_ServerSocket);
         return 0;
     }
     
     ts->m_pSockets = (struct csocket_t**)malloc(sizeof(struct csocket_t*[BACKLOG]));
     for (i = 0; i < BACKLOG; i++)
-        ts->m_pSockets[i] = csocket_init(SOCK_STREAM, ts->m_nPort);
+        ts->m_pSockets[i] = csocket_init(SOCK_STREAM, ts->m_nPort, ts->m_Server);
     
     ts->m_nClosed = 0;
     ts->m_hThread = host_thread_create(ThreadProc, "ServerSocket", (void*)ts);
-    return ts->m_nPort;
+    return ntohs(localAddr.sin_port);
 }
 
 void tcpsocket_close(struct tcpsocket_t* ts) {
@@ -104,8 +102,7 @@ void tcpsocket_close(struct tcpsocket_t* ts) {
         return;
     
     ts->m_nClosed = 1;
-    closesocket(ts->m_ServerSocket);
-    tcpsocket_portUnmap(ts->m_nPort);
+    sock_close(ts->m_ServerSocket);
     
     if (ts->m_hThread != NULL) {
         host_thread_wait(ts->m_hThread);
@@ -137,40 +134,4 @@ void tcpsocket_run(struct tcpsocket_t* ts) {
             }
         }
     }
-}
-
-static lock_t   tcpsocket_natLock;
-static uint16_t tcpsocket_toLocal[1<<16];
-static uint16_t tcpsocket_fromLocal[1<<16];
-
-void tcpsocket_portMap(uint16_t src, uint16_t local) {
-    assert(local);
-    host_lock(&tcpsocket_natLock);
-    tcpsocket_toLocal[src] = local;
-    tcpsocket_fromLocal[local] = src;
-    host_unlock(&tcpsocket_natLock);
-}
-
-void tcpsocket_portUnmap(uint16_t src) {
-    host_lock(&tcpsocket_natLock);
-    uint16_t local = tcpsocket_toLocal[src];
-    tcpsocket_toLocal[src] = 0;
-    tcpsocket_fromLocal[local] = 0;
-    host_unlock(&tcpsocket_natLock);
-}
-
-uint16_t tcpsocket_toLocalPort(uint16_t src) {
-    assert(src);
-    host_lock(&tcpsocket_natLock);
-    uint16_t result = tcpsocket_toLocal[src];
-    host_unlock(&tcpsocket_natLock);
-    return result;
-}
-
-uint16_t tcpsocket_fromLocalPort(uint16_t local) {
-    assert(local);
-    host_lock(&tcpsocket_natLock);
-    uint16_t result = tcpsocket_fromLocal[local];
-    host_unlock(&tcpsocket_natLock);
-    return result;
 }

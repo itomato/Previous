@@ -18,11 +18,11 @@
 #define NIBINDPROC_DESTROYDOMAIN 7
 #define NIBINDPROC_BIND          8
 
-extern struct ni_prog_t* ni_register;
+extern struct nidb_t* nidb;
 
 int nibind_prog(struct rpc_t* rpc);
 
-void nibind_init(void);
-void nibind_uninit(void);
+void nibind_init(struct rpc_t* rpc);
+void nibind_uninit(struct rpc_t* rpc);
 
 #endif /* _NIBIND_H_ */

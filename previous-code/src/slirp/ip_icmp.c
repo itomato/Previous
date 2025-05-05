@@ -33,6 +33,7 @@
 #include "slirp.h"
 #include "ip_icmp.h"
 #include "rpc/dns.h"
+#include "rpc/rpc.h"
 
 struct icmpstat icmpstat;
 
@@ -110,9 +111,8 @@ icmp_input(struct mbuf *m, int hlen)
     icp->icmp_type = ICMP_ECHOREPLY;
     ip->ip_len += hlen;	             /* since ip_input subtracts this */
     if (ip->ip_dst.s_addr == alias_addr.s_addr ||
-        ip->ip_dst.s_addr == ntohl(CTL_NET | CTL_ALIAS) ||
-        ip->ip_dst.s_addr == ntohl(CTL_NET | CTL_DNS) ||
-        ip->ip_dst.s_addr == ntohl(CTL_NET | CTL_NFSD)
+        ip->ip_dst.s_addr == (special_addr.s_addr | htonl(CTL_DNS)) ||
+        rpc_match_icmp(ntohl(ip->ip_dst.s_addr))
         ) {
       icmp_reflect(m);
     } else {
@@ -162,18 +162,16 @@ icmp_input(struct mbuf *m, int hlen)
     } /* if ip->ip_dst.s_addr == alias_addr.s_addr */
     break;
   case ICMP_MASKREQ:
-    if (ip->ip_dst.s_addr == alias_addr.s_addr ||
-        ip->ip_dst.s_addr == ntohl(CTL_NET | CTL_GATEWAY) ||
-        ip->ip_dst.s_addr == ntohl(CTL_BROADCAST)
+    if (ip->ip_dst.s_addr == (special_addr.s_addr | htonl(CTL_GATEWAY)) ||
+        ip->ip_dst.s_addr == htonl(CTL_BROADCAST)
         ) {
       icmp_maskreply(m);
     }
     break;
   case ICMP_TSTAMP:
     if (ip->ip_dst.s_addr == alias_addr.s_addr ||
-        ip->ip_dst.s_addr == ntohl(CTL_NET | CTL_ALIAS) ||
-        ip->ip_dst.s_addr == ntohl(CTL_NET | CTL_DNS) ||
-        ip->ip_dst.s_addr == ntohl(CTL_NET | CTL_NFSD)
+        ip->ip_dst.s_addr == (special_addr.s_addr | htonl(CTL_DNS)) ||
+        rpc_match_icmp(ntohl(ip->ip_dst.s_addr))
         ) {
       icmp_timestamp(m);
     }

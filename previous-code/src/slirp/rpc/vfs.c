@@ -255,8 +255,8 @@ int vfs_to_host_path(struct vfs_t* vfs, struct path_t* path) {
         strcpy(path->host, "");
         return 0;
     }
-    
-    snprintf(vfs_path, sizeof(vfs_path), "/%s", path_relative(path->vfs, vfs->vfs_base_path));
+    strcpy(vfs_path, "/");
+    vfscat(vfs_path, path_relative(path->vfs, vfs->vfs_base_path), sizeof(vfs_path));
     vfs_path_canonicalize(vfs_path);
     
     return make_host_path(vfs->host_base_path, vfs_path, path->host);

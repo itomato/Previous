@@ -36,13 +36,14 @@
 #define RPC_AUTH_DES      3
 
 /* Authentication constants */
-#define MAX_MACHINE_NAME 255
-#define NUM_GROUPS       16
+#define MAX_MACHINE_NAME  255
+#define NUM_GROUPS        16
 
 /* The size in bytes of the opaque file handle. */
-#define FHSIZE      32
-#define FHSIZE_NFS3 64
+#define FHSIZE            32
 
+/* The maximum size of a hostname (not FQDN) including null */
+#define MAX_HOST_NAME     64
 
 struct auth_unix_t {
     uint32_t time;
@@ -79,10 +80,22 @@ struct rpc_t {
     uint32_t low;
     uint32_t high;
     
-    struct in_addr remote_addr;
+    uint32_t ip_addr;
+    char hostname[MAX_HOST_NAME];
+    
+    struct rpc_prog_t* prog_list;
+    struct nireg_t* nireg;
+    struct mount_t* rmtab;
     
     int log;
     const char* name;
+    
+    uint16_t udp_to_local[1<<16];
+    uint16_t udp_from_local[1<<16];
+    uint16_t tcp_to_local[1<<16];
+    uint16_t tcp_from_local[1<<16];
+    
+    void* lock;
 };
 
 struct rpc_prog_t {
@@ -95,16 +108,13 @@ struct rpc_prog_t {
     int          log;
     const char*  name;
     void*        sock;
-    struct ft_t* ft;
     
     struct rpc_prog_t* next;
 };
 
-extern struct rpc_prog_t* rpc_prog_list;
-
 #define TBL_SIZE(x) (sizeof(x)/sizeof(x[0]))
 
-void rpc_add_program(struct rpc_prog_t* prog);
+void rpc_add_program(struct rpc_t* rpc, struct rpc_prog_t* prog);
 
 int proc_null(struct rpc_t* rpc);
 
@@ -118,9 +128,11 @@ void rpc_log(struct rpc_t* rpc, const char *format, ...);
 
 int rpc_read_file(const char* vfs_path, size_t offset, uint8_t* data, size_t len);
 
+int rpc_match_arp(uint8_t byte);
+int rpc_match_icmp(uint32_t addr);
 int rpc_match_addr(uint32_t addr);
 void rpc_udp_map_to_local_port(struct in_addr* ipNBO, uint16_t* dportNBO);
-void rpc_tcp_map_to_local_port(uint16_t port, uint16_t* sin_portNBO);
+void rpc_tcp_map_to_local_port(uint32_t addr, uint16_t port, uint16_t* sin_portNBO);
 void rpc_udp_map_from_local_port(uint16_t port, struct in_addr* saddrNBO, uint16_t* sin_portNBO);
 
 #endif /* _RPC_H_ */

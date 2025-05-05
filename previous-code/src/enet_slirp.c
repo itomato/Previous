@@ -157,6 +157,10 @@ void enet_slirp_stop(void) {
         slirp_started=0;
         host_thread_wait(tick_func_handle);
         host_mutex_destroy(slirp_mutex);
+        while (QueuePeek(slirpq)>0) {
+            Log_Printf(LOG_WARN, "Flushing SLIRP queue");
+            free(QueueDelete(slirpq));
+        }
         QueueDestroy(slirpq);
     }
 }

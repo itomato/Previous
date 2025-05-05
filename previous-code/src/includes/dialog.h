@@ -19,6 +19,7 @@ extern void DlgFloppy_Main(void);
 extern void DlgSCSI_Main(void);
 extern void DlgOptical_Main(void);
 extern void DlgEthernet_Main(void);
+extern void DlgNFS(void);
 extern bool DlgEthernetAdvanced_ConfigurePCAP(void);
 extern void DlgEthernetAdvanced_ConfigureMAC(uint8_t *mac);
 extern bool DlgEthernetAdvanced_GetRomMAC(uint8_t *mac);
