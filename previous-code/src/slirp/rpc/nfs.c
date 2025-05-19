@@ -750,7 +750,7 @@ static int proc_readdir(struct rpc_t* rpc) {
                 break;
             }
             count -= 4 * 4 + size; /* valid, fileid, namelen, name, cookie */
-            rpc_log(rpc, "%d %s %s", cookie, path, name);
+            rpc_log(rpc, "%d %s %s", cookie, path.vfs, name);
             cookie++;
 #ifdef _WIN32
             struct path_t file_path;
