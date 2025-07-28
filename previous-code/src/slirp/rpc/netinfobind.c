@@ -214,25 +214,25 @@ int nibind_prog(struct rpc_t* rpc) {
             
         case NIBINDPROC_UNREGISTER:
             return proc_unregister(rpc);
-
+            
         case NIBINDPROC_GETREGISTER:
             return proc_getregister(rpc);
-
+            
         case NIBINDPROC_LISTREG:
             return proc_listreg(rpc);
-
+            
         case NIBINDPROC_CREATEMASTER:
             return proc_createmaster(rpc);
-
+            
         case NIBINDPROC_CREATECLONE:
             return proc_createclone(rpc);
-
+            
         case NIBINDPROC_DESTROYDOMAIN:
             return proc_destroydomain(rpc);
-
+            
         case NIBINDPROC_BIND:
             return proc_bind(rpc);
-
+            
         default:
             break;
     }

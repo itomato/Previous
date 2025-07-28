@@ -47,7 +47,7 @@ struct mount_t {
 };
 
 
-static void mnt_add(struct mount_t** entry, char* name, char* path) {    
+static void mnt_add(struct mount_t** entry, char* name, char* path) {
     while (*entry) {
         if (strncmp((*entry)->name, name, MAXNAMELEN) || 
             strncmp((*entry)->path, path, MAXPATHLEN)) {

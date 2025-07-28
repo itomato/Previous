@@ -142,7 +142,7 @@ int ft_is_inited(struct ft_t* ft) {
 }
 
 int ft_path_changed(struct ft_t* ft, const char* host_path) {
-    if (strcmp(ft->vfs->host_base_path, host_path)) {
+    if (strcmp(ft->vfs->base_path.host, host_path)) {
         return 1;
     }
     return 0;

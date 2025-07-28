@@ -785,13 +785,13 @@ void File_UnLock(FILE *fp)
 /**
  * Read data from given FILE pointer to buffer and return status
  */
-bool File_Read(uint8_t *data, uint32_t size, uint64_t offset, FILE *fp)
+bool File_Read(uint8_t *data, uint32_t size, off_t offset, FILE *fp)
 {
 	if (!fp || !data)
 	{
 		return false;
 	}
-	if (fseek(fp, offset, SEEK_SET))
+	if (fseeko(fp, offset, SEEK_SET))
 	{
 		fprintf(stderr, "File seek failed:\n  %s\n", strerror(errno));
 		return false;
@@ -809,13 +809,13 @@ bool File_Read(uint8_t *data, uint32_t size, uint64_t offset, FILE *fp)
 /**
  * Write data to given FILE pointer and return status
  */
-bool File_Write(uint8_t *data, uint32_t size, uint64_t offset, FILE *fp)
+bool File_Write(uint8_t *data, uint32_t size, off_t offset, FILE *fp)
 {
 	if (!fp || !data)
 	{
 		return false;
 	}
-	if (fseek(fp, offset, SEEK_SET))
+	if (fseeko(fp, offset, SEEK_SET))
 	{
 		fprintf(stderr, "File seek failed:\n  %s\n", strerror(errno));
 		return false;
@@ -826,6 +826,27 @@ bool File_Write(uint8_t *data, uint32_t size, uint64_t offset, FILE *fp)
 		return false;
 	}
 	return true;
+}
+
+
+/*-----------------------------------------------------------------------*/
+/**
+ * Remove any '/'s from end of pathnames
+ */
+void File_CleanDirName(char *pszDirName)
+{
+	int len;
+#ifdef WIN32
+	int minlen = 3;
+#else
+	int minlen = 1;
+#endif
+	
+	len = strlen(pszDirName);
+	
+	/* Remove end slashes from pathname. */
+	while (len > minlen && pszDirName[--len] == PATHSEP)
+		pszDirName[len] = '\0';
 }
 
 

@@ -22,10 +22,29 @@ include(CheckSymbolExists)
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
 include(DistClean)
+include(CheckTypeSize)
 
 # set(CMAKE_VERBOSE_MAKEFILE 1)
 
 find_package(PkgConfig)
+
+
+######################################################################
+# Check if Large File Support is available
+# We test if the size of the type 'off_t' is at least 8 bytes
+######################################################################
+
+function (check_large_file)
+	set (CMAKE_REQUIRED_FLAGS ${HOST_LFS_FLAGS} )
+	check_type_size("off_t" SIZEOF_OFF_T )
+
+	if ( SIZEOF_OFF_T GREATER 7 )
+		set ( HAVE_HOST_LFS 1 CACHE INTERNAL "Large file Support" )
+	else()
+		set ( HAVE_HOST_LFS 0 CACHE INTERNAL "Large file Support" )
+	endif()
+endfunction (check_large_file)
+
 
 
 # ##########################
@@ -115,6 +134,11 @@ if(PCAP_FOUND)
 	set(HAVE_PCAP 1)
 endif(PCAP_FOUND)
 
+# Check if Large File Support is available with the standard POSIX flags
+set (HOST_LFS_FLAGS "-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64")
+check_large_file()
+
+
 # ################
 # CPP Definitions:
 # ################
@@ -170,17 +194,15 @@ check_symbol_exists(posix_memalign "stdlib.h" HAVE_POSIX_MEMALIGN)
 check_symbol_exists(aligned_alloc "stdlib.h" HAVE_ALIGNED_ALLOC)
 check_symbol_exists(_aligned_malloc "stdlib.h" HAVE__ALIGNED_MALLOC)
 
-# ########################################
-# Check for non-POSIXness on macOS et al.:
-# ########################################
+# ###########################################
+# Check for platform specific struct members:
+# ###########################################
 message("-- The following HAVE_STRUCT_* tests are checking for non-POSIX systems such as macOS; 'Failed' does not indicate a problem")
 check_struct_has_member("struct stat" st_atimespec.tv_nsec
     "sys/types.h;sys/stat.h" HAVE_STRUCT_STAT_ST_ATIMESPEC)
 check_struct_has_member("struct stat" st_mtimespec.tv_nsec
     "sys/types.h;sys/stat.h" HAVE_STRUCT_STAT_ST_MTIMESPEC)
-# Linux glibc provides a _D_EXACT_NAMELEN macro to work around this exact issue, but other supported platforms may not
-check_struct_has_member("struct dirent" d_namelen
-	"dirent.h" HAVE_STRUCT_DIRENT_D_NAMELEN)
+check_struct_has_member("struct dirent" d_type dirent.h HAVE_DIRENT_D_TYPE)
 
 # #############
 # Other CFLAGS:
@@ -259,6 +281,10 @@ endif(WARN_CXX_FALLTRHOUGH_AVAILABLE)
 IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	set(CMAKE_C_FLAGS "-O ${CMAKE_C_FLAGS}")
 ENDIF (CMAKE_BUILD_TYPE STREQUAL "Debug")
+
+# Always add the Large File Support flags in case they are supported
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${HOST_LFS_FLAGS}")
+
 
 # ####################
 # Paths configuration:
@@ -354,6 +380,12 @@ if(HAVE_SYS_XATTR_H)
 else()
   message( "  - xattr.h :\tnot found, no netboot possible" )
 endif(HAVE_SYS_XATTR_H)
+
+if (HAVE_HOST_LFS)
+  message( "  - off_t :\t${SIZEOF_OFF_T} byte, allows image files of 2 GiB and more" )
+else()
+  message( "  - off_t :\t${SIZEOF_OFF_T} byte, image files must be smaller than 2 GiB" )
+endif(HAVE_HOST_LFS)
 
 
 # #####################################

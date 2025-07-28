@@ -29,7 +29,7 @@ extern uae_u8* NEXTIo;
 typedef uae_u32 (*mem_get_func)(uaecptr) REGPARAM;
 typedef void (*mem_put_func)(uaecptr, uae_u32) REGPARAM;
 
-typedef struct {
+typedef struct addrbank {
 	/* These ones should be self-explanatory... */
 	mem_get_func lget, wget, bget;
 	mem_put_func lput, wput, bput;

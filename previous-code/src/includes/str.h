@@ -14,9 +14,8 @@
 # include <strings.h>
 #endif
 
-
+/* String processing helper macros/functions */
 #define Str_Free(s) { free(s); s = NULL; }
-
 extern char *Str_Trim(char *buffer);
 extern char *Str_ToUpper(char *pString);
 extern char *Str_ToLower(char *pString);

@@ -81,7 +81,7 @@ static int proc_dump(struct rpc_t* rpc) {
 
 static int proc_callit(struct rpc_t* rpc) {
     int result;
-    int before;
+    uint32_t before;
     uint8_t* size_ptr;
     struct rpc_prog_t* prog = rpc->prog_list;
     
@@ -122,11 +122,11 @@ int portmap_prog(struct rpc_t* rpc) {
         case PORTMAPPROC_SET:
             rpc_log(rpc, "SET unimplemented");
             return RPC_PROC_UNAVAIL;
-
+            
         case PORTMAPPROC_UNSET:
             rpc_log(rpc, "UNSET unimplemented");
             return RPC_PROC_UNAVAIL;
-
+            
         case PORTMAPPROC_GETPORT:
             return proc_getport(rpc);
             
@@ -135,7 +135,7 @@ int portmap_prog(struct rpc_t* rpc) {
             
         case PORTMAPPROC_CALLIT:
             return proc_callit(rpc);
-
+            
         default:
             break;
     }

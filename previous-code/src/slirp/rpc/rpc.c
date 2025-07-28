@@ -51,27 +51,15 @@ const struct rpc_prog_t rpc_prog_table_template[] =
     { NFSPROG,       NFSVERS,       IPPROTO_UDP, PORT_NFS, nfs_prog,       1, "NFS"        , NULL, NULL },
     { NFSPROG,       NFSVERS,       IPPROTO_TCP, PORT_NFS, nfs_prog,       1, "NFS"        , NULL, NULL },
     { NIBINDPROG,    NIBINDVERS,    IPPROTO_UDP, 0,        nibind_prog,    1, "NETINFOBIND", NULL, NULL },
-    { NIBINDPROG,    NIBINDVERS,    IPPROTO_TCP, 0,        nibind_prog,    1, "NETINFOBIND", NULL, NULL },
+    { NIBINDPROG,    NIBINDVERS,    IPPROTO_TCP, 0,        nibind_prog,    1, "NETINFOBIND", NULL, NULL }
 };
 
-
-static void rpc_set_cred(struct rpc_t* rpc) {
-    struct auth_unix_t* auth = (struct auth_unix_t*)rpc->auth.auth;
-    
-    if (rpc->ft) {
-        if (rpc->auth.flavor == RPC_AUTH_UNIX) {
-            vfs_set_process_uid_gid(rpc->ft->vfs, auth->uid, auth->gid);
-        } else {
-            vfs_set_process_uid_gid(rpc->ft->vfs, 0, 0);
-        }
-    }
-}
 
 int rpc_match_prog(struct rpc_t* rpc, struct rpc_prog_t* prog) {
     if (prog->prog == rpc->prog && prog->prot == rpc->prot) {
         rpc->name = prog->name;
         rpc->log  = prog->log;
-        if (prog->vers == 0 || prog->vers == rpc->vers) {
+        if (prog->vers == rpc->vers) {
             return 1;
         }
         return -1;
@@ -91,7 +79,6 @@ static int rpc_call(struct rpc_t* rpc) {
         if (prog->port == rpc->port) {
             result = rpc_match_prog(rpc, prog);
             if (result > 0) {
-                rpc_set_cred(rpc);
                 return prog->run(rpc);
             }
             if (result < 0) {
@@ -106,52 +93,51 @@ static int rpc_call(struct rpc_t* rpc) {
     return mismatch ? RPC_PROG_MISMATCH : RPC_PROG_UNAVAIL;
 }
 
-static void rpc_read_auth_unix(struct rpc_t* rpc, struct auth_unix_t* auth) {
+static void rpc_read_auth(struct rpc_t* rpc) {
     int i;
     
     struct xdr_t* m_in = rpc->m_in;
-    int len            = rpc->auth.length;
-    uint8_t* restore   = m_in->data + len;
+    int len = rpc->auth.length;
     
-    rpc->auth.auth = auth;
-
-    if (len > m_in->size) {
-        memset(rpc->auth.auth, 0, sizeof(struct auth_unix_t));
-        printf("[RPC] Auth UNIX underrun\n");
-        return;
-    }
-    
-    len -= 5 * 4;
-    auth->time = xdr_read_long(m_in);
-    len -= xdr_read_string(m_in, auth->machine, sizeof(auth->machine));
-    len &= ~3; /* align */
-    auth->uid  = xdr_read_long(m_in);
-    auth->gid  = xdr_read_long(m_in);
-    auth->len  = xdr_read_long(m_in);
-    len -= auth->len * 4;
-    for (i = 0; i < auth->len && i < NUM_GROUPS; i++) {
-        auth->gids[i] = xdr_read_long(m_in);
-    }
+    if (rpc->auth.flavor == RPC_AUTH_UNIX) {
+        struct auth_unix_t* auth = &rpc->auth_unix;
+        len -= 5 * 4;
+        auth->time = xdr_read_long(m_in);
+        len -= xdr_read_string(m_in, auth->machine, sizeof(auth->machine));
+        len &= ~3; /* align */
+        auth->uid  = xdr_read_long(m_in);
+        auth->gid  = xdr_read_long(m_in);
+        auth->len  = xdr_read_long(m_in);
+        len -= auth->len * 4;
+        for (i = 0; i < auth->len && i < NUM_GROUPS; i++) {
+            auth->gids[i] = xdr_read_long(m_in);
+        }
 #if DBG
-    printf("RPC UNIX TIME:   %d\n", auth->time);
-    printf("RPC UNIX NAME:   %s\n", auth->machine);
-    printf("RPC UNIX UID:    %d\n", auth->uid);
-    printf("RPC UNIX GID:    %d\n", auth->gid);
-    printf("RPC UNIX LEN:    %d\n", auth->len);
-    printf("RPC UNIX GIDS:   [");
-    for (i = 0; i < auth->len; i++) {
-        printf("%d%s", auth->gids[i], i == auth->len - 1 ? "" : ", ");
-    }
-    printf("]\n");
+        printf("UNIX TIME:   %d\n", auth->time);
+        printf("UNIX NAME:   %s\n", auth->machine);
+        printf("UNIX UID:    %d\n", auth->uid);
+        printf("UNIX GID:    %d\n", auth->gid);
+        printf("UNIX LEN:    %d\n", auth->len);
+        printf("UNIX GIDS:   [");
+        for (i = 0; i < auth->len; i++) {
+            printf("%d%s", auth->gids[i], i == auth->len - 1 ? "" : ", ");
+        }
+        printf("]\n");
 #endif
+        vfs_set_process_uid_gid(rpc->ft->vfs, auth->uid, auth->gid);
+    } else {
+        if (rpc->auth.flavor != RPC_AUTH_NONE) {
+            printf("[RPC] Authentication type %d not supported.\n", rpc->auth.flavor);
+        }
+        len = xdr_read_skip(m_in, len);
+        vfs_set_process_uid_gid(rpc->ft->vfs, 0, 0);
+    }
     if (len) {
-        printf("[RPC] Auth UNIX decode error\n");
-        m_in->data = restore;
+        printf("[RPC] Authentication decode error.\n");
     }
 }
 
 static void rpc_input(struct csocket_t* cs) {
-    struct auth_unix_t auth_unix;
     uint32_t status;
     uint8_t* status_ptr;
     
@@ -197,11 +183,8 @@ static void rpc_input(struct csocket_t* cs) {
             printf("RPC AUTH:    %d\n",   rpc->auth.flavor);
             printf("RPC AUTHLEN: %d\n",   rpc->auth.length);
 #endif
-            if (rpc->auth.flavor == RPC_AUTH_UNIX) {
-                rpc_read_auth_unix(rpc, &auth_unix);
-            } else {
-                xdr_read_skip(m_in, rpc->auth.length);
-            }
+            rpc_read_auth(rpc);
+            
             rpc->verif.flavor = xdr_read_long(m_in);
             rpc->verif.length = xdr_read_long(m_in);
             xdr_read_skip(m_in, rpc->verif.length);
@@ -483,8 +466,68 @@ static void rpc_stop_server(struct rpc_t* rpc) {
     }
 }
 
+static struct rpc_broadcast_t {
+    struct udpsocket_t* udp;
+    uint16_t            udp_port;
+} broadcasthost;
+
+static void rpc_broadcast(struct csocket_t* cs) {
+    int i;
+    uint32_t saved_size;
+    sock_t saved_sock;
+    
+    saved_sock = cs->m_Socket;
+    saved_size = cs->m_Input->size;
+    
+    for (i = 0; i < EN_MAX_SHARES; i++) {
+        if (rpc_server[i] && rpc_server[i]->ft) {
+            struct rpc_prog_t* prog = rpc_server[i]->prog_list;
+            while (prog) {
+                if (prog->port == PORT_RPC && prog->prot == IPPROTO_UDP) {
+                    struct udpsocket_t* us = (struct udpsocket_t*)prog->sock;
+                    cs->m_Socket       = us->m_pSocket->m_Socket;
+                    cs->m_pServer      = (void*)rpc_server[i];
+                    cs->m_Input->size  = saved_size;
+                    cs->m_Input->data  = cs->m_Input->head;
+                    cs->m_Output->size = 0;
+                    cs->m_Output->data = cs->m_Output->head;
+                    rpc_input(cs);
+                    break;
+                }
+                prog = prog->next;
+            }
+        }
+    }
+    cs->m_Socket = saved_sock;
+}
+
+static void rpc_broadcast_stop(void) {
+    if (broadcasthost.udp) {
+        broadcasthost.udp_port = 0;
+        udpsocket_close(broadcasthost.udp);
+        broadcasthost.udp = udpsocket_uninit(broadcasthost.udp);
+    }
+}
+
+static void rpc_broadcast_start(void) {
+    if (broadcasthost.udp_port == 0) {
+        broadcasthost.udp  = udpsocket_init(rpc_broadcast, NULL);
+        if (broadcasthost.udp) {
+            broadcasthost.udp_port = udpsocket_open(broadcasthost.udp, PORT_RPC);
+            if (broadcasthost.udp_port) {
+                printf("[RPC] Broadcast enabled (UDP: %d -> %d).\n", PORT_RPC, broadcasthost.udp_port);
+            } else {
+                printf("[RPC] Broadcast startup failed.\n");
+                rpc_broadcast_stop();
+            }
+        } else {
+            printf("[RPC] Broadcast UDP socket initialisation failed.\n");
+        }
+    }
+}
+
 static int rpc_check_nfs(struct rpc_t* rpc, const char* path, const char* name) {
-    if (access(path, F_OK | R_OK | W_OK) < 0) {
+    if (access(path, F_OK | R_OK) < 0) {
         printf("[RPC] Cannot access directory '%s'. NFS startup canceled for '%s'.\n", path, name);
         return -1;
     } else if (ft_is_inited(rpc->ft)) {
@@ -529,10 +572,14 @@ void rpc_reset(void) {
         free(rpc_server[i]);
         rpc_server[i] = NULL;
     }
+    
+    rpc_broadcast_start();
 }
 
 void rpc_uninit(void) {
     int i;
+    
+    rpc_broadcast_stop();
     
     for (i = 0; i < EN_MAX_SHARES; i++) {
         if (rpc_server[i]) {
@@ -546,16 +593,11 @@ void rpc_uninit(void) {
     vdns_uninit();
 }
 
-static struct rpc_t* rpc_find_server(uint32_t addr, uint16_t port) {
+static struct rpc_t* rpc_find_server(uint32_t addr) {
     int i;
     for (i = 0; i < EN_MAX_SHARES; i++) {
         if (rpc_server[i] && rpc_server[i]->ft) {
             if (rpc_server[i]->ip_addr == addr) {
-                return rpc_server[i];
-            } else if ((addr & 0xFF) == 0xFF) {
-                printf("[RPC] Warning: Broadcast to %d.%d.%d.%d, port %d only received by %s\n", 
-                       (addr>>24)&0xFF, (addr>>16)&0xFF, (addr>>8)&0xFF, addr&0xFF, port, 
-                       rpc_server[i]->hostname);
                 return rpc_server[i];
             }
         }
@@ -575,12 +617,13 @@ static struct rpc_t* rpc_find_server_by_port(uint16_t local_port) {
     return NULL;
 }
 
-int rpc_read_file(const char* vfs_path, size_t offset, uint8_t* data, size_t len) {
+int rpc_read_file(const char* vfs_path, uint32_t offset, uint8_t* data, uint32_t len) {
     if (rpc_server[0] && rpc_server[0]->ft) {
         struct path_t path;
         vfscpy(path.vfs, vfs_path, sizeof(path.vfs));
         vfs_to_host_path(rpc_server[0]->ft->vfs, &path);
-        return vfs_read(&path, offset, data, len);
+        if (vfs_read(&path, offset, data, &len) >= 0)
+            return (int)len;
     }
     return -1;
 }
@@ -622,10 +665,16 @@ int rpc_match_addr(uint32_t addr) {
 }
 
 void rpc_udp_map_to_local_port(struct in_addr* ipNBO, uint16_t* dportNBO) {
-    struct rpc_t* rpc = rpc_find_server(htonl(ipNBO->s_addr), htons(*dportNBO));
-    
     uint16_t dport = ntohs(*dportNBO);
-    uint16_t port  = rpc_udp_to_local(rpc, dport);
+    uint16_t port  = 0;
+    if (dport == PORT_RPC && (ipNBO->s_addr == htonl(CTL_NET | ~(uint32_t)CTL_NET_MASK) ||
+                              ipNBO->s_addr == htonl(CTL_NET | ~(uint32_t)CTL_CLASS_MASK(CTL_NET)))) {
+        printf("[RPC] Broadcast to %s, port %d\n", inet_ntoa(*ipNBO), dport);
+        port = broadcasthost.udp_port;
+    } else {
+        struct rpc_t* rpc = rpc_find_server(htonl(ipNBO->s_addr));
+        port = rpc_udp_to_local(rpc, dport);
+    }
     if (port) {
         *dportNBO = htons(port);
         *ipNBO    = loopback_addr;
@@ -633,14 +682,14 @@ void rpc_udp_map_to_local_port(struct in_addr* ipNBO, uint16_t* dportNBO) {
 }
 
 void rpc_tcp_map_to_local_port(uint32_t addr, uint16_t port, uint16_t* sin_portNBO) {
-    struct rpc_t* rpc = rpc_find_server(addr, port);
-    
+    struct rpc_t* rpc = rpc_find_server(addr);
     uint16_t localPort = rpc_tcp_to_local(rpc, port);
     if (localPort)
         *sin_portNBO = htons(localPort);
 }
 
-void rpc_udp_map_from_local_port(uint16_t port, struct in_addr* saddrNBO, uint16_t* sin_portNBO) {
+void rpc_udp_map_from_local_port(struct in_addr* saddrNBO, uint16_t* sin_portNBO) {
+    uint16_t port = ntohs(*sin_portNBO);
     struct rpc_t* rpc = rpc_find_server_by_port(port);
     uint16_t srcPort = rpc_udp_from_local(rpc, port);
     if (srcPort) {

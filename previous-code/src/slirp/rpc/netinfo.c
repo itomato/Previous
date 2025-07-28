@@ -1333,7 +1333,7 @@ int netinfo_prog(struct rpc_t* rpc) {
             
         case NETINFOPROC_LIST:
             return proc_list(rpc, ni);
-
+            
         case NETINFOPROC_CREATEPROP:
             return proc_createprop(rpc, ni);
             
@@ -1369,7 +1369,7 @@ int netinfo_prog(struct rpc_t* rpc) {
             
         case NETINFOPROC_LISTALL:
             return proc_listall(rpc, ni);
-
+            
         case NETINFOPROC_BIND:
             return proc_bind(rpc, ni);
             
@@ -1384,7 +1384,7 @@ int netinfo_prog(struct rpc_t* rpc) {
             
         case NETINFOPROC_LOOKUPREAD:
             return proc_lookupread(rpc, ni);
-
+            
         default:
             break;
     }

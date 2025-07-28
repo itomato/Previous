@@ -13,7 +13,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* Name and version for window title: */
-#define PROG_NAME "Previous 3.8"
+#define PROG_NAME "Previous 3.9"
 
 #include "config.h"
 
@@ -85,6 +85,7 @@ extern void Main_ResetKeys(void);
 extern void Main_EventHandler(void);
 extern void Main_EventHandlerInterrupt(void);
 extern void Main_SetTitle(const char *title);
+extern void Main_ErrorExit(const char *msg1, const char *msg2, int errval);
 extern void Main_SpeedReset(void);
 extern const char* Main_SpeedMsg(void);
 

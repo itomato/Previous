@@ -94,11 +94,15 @@ static const char* status_str(int status) {
 static int nfs_err(int error) {
     switch (error) {
         case 0:            return NFS_OK;
+        case EPERM:        return NFSERR_PERM;
         case ENOENT:       return NFSERR_NOENT;
         case EACCES:       return NFSERR_ACCES;
         case EEXIST:       return NFSERR_EXIST;
+        case ENOTDIR:      return NFSERR_NOTDIR;
         case EISDIR:       return NFSERR_ISDIR;
+        case ENOSPC:       return NFSERR_NOSPC;
         case EROFS:        return NFSERR_ROFS;
+        case ENAMETOOLONG: return NFSERR_NAMETOOLONG;
         case ENOTEMPTY:    return NFSERR_NOTEMPTY;
         default:           return NFSERR_IO;
     }
@@ -186,7 +190,7 @@ static int read_path(struct ft_t* ft, struct xdr_t* m_in, struct path_t* path, i
     if (vfs_to_host_path(ft->vfs, path) >= sizeof(path->host)) {
         return NFSERR_NAMETOOLONG;
     }
-    return create ? NFS_OK : check_file(ft, path, 0);    
+    return create ? NFS_OK : check_file(ft, path, 0);
 }
 
 
@@ -312,13 +316,11 @@ static void write_handle(struct xdr_t* m_out, uint64_t handle) {
 }
 
 
-static uint32_t nfs_blocks(const struct statvfs* fsstat, uint32_t fsblocks) {
-    uint64_t result = fsblocks;
+static uint32_t nfs_blocks(const struct statvfs* fsstat, uint64_t fsblocks) {
     /* take minimum as block size, looks like every filesystem uses these fields somewhat different */
-    result *= (uint64_t)min(fsstat->f_frsize, fsstat->f_bsize);
-    result /= BLOCK_SIZE;
-    if(result >= 0x7FFFFFFF) result = 0x7FFFFFFF; /* fix size for signed 32bit */
-    return (uint32_t)result;
+    fsblocks *= fsstat->f_frsize > 0 ? fsstat->f_frsize : fsstat->f_bsize;
+    if (fsblocks > 0x7FFFFFFF) fsblocks = 0x7FFFFFFF; /* limit size to signed 32-bit integer */
+    return (uint32_t)(fsblocks / BLOCK_SIZE);
 }
 
 
@@ -423,7 +425,7 @@ static int proc_read(struct rpc_t* rpc) {
     struct path_t path;
     int status;
     uint8_t* data;
-    int skip;
+    uint32_t skip;
     
     uint32_t offset;
     uint32_t count;
@@ -443,12 +445,9 @@ static int proc_read(struct rpc_t* rpc) {
         skip = (1 + 17 + 1) * 4; /* status + fattr + count */
         if (xdr_write_check(m_out, skip + count) < 0) {
             count = 0;
-        } else {
-            count = vfs_read(&path, offset, data + skip, count);
-            if (count < 0) {
-                count = 0;
-                status = nfs_err(errno);
-            }
+        } else if (vfs_read(&path, offset, data + skip, &count) < 0) {
+            status = nfs_err(errno);
+            count = 0;
         }
     }
     xdr_write_long(m_out, status);
@@ -472,7 +471,7 @@ static int proc_write(struct rpc_t* rpc) {
     int status;
     struct sattr_t sattr;
     uint8_t* data;
-    int len;
+    uint32_t len;
     
     uint32_t offset;
     
@@ -724,41 +723,34 @@ static int proc_readdir(struct rpc_t* rpc) {
     rpc_log(rpc, "READDIR %s (%s)", path.vfs, status_str(status));
     
     if (status == NFS_OK && handle) {
-        char name[MAXNAMELEN+1];
-        size_t namelen;
-        size_t size;
         struct dirent* fileinfo;
         uint32_t fileid;
+        int namelen;
         int skip = cookie;
         int eof  = 1;
         while ((fileinfo = readdir(handle))) {
-            if(--skip >= 0) continue;
-#if HAVE_STRUCT_DIRENT_D_NAMELEN
-            namelen = fileinfo->d_namlen;
-#else
-            namelen = strlen(fileinfo->d_name);
-#endif
-            if (namelen >= sizeof(name)) {
-                rpc_log(rpc, "name too long");
-                namelen = sizeof(name) - 1;
+            if (--skip >= 0) continue;
+            /* We assume that d_name is null-terminated */
+            if ((namelen = strlen(fileinfo->d_name)) > MAXNAMELEN) {
+                rpc_log(rpc, "file name too long: %s", fileinfo->d_name);
+                cookie++;
+                continue;
             }
-            memcpy(name, fileinfo->d_name, namelen);
-            name[namelen] = '\0';
-            size = (strlen(name) + 3) & ~3;  /* matches xdr_write_string() */
-            if (count < 4 * 4 + size + 4) {  /* includes final valid false */
+            namelen = (namelen + 3) & ~3;    /* must match xdr_write_string() */
+            if (count < 4 * 4 + namelen + 4) {  /* includes final valid false */
                 eof = 0;
                 break;
             }
-            count -= 4 * 4 + size; /* valid, fileid, namelen, name, cookie */
-            rpc_log(rpc, "%d %s %s", cookie, path.vfs, name);
+            count -= 4 * 4 + namelen; /* valid, fileid, namelen, name, cookie */
+            rpc_log(rpc, "%d %s %s", cookie, path.vfs, fileinfo->d_name);
             cookie++;
 #ifdef _WIN32
             struct path_t file_path;
             int len = vfscpy(file_path.vfs, path.vfs, sizeof(file_path.vfs));
-            if (len > 0 && file_path.vfs[len - 1] != '/' && strlen(name) > 0) {
+            if (len > 0 && file_path.vfs[len - 1] != '/' && namelen > 0) {
                 vfscat(file_path.vfs, "/", sizeof(file_path.vfs));
             }
-            vfscat(file_path.vfs, name, sizeof(file_path.vfs));
+            vfscat(file_path.vfs, fileinfo->d_name, sizeof(file_path.vfs));
             vfs_to_host_path(rpc->ft->vfs, &file_path);
             fileid = vfs_file_id(ft_get_fhandle(rpc->ft, &file_path));
 #else
@@ -766,7 +758,7 @@ static int proc_readdir(struct rpc_t* rpc) {
 #endif
             xdr_write_long(m_out, 1); /* valid entry follows */
             xdr_write_long(m_out, fileid);
-            xdr_write_string(m_out, name, sizeof(name));
+            xdr_write_string(m_out, fileinfo->d_name, namelen);
             xdr_write_long(m_out, cookie);
         }
         xdr_write_long(m_out, 0);  /* no valid entry follows */
@@ -792,8 +784,8 @@ static int proc_statfs(struct rpc_t* rpc) {
     }
     xdr_write_long(m_out, status);
     if (status == NFS_OK) {
-        xdr_write_long(m_out, BLOCK_SIZE*2); /* transfer size */
-        xdr_write_long(m_out, BLOCK_SIZE);   /* block size */
+        xdr_write_long(m_out, BLOCK_SIZE * 2);                       /* transfer size */
+        xdr_write_long(m_out, BLOCK_SIZE);                           /* block size */
         xdr_write_long(m_out, nfs_blocks(&fsstat, fsstat.f_blocks)); /* total blocks */
         xdr_write_long(m_out, nfs_blocks(&fsstat, fsstat.f_bfree));  /* free blocks */
         xdr_write_long(m_out, nfs_blocks(&fsstat, fsstat.f_bavail)); /* available blocks */

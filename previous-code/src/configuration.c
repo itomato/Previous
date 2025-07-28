@@ -644,6 +644,12 @@ void Configuration_Apply(bool bReset)
 		File_MakeAbsoluteName(ConfigureParams.Floppy.drive[i].szImageName);
 	}
 
+	/* make sure there are no trailing path separators */
+	for (i = 0; i < EN_MAX_SHARES; i++) {
+		File_CleanDirName(ConfigureParams.Ethernet.nfs[i].szPathName);
+	}
+	File_CleanDirName(ConfigureParams.Printer.szPrintToFileName);
+	
 	/* make path names absolute, but handle special file names */
 	File_MakeAbsoluteSpecialName(ConfigureParams.Log.sLogFileName);
 	File_MakeAbsoluteSpecialName(ConfigureParams.Log.sTraceFileName);

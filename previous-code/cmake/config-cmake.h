@@ -87,8 +87,8 @@
 /* Define to 1 if you have the member 'st_atimespec.tv_nsec' in struct 'stat' */
 #cmakedefine HAVE_STRUCT_STAT_ST_MTIMESPEC 1
 
-/* Define to 1 if you have the member 'd_namelen' in struct 'dirent' */
-#cmakedefine HAVE_STRUCT_DIRENT_D_NAMELEN 1
+/* Define to 1 if you have the 'd_type' member in the 'dirent' struct */
+#cmakedefine HAVE_DIRENT_D_TYPE 1
 
 /* Relative path from bindir to datadir */
 #define BIN2DATADIR "@BIN2DATADIR@"

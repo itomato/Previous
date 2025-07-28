@@ -270,7 +270,7 @@ static void vdns_input(struct csocket_t* pSocket) {
     struct xdr_t* m_out = pSocket->m_Output;
     
     uint8_t*      msg   = m_in->data;
-    int           n     = m_in->size;
+    uint32_t      n     = m_in->size;
     size_t        off   = 12;
     
     host_mutex_lock(vdns.mutex);

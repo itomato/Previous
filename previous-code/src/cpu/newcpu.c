@@ -3941,6 +3941,17 @@ void NMI (void)
 	do_interrupt (7);
 }
 
+static void cpu_halt_clear(void)
+{
+	regs.halted = 0;
+#ifndef WINUAE_FOR_HATARI
+	if (gui_data.cpu_halted) {
+		gui_data.cpu_halted = 0;
+		gui_led(LED_CPU, 0, -1);
+	}
+#endif
+}
+
 static void maybe_disable_fpu(void)
 {
 #ifndef WINUAE_FOR_HATARI
@@ -3978,11 +3989,7 @@ static void m68k_reset2(bool hardreset)
 	uae_u32 v;
 
 //fprintf ( stderr,"m68k_reset2 hard=%d in pc=%x\n" , hardreset , regs.pc );
-	regs.halted = 0;
-#ifndef WINUAE_FOR_HATARI
-	gui_data.cpu_halted = 0;
-	gui_led(LED_CPU, 0, -1);
-#endif
+	cpu_halt_clear();
 
 	regs.spcflags = 0;
 	m68k_reset_delay = 0;
@@ -5192,13 +5199,6 @@ static int do_specialties (int cycles)
 }
 
 
-#ifndef WINUAE_FOR_HATARI
-uaecptr m68kpc(void)
-{
-	return m68k_getpc();
-}
-#endif
-
 //static uae_u32 pcs[1000];
 
 #if DEBUG_CD32CDTVIO
@@ -5871,7 +5871,7 @@ static void run_cpu_thread(void (*f)(void *))
 #endif
 
 #ifndef WINUAE_FOR_HATARI
-void custom_reset_cpu(bool hardreset, bool keyboardreset)
+static void custom_reset_cpu(bool hardreset, bool keyboardreset)
 {
 #ifdef WITH_THREADED_CPU
 	if (cpu_thread_tid != uae_thread_get_id()) {
@@ -6044,6 +6044,12 @@ static void m68k_run_jit(void)
 		return;
 	}
 #endif
+
+	if (regs.spcflags) {
+		if (do_specialties(0)) {
+			return;
+		}
+	}
 
 	for (;;) {
 #ifdef USE_STRUCTURED_EXCEPTION_HANDLING
@@ -7374,7 +7380,7 @@ void m68k_go (int may_quit)
 
 #ifndef WINUAE_FOR_HATARI
 		if (regs.halted == CPU_HALT_ACCELERATOR_CPU_FALLBACK) {
-			regs.halted = 0;
+			cpu_halt_clear();
 			cpu_do_fallback();
 		}
 
@@ -11308,9 +11314,7 @@ void fill_prefetch (void)
 	}
 }
 
-#ifndef WINUAE_FOR_HATARI
-extern bool cpuboard_fc_check(uaecptr addr, uae_u32 *v, int size, bool write);
-#else
+#ifdef WINUAE_FOR_HATARI
 STATIC_INLINE bool cpuboard_fc_check(uaecptr addr, uae_u32 *v, int size, bool write)
 {
 	return false;

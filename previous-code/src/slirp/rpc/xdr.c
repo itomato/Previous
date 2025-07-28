@@ -93,10 +93,12 @@ int xdr_read_string(struct xdr_t* xdr, char* str, int maxlen) {
     if (len < maxlen) {
         memcpy(str, xdr->data, len);
         str[len] = '\0';
-    } else {
+    } else if (maxlen > 0) {
         printf("[XDR] Error: Read string truncated\n");
         memcpy(str, xdr->data, maxlen - 1);
         str[maxlen - 1] = '\0';
+    } else {
+        printf("[XDR] Error: Read string without buffer\n");
     }
     xdr->data += len;
     xdr->size -= len;
@@ -127,7 +129,7 @@ void xdr_write_string(struct xdr_t* xdr, const char* str, int maxlen) {
     xdr_write_align(xdr);
 }
 
-int xdr_read_data(struct xdr_t* xdr, void* data, int len) {
+int xdr_read_data(struct xdr_t* xdr, void* data, uint32_t len) {
     if (xdr->size < len) {
         printf("[XDR] Error: Read data underrun\n");
         return -1;
@@ -140,7 +142,7 @@ int xdr_read_data(struct xdr_t* xdr, void* data, int len) {
     return 0;
 }
 
-void xdr_write_data(struct xdr_t* xdr, void* data, int len) {
+void xdr_write_data(struct xdr_t* xdr, void* data, uint32_t len) {
     if (xdr->capacity - xdr->size < len) {
         printf("[XDR] Error: Write data overflow\n");
     } else if (len > 0) {
@@ -151,7 +153,7 @@ void xdr_write_data(struct xdr_t* xdr, void* data, int len) {
     }
 }
 
-int xdr_read_skip(struct xdr_t* xdr, int len) {
+int xdr_read_skip(struct xdr_t* xdr, uint32_t len) {
     if (xdr->size < len) {
         printf("[XDR] Error: Read skip underrun\n");
         return -1;
@@ -163,7 +165,7 @@ int xdr_read_skip(struct xdr_t* xdr, int len) {
     return 0;
 }
 
-void xdr_write_skip(struct xdr_t* xdr, int len) {
+void xdr_write_skip(struct xdr_t* xdr, uint32_t len) {
     if (xdr->capacity - xdr->size < len) {
         printf("[XDR] Error: Write skip overflow\n");
     } else if (len > 0) {
@@ -173,7 +175,7 @@ void xdr_write_skip(struct xdr_t* xdr, int len) {
     }
 }
 
-void xdr_write_zero(struct xdr_t* xdr, int len) {
+void xdr_write_zero(struct xdr_t* xdr, uint32_t len) {
     if (xdr->capacity - xdr->size < len) {
         printf("[XDR] Error: Write zero overflow\n");
     } else if (len > 0) {
@@ -184,7 +186,7 @@ void xdr_write_zero(struct xdr_t* xdr, int len) {
     }
 }
 
-int xdr_write_check(struct xdr_t* xdr, int len) {
+int xdr_write_check(struct xdr_t* xdr, uint32_t len) {
     if (xdr->capacity - xdr->size < len) {
         printf("[XDR] Error: Write check overflow\n");
         return -1;

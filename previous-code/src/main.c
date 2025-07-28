@@ -825,18 +825,17 @@ static bool Main_StartMenu(void) {
  */
 static bool Main_Init(void) {
 	/* Open debug log file */
-	if (!Log_Init()) {
-		fprintf(stderr, "Logging/tracing initialization failed\n");
-		exit(-1);
+	if (!Log_Init())
+	{
+		Main_ErrorExit("Logging/tracing initialization failed", NULL, -1);
 	}
 	Log_Printf(LOG_INFO, PROG_NAME ", compiled on:  " __DATE__ ", " __TIME__ "\n");
 
-	/* Init SDL's video and timer subsystems. Note: Audio subsystem
+	/* Init SDL's video subsystem. Note: Audio subsystem
 	   will be initialized later (failure not fatal). */
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0)
 	{
-		fprintf(stderr, "Could not initialize the SDL library:\n %s\n", SDL_GetError() );
-		exit(-1);
+		Main_ErrorExit("Could not initialize the SDL library:", SDL_GetError(), -1);
 	}
 	SDLGui_Init();
 	Screen_Init();
@@ -938,7 +937,6 @@ static void Main_StatusbarSetup(void) {
 	Statusbar_UpdateInfo();
 }
 
-/*-----------------------------------------------------------------------*/
 /**
  * Set signal handlers to catch signals
  */
@@ -949,8 +947,41 @@ static void Main_SetSignalHandlers(void) {
 	signal(SIGFPE, SIG_IGN);
 }
 
+/**
+ * Error exit wrapper, to make sure user sees the error messages
+ * also on Windows.
+ *
+ * If message is given, Windows console is opened to show it,
+ * otherwise it's assumed to be already open and relevant
+ * messages shown before calling this.
+ *
+ * User input is waited on Windows, to make sure user sees
+ * the message before console closes.
+ *
+ * Value overrides nQuitValue as process exit/return value.
+ */
+void Main_ErrorExit(const char *msg1, const char *msg2, int errval)
+{
+	if (msg1)
+	{
+#ifdef WIN32
+		Win_ForceCon();
+#endif
+		if (msg2)
+			fprintf(stderr, "ERROR: %s\n\t%s\n", msg1, msg2);
+		else
+			fprintf(stderr, "ERROR: %s!\n", msg1);
+	}
 
-/*-----------------------------------------------------------------------*/
+	SDL_Quit();
+
+#ifdef WIN32
+	fputs("<press Enter to exit>\n", stderr);
+	(void)fgetc(stdin);
+#endif
+	exit(errval);
+}
+
 /**
  * Main
  * 

@@ -121,6 +121,7 @@ void deactivate_debugger (void)
 	debugmem_enable();
 	debug_pc = 0xffffffff;
 	keybuf_ignore_next_release();
+	deactivate_console();
 }
 
 void activate_debugger (void)
@@ -481,7 +482,8 @@ uae_u32 get_ilong_debug (uaecptr addr)
 #endif
 	}
 }
-uae_u8 *get_real_address_debug(uaecptr addr)
+
+static uae_u8 *get_real_address_debug(uaecptr addr)
 {
 	if (debug_mmu_mode) {
 		flagtype olds = regs.s;
@@ -1497,33 +1499,6 @@ STATIC_INLINE uae_u32 ledcolor (uae_u32 c, uae_u32 *rc, uae_u32 *gc, uae_u32 *bc
 	if (a)
 		v |= a[255 - ((c >> 24) & 0xff)];
 	return v;
-}
-
-STATIC_INLINE void putpixel (uae_u8 *buf, int bpp, int x, xcolnr c8)
-{
-	if (x <= 0)
-		return;
-
-	switch (bpp) {
-	case 1:
-		buf[x] = (uae_u8)c8;
-		break;
-	case 2:
-		{
-			uae_u16 *p = (uae_u16*)buf + x;
-			*p = (uae_u16)c8;
-			break;
-		}
-	case 3:
-		/* no 24 bit yet */
-		break;
-	case 4:
-		{
-			uae_u32 *p = (uae_u32*)buf + x;
-			*p = c8;
-			break;
-		}
-	}
 }
 
 #define lc(x) ledcolor (x, xredcolors, xgreencolors, xbluecolors, NULL)
@@ -3657,7 +3632,9 @@ static int debug_mem_off (uaecptr *addrp)
 	if (ba->mask || ba->startmask) {
 		uae_u32 start = ba->startmask ? ba->startmask : ba->start;
 		addr -= start;
-		addr &= ba->mask;
+		if (ba->mask) {
+			addr &= ba->mask;
+		}
 		addr += start;
 	}
 	*addrp = addr;
@@ -7764,6 +7741,7 @@ void debug (void)
 	uae_ppc_pause(0);
 #endif
 	setmouseactive(0, wasactive ? 2 : 0);
+	target_inputdevice_acquire();
 
 	last_cycles1 = get_cycles();
 	last_vpos1 = vpos;

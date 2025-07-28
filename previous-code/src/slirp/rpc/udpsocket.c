@@ -80,7 +80,7 @@ uint16_t udpsocket_open(struct udpsocket_t* us, uint16_t nPort) {
         return 0;
     }
     
-    us->m_nPort = nPort ? nPort : ntohs(localAddr.sin_port);    
+    us->m_nPort = nPort ? nPort : ntohs(localAddr.sin_port);
     us->m_nClosed = 0;
     us->m_pSocket = csocket_init(SOCK_DGRAM, us->m_nPort, us->m_Server);
     if (us->m_pSocket) {
