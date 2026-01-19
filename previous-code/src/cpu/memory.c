@@ -13,19 +13,18 @@
   */
 const char Memory_fileid[] = "Previous memory.c";
 
-#include "config.h"
+#include "main.h"
 #include "sysdeps.h"
 #include "hatari-glue.h"
 #include "maccess.h"
 #include "memory.h"
 
-#include "main.h"
 #include "rom.h"
-#include "ioMem.h"
 #include "bmap.h"
 #include "tmc.h"
 #include "ncc.h"
 #include "nbic.h"
+#include "ioMem.h"
 #include "reset.h"
 #include "m68000.h"
 #include "configuration.h"
@@ -193,13 +192,13 @@ static uae_u32 next_ram_bank3_mask;
 
 
 /* **** A dummy bank that only contains zeros **** */
-
+#if 0 /* unused */
 static uae_u32 dummy_lget(uaecptr addr)
 {
 	illegal_trace(write_log ("Illegal lget at %08lx PC=%08x\n", (long)addr,m68k_getpc()));
 	return 0;
 }
-
+#endif
 static uae_u32 dummy_wget(uaecptr addr)
 {
 	illegal_trace(write_log ("Illegal wget at %08lx PC=%08x\n", (long)addr,m68k_getpc()));
@@ -211,12 +210,12 @@ static uae_u32 dummy_bget(uaecptr addr)
 	illegal_trace(write_log ("Illegal bget at %08lx PC=%08x\n", (long)addr,m68k_getpc()));
 	return 0;
 }
-
+#if 0 /* unused */
 static void dummy_lput(uaecptr addr, uae_u32 l)
 {
 	illegal_trace(write_log ("Illegal lput at %08lx PC=%08x\n", (long)addr,m68k_getpc()));
 }
-
+#endif
 static void dummy_wput(uaecptr addr, uae_u32 w)
 {
 	illegal_trace(write_log ("Illegal wput at %08lx PC=%08x\n", (long)addr,m68k_getpc()));
@@ -846,13 +845,13 @@ static void mem_bmap_bput(uaecptr addr, uae_u32 b)
 
 
 /* **** Address banks **** */
-
+#if 0 /* unused */
 static addrbank dummy_bank =
 {
 	dummy_lget, dummy_wget, dummy_bget,
 	dummy_lput, dummy_wput, dummy_bput
 };
-
+#endif
 static addrbank BusErrMem_bank =
 {
 	BusErrMem_lget, BusErrMem_wget, BusErrMem_bget,

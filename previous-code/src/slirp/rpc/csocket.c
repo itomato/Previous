@@ -156,7 +156,7 @@ void csocket_run(struct csocket_t* cs) {
                     }
                 }
             }
-            cs->m_Input->size  = nBytes;
+            cs->m_Input->size  = (uint32_t)nBytes;
             cs->m_Output->size = 0;
             
             if (cs->m_pListener != NULL)

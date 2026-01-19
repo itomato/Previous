@@ -81,7 +81,7 @@ static void ni_register_add(struct rpc_t* rpc, struct nireg_t* nireg) {
 }
 
 void nibind_init(struct rpc_t* rpc) {
-    int i;
+    size_t i;
     struct nireg_t* nireg;
     
     for (i = 0; i < TBL_SIZE(ni_register_template); i++) {
@@ -183,6 +183,7 @@ static int proc_destroydomain(struct rpc_t* rpc) {
 }
 
 static int proc_bind(struct rpc_t* rpc) {
+    char client[16];
     uint32_t clientAddr;
     char clientTag[MAXNAMELEN+1];
     char serverTag[MAXNAMELEN+1];
@@ -196,8 +197,8 @@ static int proc_bind(struct rpc_t* rpc) {
     if (xdr_read_string(m_in, clientTag, sizeof(clientTag)) < 0) return RPC_GARBAGE_ARGS;
     if (xdr_read_string(m_in, serverTag, sizeof(serverTag)) < 0) return RPC_GARBAGE_ARGS;
     
-    rpc_log(rpc, "BIND '%s' to '%s'", clientTag, serverTag);
-
+    rpc_log(rpc, "BIND '%s/%s' to '%s'", rpc_ip_str(client, clientAddr, 4, sizeof(client)), clientTag, serverTag);
+    
     xdr_write_long(m_out, NI_OK);
     
     return RPC_SUCCESS;

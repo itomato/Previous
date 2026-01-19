@@ -13,7 +13,6 @@ const char IoMemTabNEXT_fileid[] = "Previous ioMemTabNEXT.c";
 #include "ioMemTables.h"
 #include "video.h"
 #include "configuration.h"
-#include "sysdeps.h"
 #include "m68000.h"
 #include "esp.h"
 #include "ethernet.h"

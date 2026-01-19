@@ -24,7 +24,6 @@
  */
 #include "config.h"
 
-#include <sys/time.h>
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -60,8 +59,8 @@
 
 
 /* ----- Helpers */
-int vfscpy(char* dst, const char* src, int size) {
-    int srclen, retval;
+size_t vfscpy(char* dst, const char* src, size_t size) {
+    size_t srclen, retval;
     
     srclen = strlen(src);
     retval = srclen;
@@ -76,8 +75,8 @@ int vfscpy(char* dst, const char* src, int size) {
     return retval;
 }
 
-int vfscat(char* dst, const char* src, int size) {
-    int dstlen, srclen, retval;
+size_t vfscat(char* dst, const char* src, size_t size) {
+    size_t dstlen, srclen, retval;
     
     dstlen = strlen(dst);
     srclen = strlen(src);
@@ -92,6 +91,29 @@ int vfscat(char* dst, const char* src, int size) {
         }
         memcpy(dst + dstlen, src, srclen);
         dst[dstlen + srclen] = '\0';
+    }
+    return retval;
+}
+
+size_t vfs_join(char* path, const char* name, size_t size) {
+    int needsep;
+    size_t pathlen, namelen, retval;
+    
+    pathlen = strlen(path);
+    namelen = strlen(name);
+    needsep = pathlen && namelen && path[pathlen - 1] != '/';
+    retval  = pathlen + namelen + needsep;
+
+    if (size > pathlen + needsep + 1) {
+        if (needsep) {
+            path[pathlen] = '/';
+            pathlen += needsep;
+        }
+        if (namelen >= size - pathlen) {
+            namelen = size - pathlen - 1;
+        }
+        memcpy(path + pathlen, name, namelen);
+        path[pathlen + namelen] = '\0';
     }
     return retval;
 }
@@ -168,7 +190,7 @@ void vfs_path_canonicalize(char* vfs_path) {
         }
     }
     
-    /* step 5 : remove a traling '/.' */
+    /* step 5 : remove a trailing '/.' */
     slashdotptr = vfsPath;
     while(1) {
         slashdotptr = strstr(slashdotptr,"/.");
@@ -192,11 +214,6 @@ void vfs_path_canonicalize(char* vfs_path) {
     assert(strstr(vfsPath, "/../") == NULL);
 }
 
-static const char* vfs_get_filename(const char* vfs_path) {
-    char* sep = strrchr(vfs_path, '/');
-    return sep ? (sep + 1) : vfs_path;
-}
-
 static void vfs_get_parent_path(const char* vfs_path, char* parent_path) {
     char* sep;
     strcpy(parent_path, vfs_path);
@@ -218,7 +235,7 @@ static char* path_relative(char* path, const char* base_path) {
     }
 }
 
-static int make_host_path(const char* host_base, char* vfs_path, char* host_path) {
+static size_t make_host_path(const char* host_base, char* vfs_path, char* host_path) {
     char* p;
         
     if (strchr(vfs_path, '/') == vfs_path) {
@@ -243,7 +260,7 @@ static int make_host_path(const char* host_base, char* vfs_path, char* host_path
     return vfscat(host_path, vfs_path, FILENAME_MAX);
 }
 
-int vfs_to_host_path(struct vfs_t* vfs, struct path_t* path) {
+size_t vfs_to_host_path(struct vfs_t* vfs, struct path_t* path) {
     char vfs_path[MAXPATHLEN];
     
     if (!vfs_path_is_absolute(path->vfs)) {
@@ -258,13 +275,13 @@ int vfs_to_host_path(struct vfs_t* vfs, struct path_t* path) {
     return make_host_path(vfs->base_path.host, vfs_path, path->host);
 }
 
-static int make_vfs_path(const char* vfs_base, char* host_path, char* vfs_path, int relative) {
+static size_t make_vfs_path(const char* vfs_base, char* host_path, char* vfs_path, int relative) {
     char* p;
     
     if (relative) {
         vfs_path[0] = '\0';
     } else {
-        int len = vfscpy(vfs_path, vfs_base, MAXPATHLEN);
+        size_t len = vfscpy(vfs_path, vfs_base, MAXPATHLEN);
         if (len > 0 && len < MAXPATHLEN && vfs_path[len - 1] != '/') {
             vfscat(vfs_path, "/", MAXPATHLEN);
         }
@@ -282,7 +299,7 @@ static int make_vfs_path(const char* vfs_base, char* host_path, char* vfs_path, 
     return vfscat(vfs_path, host_path, MAXPATHLEN);
 }
 
-int vfs_to_vfs_path(struct vfs_t* vfs, struct path_t* path) {
+size_t vfs_to_vfs_path(struct vfs_t* vfs, struct path_t* path) {
     char* host_path = path_relative(path->host, vfs->base_path.host);
     
     return make_vfs_path(vfs->base_path.vfs, host_path, path->vfs, host_path == path->host);
@@ -338,18 +355,20 @@ static void file_close(const struct path_t* path, struct file_t* file) {
     free(file);
 }
 
-static size_t file_read(struct file_t* file, size_t fileOffset, void* dst, size_t count) {
-    fseek(file->file, fileOffset, SEEK_SET);
+static int file_is_open(struct file_t* file) {
+    return file->file == NULL ? errno : 0;
+}
+
+static int file_seek(struct file_t* file, long offset) {
+    return fseek(file->file, offset, SEEK_SET) < 0 ? errno : 0;
+}
+
+static size_t file_read(struct file_t* file, void* dst, size_t count) {
     return fread(dst, sizeof(uint8_t), count, file->file);
 }
 
-static size_t file_write(struct file_t* file, size_t fileOffset, void* src, size_t count) {
-    fseek(file->file, fileOffset, SEEK_SET);
+static size_t file_write(struct file_t* file, void* src, size_t count) {
     return fwrite(src, sizeof(uint8_t), count, file->file);
-}
-
-static int file_is_open(struct file_t* file) {
-    return file->file != NULL;
 }
 
 /*----- file attributes */
@@ -358,7 +377,7 @@ int valid16(uint32_t statval) { return (statval & 0x0000FFFF) != 0x0000FFFF; }
 
 uint32_t vfs_file_id(uint64_t ino) {
     uint32_t result = (uint32_t)ino;
-    return (result ^ (ino >> 32LL)) & 0x7FFFFFFF;
+    return (result ^ (ino >> 32)) & 0x7FFFFFFF;
 }
 
 uint32_t vfs_get_parent_gid(struct vfs_t* vfs, const struct path_t* path) {
@@ -400,23 +419,23 @@ int vfs_get_fstat(struct vfs_t* vfs, const struct path_t* path, struct stat* fst
     return result;
 }
 
-static void stat_to_sattr(const struct stat* stat, struct sattr_t* sattr) {
-    sattr->mode = stat->st_mode;
-    sattr->uid  = stat->st_uid;
-    sattr->gid  = stat->st_gid;
-    sattr->size = stat->st_size;
+void vfs_stat_to_sattr(const struct stat* stat, struct sattr_t* sattr) {
+    sattr->mode       = (uint32_t)stat->st_mode;
+    sattr->uid        = (uint32_t)stat->st_uid;
+    sattr->gid        = (uint32_t)stat->st_gid;
+    sattr->size       = (uint32_t)stat->st_size;
 #ifdef _WIN32
-    sattr->atime.sec  = stat->st_atime;
+    sattr->atime.sec  = (uint32_t)stat->st_atime;
     sattr->atime.usec = 0;
-    sattr->mtime.sec  = stat->st_mtime;
+    sattr->mtime.sec  = (uint32_t)stat->st_mtime;
     sattr->mtime.usec = 0;
 #else
-    sattr->atime.sec  = stat->st_atimespec.tv_sec;
-    sattr->atime.usec = stat->st_atimespec.tv_nsec / 1000;
-    sattr->mtime.sec  = stat->st_mtimespec.tv_sec;
-    sattr->mtime.usec = stat->st_mtimespec.tv_nsec / 1000;
+    sattr->atime.sec  = (uint32_t)stat->st_atimespec.tv_sec;
+    sattr->atime.usec = (uint32_t)stat->st_atimespec.tv_nsec / 1000;
+    sattr->mtime.sec  = (uint32_t)stat->st_mtimespec.tv_sec;
+    sattr->mtime.usec = (uint32_t)stat->st_mtimespec.tv_nsec / 1000;
 #endif
-    sattr->rdev = stat->st_rdev;
+    sattr->rdev       = (uint32_t)stat->st_rdev;
 }
 
 static int get_error(int result) {
@@ -447,6 +466,7 @@ int vfs_stat(const struct path_t* path, struct stat* fstat) {
 #endif
 }
 
+#if HAVE_SYS_XATTR_H
 const char* NFSD_ATTRS = ".nfsd_fattrs";
 
 static void deserialize(const char* buffer, struct sattr_t* sattr) {
@@ -457,14 +477,21 @@ static void serialize(const struct sattr_t* sattr, char* buffer) {
     snprintf(buffer, 128, "0%o:%d:%d:%d", sattr->mode, sattr->uid, sattr->gid, sattr->rdev);
 }
 
+static const char* vfs_get_filename(const char* vfs_path) {
+    char* sep = strrchr(vfs_path, '/');
+    return sep ? (sep + 1) : vfs_path;
+}
+#endif
+
 void vfs_set_sattr(struct vfs_t* vfs, const struct path_t* path, struct sattr_t* sattr) {
+#if HAVE_SYS_XATTR_H
     char buffer[128];
     const char* fname = vfs_get_filename(path->vfs);
     
     assert(strcmp(fname, ".") && strcmp(fname, ".."));
+    (void)fname; /* may be unused */
     
     serialize(sattr, buffer);
-#if HAVE_SYS_XATTR_H
 #if HAVE_LXETXATTR
     if (lsetxattr(path->host, NFSD_ATTRS, buffer, strlen(buffer), 0) != 0)
 #else
@@ -475,9 +502,9 @@ void vfs_set_sattr(struct vfs_t* vfs, const struct path_t* path, struct sattr_t*
 }
 
 void vfs_get_sattr(struct vfs_t* vfs, const struct path_t* path, struct sattr_t* sattr) {
+#if HAVE_SYS_XATTR_H
     char buffer[128];
     memset(buffer, 0, sizeof(buffer));
-#if HAVE_SYS_XATTR_H
 #if HAVE_LXETXATTR
     if (lgetxattr(path->host, NFSD_ATTRS, buffer, sizeof(buffer)) == 0)
 #else
@@ -495,14 +522,15 @@ void vfs_get_sattr(struct vfs_t* vfs, const struct path_t* path, struct sattr_t*
 #endif
         fstat.st_uid = vfs->uid;
         fstat.st_gid = vfs->gid;
-        fstat.st_mode |= S_ISDIR(fstat.st_mode) ? 0755 : 0644;
-        stat_to_sattr(&fstat, sattr);
+        fstat.st_mode |= S_ISDIR(fstat.st_mode) ? 0755 : 0644; /* strcmp(vfs->base_path.vfs, path->vfs) ? 0 : 0755; */
+        vfs_stat_to_sattr(&fstat, sattr);
     }
 }
 
 /* ----- file handle */
-static uint64_t rotl(uint64_t x, uint64_t n) {
-    return (x<<n) | (x>>(64LL-n));
+#ifndef _WIN32
+static uint64_t rotl(uint64_t x, int n) {
+    return (x << n) | (x >> (64 - n));
 }
 
 static uint64_t make_file_handle(struct stat* fstat) {
@@ -511,6 +539,7 @@ static uint64_t make_file_handle(struct stat* fstat) {
     if (result == 0) result = ~result;
     return result;
 }
+#endif
 
 uint64_t vfs_get_fhandle(const struct path_t* path) {
     struct stat fstat;
@@ -545,7 +574,8 @@ int vfs_readlink(const struct path_t* path, struct path_t* result) {
     return EACCES; /* not supported */
 #else
     struct stat sb;
-    ssize_t nbytes, bufsiz;
+    size_t  bufsiz;
+    ssize_t nbytes;
     
     if (lstat(path->host, &sb) == -1)
         return errno;
@@ -576,41 +606,42 @@ int vfs_readlink(const struct path_t* path, struct path_t* result) {
 }
 
 int vfs_read(const struct path_t* path, uint32_t offset, uint8_t* data, uint32_t* len) {
-    int retval;
+    int err = 0;
     struct file_t* file = file_open(path, "rb");
-    if (file_is_open(file)) {
-        *len = file_read(file, offset, data, *len);
-        retval = 1;
-    } else {
-        retval = -1;
+    err = file_is_open(file);
+    if (err == 0) {
+        err = file_seek(file, offset);
+        if (err == 0) {
+            *len = (uint32_t)file_read(file, data, *len);
+        }
     }
     file_close(path, file);
-    return retval;
+    return err;
 }
 
 int vfs_write(const struct path_t* path, uint32_t offset, uint8_t* data, uint32_t len) {
-    int retval;
+    int err;
     struct file_t* file = file_open(path, "r+b");
-    if (file_is_open(file)) {
-        file_write(file, offset, data, len);
-        retval = 1;
-    } else {
-        retval = -1;
+    err = file_is_open(file);
+    if (err == 0) {
+        err = file_seek(file, offset);
+        if (err == 0) {
+            err = (file_write(file, data, len) < len) ? ENOSPC : 0;
+        }
     }
     file_close(path, file);
-    return retval;
+    return err;
 }
 
-int vfs_touch(const struct path_t* path) {
+int vfs_create(const struct path_t* path, uint8_t* data, uint32_t len) {
+    int err = 0;
     struct file_t* file = file_open(path, "wb");
-    int retval = 0;
-    if (file_is_open(file)) {
-        retval = 1;
-    } else {
-        retval = -1;
+    err = file_is_open(file);
+    if (data && err == 0) {
+        err = (file_write(file, data, len) < len) ? ENOSPC : 0;
     }
     file_close(path, file);
-    return retval;
+    return err;
 }
 
 int vfs_remove(const struct path_t* path) {
@@ -676,13 +707,17 @@ int vfs_access(const struct path_t* path, int mode) {
 struct vfs_t* vfs_init(const char* host_path, const char* vfs_path_alias) {
     struct vfs_t* vfs = NULL;
     if (host_path && vfs_path_alias && strlen(host_path) && strlen(vfs_path_alias)) {
-        if (strcmp(host_path + strlen(host_path) - strlen(HOST_SEPARATOR), HOST_SEPARATOR)) {
-            vfs = (struct vfs_t*)malloc(sizeof(struct vfs_t));
-            if (vfs) {
-                vfscpy(vfs->base_path.vfs, vfs_path_alias, sizeof(vfs->base_path.vfs));
-                vfscpy(vfs->base_path.host, host_path, sizeof(vfs->base_path.host));
-                vfs->uid = 20;
-                vfs->gid = 20;
+        vfs = (struct vfs_t*)malloc(sizeof(struct vfs_t));
+        if (vfs) {
+            char* p;
+            vfscpy(vfs->base_path.vfs, vfs_path_alias, sizeof(vfs->base_path.vfs));
+            vfscpy(vfs->base_path.host, host_path, sizeof(vfs->base_path.host));
+            vfs->uid = 20;
+            vfs->gid = 20;
+            /* Make sure there is no trailing separator in host path */
+            p = vfs->base_path.host + strlen(vfs->base_path.host) - strlen(HOST_SEPARATOR);
+            if (strcmp(p, HOST_SEPARATOR) == 0 && p != vfs->base_path.host) {
+                p[0] = '\0';
             }
         }
     }
@@ -699,6 +734,6 @@ void vfs_set_process_uid_gid(struct vfs_t* vfs, uint32_t uid, uint32_t gid) {
     vfs->gid = gid;
 }
 
-void vfs_get_basepath_alias(struct vfs_t* vfs, char* path, int maxlen) {
+void vfs_get_basepath_alias(struct vfs_t* vfs, char* path, size_t maxlen) {
     vfscpy(path, vfs->base_path.vfs, maxlen);
 }

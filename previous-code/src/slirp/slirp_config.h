@@ -51,7 +51,7 @@
 
 /* XXX: Define according to how time.h should be included */
 #undef TIME_WITH_SYS_TIME
-#define TIME_WITH_SYS_TIME 0
+#define TIME_WITH_SYS_TIME 1
 #undef HAVE_SYS_TIME_H
 
 /* Define if your sprintf returns char * instead of int */

@@ -243,7 +243,6 @@ void tcp_input(register struct mbuf *m, int iphlen, struct socket *inso)
 	u_long tiwin;
 	int ret;
 	/*	int ts_present = 0; */
-	int needfree = 0;
 
 	DEBUG_CALL("tcp_input");
 	DEBUG_ARGS((dfd, " m = %8lx  iphlen = %2d  inso = %lx\n",
@@ -1372,7 +1371,7 @@ dodata:
 		len = so->so_rcv.sb_datalen - (tp->rcv_adv - tp->rcv_nxt);
 	}
 	else {
-		needfree = 1;
+		m_free(m);
 		tiflags &= ~TH_FIN;
 	}
 
@@ -1454,14 +1453,12 @@ dodata:
 	   *	       ((so->so_iptos & IPTOS_LOWDELAY) &&
 	   *	       ((struct tcpiphdr_2 *)ti)->first_char == (char)27)) {
 	   */
+#if 0 /* FIXME: This causes use after free errors */
 	if (ti->ti_len && (unsigned)ti->ti_len <= 5 &&
 		((struct tcpiphdr_2 *)ti)->first_char == (char)27) {
 		tp->t_flags |= TF_ACKNOW;
 	}
-	if (needfree) {
-		m_free(m);
-	}
-
+#endif
 	/*
 	 * Return any desired output.
 	 */

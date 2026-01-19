@@ -46,7 +46,6 @@ extern FILE *File_Open(const char *path, const char *mode);
 extern FILE *File_Close(FILE *fp);
 extern bool File_Read(uint8_t *data, uint32_t size, off_t offset, FILE *fp);
 extern bool File_Write(uint8_t *data, uint32_t size, off_t offset, FILE *fp);
-extern void File_CleanDirName(char *pszDirName);
 extern bool File_Lock(FILE *fp);
 extern void File_UnLock(FILE *fp);
 extern bool File_InputAvailable(FILE *fp);

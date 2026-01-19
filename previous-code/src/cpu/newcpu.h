@@ -86,7 +86,9 @@ struct cputbl {
 	uae_s8 length;
 	uae_s8 disp020[2];
 	uae_s8 branch;
+#ifdef JIT
 	uae_u16 specific;
+#endif
 };
 
 #ifdef JIT
@@ -343,6 +345,7 @@ extern bool cpu_bus_rmw;			// WINUAE_FOR_HATARI
 extern void safe_interrupt_set(int, int, bool);
 
 #define SPCFLAG_CPUINRESET 2
+#define SPCFLAG_CPU_SLOW 4
 #define SPCFLAG_INT 8
 #define SPCFLAG_BRK 16
 #define SPCFLAG_UAEINT 32
@@ -747,7 +750,7 @@ extern void m68k_disasm (uaecptr addr, uaecptr *nextpc, uaecptr lastpc, int cnt)
 extern uae_u32 m68k_disasm_2(TCHAR *buf, int bufsize, uaecptr pc, uae_u16 *bufpc, int bufpccount, uaecptr *nextpc, int cnt, uae_u32 *seaddr, uae_u32 *deaddr, uaecptr lastpc, int safemode);
 #ifdef WINUAE_FOR_HATARI
 extern void m68k_disasm_file (FILE *f, uaecptr addr, uaecptr *nextpc, uaecptr lastpc, int cnt);
-extern void m68k_disasm_file_wrapper (FILE *f, uaecptr addr, uaecptr *nextpc, uaecptr lastpc, int cnt);
+extern void m68k_disasm_file_wrapper (FILE *f, uaecptr addr, uaecptr *nextpc, int cnt);
 #endif
 extern void sm68k_disasm (TCHAR*, TCHAR*, uaecptr addr, uaecptr *nextpc, uaecptr lastpc);
 extern int m68k_asm(TCHAR *buf, uae_u16 *out, uaecptr pc);

@@ -211,11 +211,8 @@ static int proc_export(struct rpc_t* rpc) {
     xdr_write_long(m_out, 0); /* groups (no group entry means everyone) */
     
     /* private filesystem */
-    if (strlen(path) > 0 && path[strlen(path)-1] != '/') {
-        vfscat(path, "/", sizeof(path));
-    }
-    vfscat(path, "private", sizeof(path));
-
+    vfs_join(path, "private", sizeof(path));
+    
     xdr_write_long(m_out, 1);
     xdr_write_string(m_out, path, sizeof(path));
     xdr_write_long(m_out, 0);

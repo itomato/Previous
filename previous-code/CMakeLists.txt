@@ -106,10 +106,10 @@ endif(ENABLE_OSX_BUNDLE)
 # Check for libraries:
 # ####################
 
-find_package(SDL2)
-if(NOT SDL2_FOUND)
-	message(FATAL_ERROR "SDL2 library not found!")
-endif(NOT SDL2_FOUND)
+find_package(SDL3 REQUIRED COMPONENTS SDL3)
+if(NOT SDL3_FOUND)
+	message(FATAL_ERROR "SDL3 library not found!")
+endif(NOT SDL3_FOUND)
 
 find_package(Math)
 
@@ -143,6 +143,10 @@ check_large_file()
 # CPP Definitions:
 # ################
 
+# We still want to have assert() in RelWithDebInfo builds:
+string(REPLACE " -DNDEBUG" ""
+       CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO}")
+
 # Test for large file support:
 execute_process(COMMAND getconf LFS_CFLAGS
                 OUTPUT_VARIABLE DETECTED_LFS_CFLAGS
@@ -151,13 +155,6 @@ if(DETECTED_LFS_CFLAGS)
 	add_definitions(${DETECTED_LFS_CFLAGS})
 	# message(STATUS "Large filesystem flags: ${DETECTED_LFS_CFLAGS}")
 endif(DETECTED_LFS_CFLAGS)
-
-# Additional CFLAGS suggested by the SDL library:
-if(PKG_CONFIG_FOUND)
-	execute_process(COMMAND ${PKG_CONFIG_EXECUTABLE} --cflags-only-other sdl2
-			OUTPUT_VARIABLE SDL2_OTHER_CFLAGS
-			ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-endif(PKG_CONFIG_FOUND)
 
 # ###########################
 # Check for optional headers:
@@ -216,11 +213,13 @@ if(ENABLE_ASAN)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fstack-protector-all")
 	# enable AddressSanitizer with global variable tracking
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fno-common")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
 endif(ENABLE_ASAN)
 
 # GCC/Clang undefined behavior debugging
 if(ENABLE_UBSAN)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=undefined")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=undefined")
 	add_definitions(-DENABLE_UBSAN=1)
 endif(ENABLE_UBSAN)
 
@@ -236,10 +235,14 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wformat-security")
 	# Enable and disable some warnings and flags for Previous:
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -D__USE_MINGW_ANSI_STDIO=1")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-conversion -Wno-unused -Wno-sign-compare")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-conversion")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wtautological-compare")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-sign-compare -Wno-conversion")
  	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter")
+endif()
+
+if(APPLE AND CMAKE_C_COMPILER_ID MATCHES "Clang")
+	# Silence linker warning with AppleClang 17
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-common")
 endif()
 
 CHECK_C_COMPILER_FLAG("-Wimplicit-fallthrough=0" WARN_FALLTRHOUGH_AVAILABLE)
@@ -270,12 +273,6 @@ endif(ENABLE_WERROR)
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpointer-bool-conversion")
 endif()
-
-# Silence warnings in DiskImage.cpp
-CHECK_CXX_COMPILER_FLAG("-Wimplicit-fallthrough=0" WARN_CXX_FALLTRHOUGH_AVAILABLE)
-if(WARN_CXX_FALLTRHOUGH_AVAILABLE)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wimplicit-fallthrough=0")
-endif(WARN_CXX_FALLTRHOUGH_AVAILABLE)
 
 # Building Previous w/o optimization is no fun...
 IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -361,30 +358,30 @@ Libraries summary :
 -------------------
 ")
 
-message("  - sdl :\tusing SDL2 ${SDL2_VERSION}")
+message( "  - sdl :     using SDL3 ${SDL3_VERSION}")
 
 if(PNG_FOUND)
-  message( "  - png :\tfound, allows to print to files using png" )
+  message( "  - png :     found, allows to print to files using png" )
 else()
-  message( "  - png :\tnot found, install it to print to files using png" )
+  message( "  - png :     not found, install it to print to files using png" )
 endif(PNG_FOUND)
 
 if(PCAP_FOUND)
-  message( "  - pcap :\tfound, allows networking without NAT" )
+  message( "  - pcap :    found, allows networking without NAT" )
 else()
-  message( "  - pcap :\tnot found, install it to use networking without NAT" )
+  message( "  - pcap :    not found, install it to use networking without NAT" )
 endif(PCAP_FOUND)
 
 if(HAVE_SYS_XATTR_H)
-  message( "  - xattr.h :\tfound, allows netbooting from a folder" )
+  message( "  - xattr.h : found, allows netbooting from a folder" )
 else()
-  message( "  - xattr.h :\tnot found, no netboot possible" )
+  message( "  - xattr.h : not found, no netboot possible" )
 endif(HAVE_SYS_XATTR_H)
 
 if (HAVE_HOST_LFS)
-  message( "  - off_t :\t${SIZEOF_OFF_T} byte, allows image files of 2 GiB and more" )
+  message( "  - off_t :   ${SIZEOF_OFF_T} byte, allows image files of 2 GiB and more" )
 else()
-  message( "  - off_t :\t${SIZEOF_OFF_T} byte, image files must be smaller than 2 GiB" )
+  message( "  - off_t :   ${SIZEOF_OFF_T} byte, image files must be smaller than 2 GiB" )
 endif(HAVE_HOST_LFS)
 
 

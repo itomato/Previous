@@ -361,6 +361,7 @@ static void oldrtc_put_clock(uint8_t addr, uint8_t val) {
 }
 
 /* RTC alarm */
+#if 0
 static void oldrtc_check_alarm(void) {
     if (rtc.intctrl&RTC_ENABLEALRM) {
         if (rtc.clkctrl&RTC_START) {
@@ -373,6 +374,7 @@ static void oldrtc_check_alarm(void) {
         }
     }
 }
+#endif
 
 /* Interrupt pin of RTC is not connected. Interrupts are generated from the keyboard. */
 static void oldrtc_request_power_down(void) {
@@ -663,6 +665,7 @@ static void newrtc_put_clock(uint8_t addr, uint8_t val) {
     }
 }
 
+#if 0
 static void newrtc_check_alarm(void) {
     if (newrtc.control&NRTC_START) {
         newrtc.timecntr = (uint32_t)host_unix_time();
@@ -672,6 +675,7 @@ static void newrtc_check_alarm(void) {
         newrtc_check_interrupt();
     }
 }
+#endif
 
 static void newrtc_check_time(void) {
     newrtc.timecntr = (uint32_t)host_unix_time();

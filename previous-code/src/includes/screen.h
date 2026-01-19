@@ -12,7 +12,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 extern volatile bool bGrabMouse;
 extern volatile bool bInFullScreen;
@@ -26,7 +26,9 @@ extern void Screen_ReturnFromFullScreen(void);
 extern void Screen_ShowMainWindow(void);
 extern void Screen_SizeChanged(void);
 extern void Screen_ModeChanged(void);
+extern void Screen_TitlebarChanged(void);
 extern void Screen_StatusbarChanged(void);
+extern void Screen_StatusbarMessage(const char *msg, uint32_t msecs);
 extern void Screen_UpdateRects(SDL_Surface *screen, int numrects, SDL_Rect *rects);
 extern void Screen_UpdateRect(SDL_Surface *screen, int32_t x, int32_t y, int32_t w, int32_t h);
 extern void Screen_BlitDimension(uint32_t* vram, SDL_Texture* tex);

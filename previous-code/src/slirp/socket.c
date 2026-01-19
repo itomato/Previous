@@ -518,6 +518,7 @@ sosendto(struct socket *so, struct mbuf *m)
 	char addrstr[INET_ADDRSTRLEN];
 	DEBUG_MISC((dfd, " sendto()ing, addr.sin_port=%d, addr.sin_addr.s_addr=%.16s\n",
 		ntohs(addr.sin_port), inet_ntop(AF_INET, &addr.sin_addr, addrstr, sizeof(addrstr))));
+	(void)addrstr; /* may be unused */
 	
 	/* Don't care what port we get */
 	ret = sendto(so->s, m->m_data, m->m_len, 0,

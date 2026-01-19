@@ -14,7 +14,6 @@ const char SysReg_fileid[] = "Previous sysReg.c";
 #include "ioMemTables.h"
 #include "video.h"
 #include "configuration.h"
-#include "sysdeps.h"
 #include "m68000.h"
 #include "dsp.h"
 #include "sysReg.h"

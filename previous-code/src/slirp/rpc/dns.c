@@ -24,6 +24,7 @@
  */
 #include <slirp.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include "rpc.h"
 #include "dns.h"
@@ -156,21 +157,23 @@ static size_t domain_name(uint8_t* dst, const char* src) {
 }
 
 static char* alloc_ip_addr_str(uint32_t addr, const char* suffix) {
-    int len = 16 + strlen(suffix);
+    char addrstr[16];
+    size_t len = sizeof(addrstr) + strlen(suffix);
     char* result = (char*)malloc(len);
-    snprintf(result, len, "%d.%d.%d.%d%s", (addr>>24)&0xFF, (addr>>16)&0xFF, (addr>>8)&0xFF, addr&0xFF, suffix);
+    snprintf(result, len, "%s%s", rpc_ip_str(addrstr, addr, 4, sizeof(addrstr)), suffix);
     return result;
 }
 
 static char* alloc_lowercase_name(const char* name, const char* suffix) {
     size_t i;
-    size_t size = strlen(name);
-    char* result = (char*)malloc(size + strlen(suffix) + 1);
-    for (i = 0; i < size; i++) {
+    size_t namelen = strlen(name);
+    size_t suffixlen = strlen(suffix);
+    char* result = (char*)malloc(namelen + suffixlen + 1);
+    for (i = 0; i < namelen; i++) {
         result[i] = tolower(name[i]);
     }
-    result[size] = '\0';
-    strcat(result, suffix);
+    memcpy(result + namelen, suffix, suffixlen);
+    result[namelen + suffixlen] = '\0';
     return result;
 }
 
@@ -318,6 +321,7 @@ static void vdns_input(struct csocket_t* pSocket) {
         msg_write_word(msg, 10, 0); /* ARCOUNT */
         
         if (rec) {
+            char addrstr[16];
             msg_write_word(msg, 6, 1); /* Num answers */
             
             /* Keep request in message and add answer */
@@ -330,7 +334,7 @@ static void vdns_input(struct csocket_t* pSocket) {
             msg_write_long(msg, n, 60);           /* TTL */
             n += 4;
             
-            printf("[DNS] reply '%s' -> %d.%d.%d.%d\n", rec->key, (rec->inaddr>>24)&0xFF, (rec->inaddr>>16)&0xFF, (rec->inaddr>>8)&0xFF, rec->inaddr&0xFF);
+            printf("[DNS] reply '%s' -> %s\n", rec->key, rpc_ip_str(addrstr, rec->inaddr, 4, sizeof(addrstr)));
             switch(rec->type) {
                 case REC_A:
                 case REC_PTR:
@@ -414,17 +418,17 @@ void vdns_uninit(void) {
 }
 
 void vdns_add_rec(const char* name, uint32_t addr) {
+    char addrstr[16];
     char hostname[NAME_HOST_MAX];
-    printf("[DNS] Adding record for %d.%d.%d.%d: '%s'.\n", (addr>>24)&0xff, 
-           (addr>>16)&0xff, (addr>>8)&0xff, addr&0xff, name);
+    printf("[DNS] Adding record for %s: '%s'.\n", rpc_ip_str(addrstr, addr, 4, sizeof(addrstr)), name);
     vfscpy(hostname, name, sizeof(hostname));
     vfscat(hostname, NAME_DOMAIN, sizeof(hostname));
     addRecord(addr, hostname);
 }
 
 void vdns_remove_rec(uint32_t addr) {
-    printf("[DNS] Removing record for %d.%d.%d.%d.\n", (addr>>24)&0xff, 
-           (addr>>16)&0xff, (addr>>8)&0xff, addr&0xff);
+    char addrstr[16];
+    printf("[DNS] Removing record for %s.\n", rpc_ip_str(addrstr, addr, 4, sizeof(addrstr)));
     vdns_remove_records(addr);
 }
 

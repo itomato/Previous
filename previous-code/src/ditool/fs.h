@@ -32,10 +32,6 @@
   #include <sys/types.h>
 #endif
 
-#ifdef _WIN32
-typedef uint8_t u_char;
-#endif
-
 /*
  * Copyright (c) 1982, 1986 Regents of the University of California.
  * All rights reserved.  The Berkeley software License Agreement
@@ -80,9 +76,9 @@ typedef uint8_t u_char;
  *  device blocks based on the blocksize of the device...
  */
 #define	SBLOCK		((int32_t)(BBLOCK + BBSIZE))
-#else	// NeXT
+#else	/* NeXT */
 #define	SBLOCK		((int32_t)(BBLOCK + BBSIZE) / DEV_BSIZE)
-#endif	// NeXT
+#endif	/* NeXT */
 
 /*
  * Addresses stored in inodes are capable of addressing fragments
@@ -377,23 +373,23 @@ struct csum {
 	__fs32	cs_nffree;	/* number of free frags */
 };
 
-#define    INOPB(fs)    (fsv((fs)->fs_inopb))
+#define    INOPB(fs)    (ntohl((fs)->fs_inopb))
 
 #define blkstofrags(fs, blks)    /* calculates (blks * fs->fs_frag) */ \
-((blks) << fsv((fs)->fs_fragshift))
+((blks) << ntohl((fs)->fs_fragshift))
 
-#define    cgbase(fs, c)    ((int32_t)(fsv((fs)->fs_fpg) * (c)))
+#define    cgbase(fs, c)    ((int32_t)(ntohl((fs)->fs_fpg) * (c)))
 
 #define cgstart(fs, c) \
-(cgbase(fs, c) + fsv((fs)->fs_cgoffset) * ((c) & ~(fsv((fs)->fs_cgmask))))
+(cgbase(fs, c) + ntohl((fs)->fs_cgoffset) * ((c) & ~(ntohl((fs)->fs_cgmask))))
 
-#define    cgimin(fs, c)    (cgstart(fs, c) + fsv((fs)->fs_iblkno))    /* inode blk */
+#define    cgimin(fs, c)    (cgstart(fs, c) + ntohl((fs)->fs_iblkno))    /* inode blk */
 
 #define    itoo(fs, x)    ((x) % INOPB(fs))
-#define    itog(fs, x)    ((x) / fsv((fs)->fs_ipg))
+#define    itog(fs, x)    ((x) / ntohl((fs)->fs_ipg))
 #define    itod(fs, x) \
 ((int32_t)(cgimin(fs, itog(fs, x)) + \
-(blkstofrags((fs), (((x) % fsv((fs)->fs_ipg)) / INOPB(fs))))))
+(blkstofrags((fs), (((x) % ntohl((fs)->fs_ipg)) / INOPB(fs))))))
 
 /*
  * Preference for optimization.
@@ -415,7 +411,7 @@ struct csum {
 #define FS_STATE_CLEAN		1	/* cleanly unmounted */
 #define FS_STATE_DIRTY		2	/* dirty */
 #define FS_STATE_CORRUPTED	3	/* mounted while dirty */
-#endif	// NeXT
+#endif	/* NeXT */
 
 /* As noted in cpu/sysdeps.h, "if a char has more than 8 bits, good night" */
 #ifndef NBBY
@@ -443,7 +439,7 @@ struct	cg {
 	int16_t	cg_b[MAXCPG][NRPOS];	/* positions of free blocks */
 	char	cg_iused[MAXIPG/NBBY];	/* used inode map */
 	int32_t	cg_magic;		/* magic number */
-	u_char	cg_free[1];		/* free block map */
+	uint8_t	cg_free[1];		/* free block map */
 /* actually int32_ter */
 };
 
@@ -453,7 +449,7 @@ struct	cg {
  * At NeXT, all little endian machines read and write big endian file systems.
  */
 #define	BIG_ENDIAN_FS	(__LITTLE_ENDIAN__)
-#endif	// NeXT
+#endif	/* NeXT */
 
 #pragma pack(pop)
 

@@ -115,7 +115,7 @@ int8_t floatx80_internal_mode = float_round_nearest_even;
  *----------------------------------------------------------------------------*/
 floatx80 roundSaveFloatx80Internal( int8_t roundingPrecision, flag zSign, int32_t zExp, uint64_t zSig0, uint64_t zSig1, float_status *status )
 {
-    int64_t roundMask, roundBits;
+    uint64_t roundMask, roundBits;
     uint64_t roundIncrement;
     flag increment;
     
@@ -227,7 +227,7 @@ static void saveFloat32Internal( flag zSign, int16_t zExp, uint32_t zSig, float_
 
 void getRoundedFloatInternal( int8_t roundingPrecision, flag *pzSign, int32_t *pzExp, uint64_t *pzSig )
 {
-    int64_t roundMask, roundBits;
+    uint64_t roundMask, roundBits;
     uint64_t roundIncrement;
     flag increment;
 
@@ -646,7 +646,7 @@ static int64_t roundAndPackInt64(flag zSign, uint64_t absZ0, uint64_t absZ1,
         float_raise(float_flag_invalid, status);
         return
               zSign ? (int64_t) LIT64( 0x8000000000000000 )
-            : LIT64( 0x7FFFFFFFFFFFFFFF );
+            : (int64_t)LIT64( 0x7FFFFFFFFFFFFFFF );
     }
     if (absZ1) {
         status->float_exception_flags |= float_flag_inexact;
@@ -1350,7 +1350,7 @@ floatx80 roundAndPackFloatx80( int8_t roundingPrecision, flag zSign, int32_t zEx
 {
     int8_t roundingMode;
     flag roundNearestEven, increment;
-    int64_t roundMask, roundBits;
+    uint64_t roundMask, roundBits;
     uint64_t roundIncrement;
     int32_t expOffset;
     
@@ -1504,7 +1504,7 @@ floatx80 roundSigAndPackFloatx80( int8_t roundingPrecision, flag zSign, int32_t 
 {
     int8_t roundingMode;
     flag roundNearestEven, isTiny;
-    int64_t roundMask, roundBits;
+    uint64_t roundMask, roundBits;
     uint64_t roundIncrement;
     
     roundingMode = status->float_rounding_mode;
@@ -3591,7 +3591,7 @@ static int32_t roundAndPackInt32_2( flag zSign, uint64_t absZ, float_status* c )
     roundBits = absZ & 0x7F;
     absZ = ( absZ + roundIncrement )>>7;
     absZ &= ~ ( ( ( roundBits ^ 0x40 ) == 0 ) & roundNearestEven );
-    z = absZ;
+    z = (int32_t) absZ;
     if ( zSign ) z = - z;
     z = (int32_t) z;
     if ( ( absZ>>32 ) || ( z && ( ( z < 0 ) ^ zSign ) ) ) {
@@ -4091,7 +4091,7 @@ float32 float32_mul( float32 a, float32 b, float_status* c )
     aSig = ( aSig | 0x00800000 )<<7;
     bSig = ( bSig | 0x00800000 )<<8;
     shift64RightJamming( ( (uint64_t) aSig ) * bSig, 32, &zSig64 );
-    zSig = zSig64;
+    zSig = (uint32_t) zSig64;
     if ( 0 <= (int32_t) ( zSig<<1 ) ) {
         zSig <<= 1;
         --zExp;
@@ -4170,7 +4170,7 @@ float32 float32_div( float32 a, float32 b, float_status* c )
         aSig >>= 1;
         ++zExp;
     }
-    zSig = ( ( (uint64_t) aSig )<<32 ) / bSig;
+    zSig = (uint32_t) ( ( ( (uint64_t) aSig )<<32 ) / bSig );
     if ( ( zSig & 0x3F ) == 0 ) {
         zSig |= ( (uint64_t) bSig * zSig != ( (uint64_t) aSig )<<32 );
     }
@@ -4239,7 +4239,7 @@ float32 float32_rem( float32 a, float32 b, float_status* c )
         q = ( bSig <= aSig );
         if ( q ) aSig -= bSig;
         if ( 0 < expDiff ) {
-            q = ( ( (uint64_t) aSig )<<32 ) / bSig;
+            q = (uint32_t) ( ( ( (uint64_t) aSig )<<32 ) / bSig );
             q >>= 32 - expDiff;
             bSig >>= 2;
             aSig = ( ( aSig>>1 )<<( expDiff - 1 ) ) - bSig * q;
@@ -4263,9 +4263,9 @@ float32 float32_rem( float32 a, float32 b, float_status* c )
         expDiff += 64;
         q64 = estimateDiv128To64( aSig64, 0, bSig64 );
         q64 = ( 2 < q64 ) ? q64 - 2 : 0;
-        q = q64>>( 64 - expDiff );
+        q = (uint32_t) ( q64>>( 64 - expDiff ) );
         bSig <<= 6;
-        aSig = ( ( aSig64>>33 )<<( expDiff - 1 ) ) - bSig * q;
+        aSig = (uint32_t) ( ( ( aSig64>>33 )<<( expDiff - 1 ) ) - bSig * q );
     }
     do {
         alternateASig = aSig;
@@ -4643,7 +4643,7 @@ int32_t float64_to_int32_round_to_zero( float64 a, float_status* c )
     shiftCount = 0x433 - aExp;
     savedASig = aSig;
     aSig >>= shiftCount;
-    z = aSig;
+    z = (int32_t) aSig;
     if ( aSign ) z = - z;
     z = (int32_t) z;
     if ( ( z < 0 ) ^ aSign ) {
@@ -4782,7 +4782,7 @@ float32 float64_to_float32( float64 a, float_status* c )
         return packFloat32( aSign, 0xFF, 0 );
     }
     shift64RightJamming( aSig, 22, &aSig );
-    zSig = aSig;
+    zSig = (uint32_t) aSig;
     if ( aExp || zSig ) {
         zSig |= 0x40000000;
         aExp -= 0x381;
@@ -5285,7 +5285,7 @@ float64 float64_sqrt( float64 a, float_status* c )
     }
     zExp = ( ( aExp - 0x3FF )>>1 ) + 0x3FE;
     aSig |= LIT64( 0x0010000000000000 );
-    zSig = estimateSqrt32( aExp, aSig>>21 );
+    zSig = estimateSqrt32( aExp, (uint32_t) ( aSig>>21 ) );
     aSig <<= 9 - ( aExp & 1 );
     zSig = estimateDiv128To64( aSig, 0, zSig<<32 ) + ( zSig<<30 );
     if ( ( zSig & 0x1FF ) <= 5 ) {

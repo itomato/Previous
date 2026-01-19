@@ -12,7 +12,6 @@
 #include "main.h"
 #include "configuration.h"
 #include "m68000.h"
-#include "sysdeps.h"
 #include "dimension.hpp"
 #include "i860cfg.h"
 #include "nd_sdl.hpp"

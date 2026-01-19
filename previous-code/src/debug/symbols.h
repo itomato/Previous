@@ -44,7 +44,7 @@ extern bool Symbols_GetDspAddress(symtype_t symtype, const char *name, uint32_t 
 extern const char* Symbols_GetByCpuAddress(uint32_t addr, symtype_t symtype);
 extern const char* Symbols_GetByDspAddress(uint32_t addr, symtype_t symtype);
 /* handlers for automatic program symbol loading */
-extern void Symbols_LoadCurrentProgram(void);
+extern void Symbols_LoadCurrentProgram(uint32_t textAddr, uint32_t textEnd);
 extern void Symbols_FreeAll(void);
 /* symbols/dspsymbols command parsing */
 extern char *Symbols_MatchCpuCommand(const char *text, int state);

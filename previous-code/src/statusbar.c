@@ -114,19 +114,24 @@ static int StatusbarHeight;
 /**
  * Return statusbar height for given width and height
  */
-int Statusbar_GetHeightForSize(int width, int height)
+static int Statusbar_GetHeightForSize(int width, int height, bool force)
 {
-	if (ConfigureParams.Screen.bShowStatusbar) {
-		/* Should check the same thing as SDLGui_SetScreen()
-		 * does to decide the font size.
-		 */
-		if (width >= 640 && height >= (400-24)) {
-			return 24;
-		} else {
-			return 12;
+	int h = 0;
+	/* Must arrive at same conclusion about font size as SDLGui_SetScreen(),
+	 * and max size returned by this must correspond to STATUSBAR_MAX_HEIGHT
+	 */
+	if (ConfigureParams.Screen.bShowStatusbar || force)
+	{
+		/* smaller SDL GUI font height = 8, larger = 16 */
+		h = 8;
+		if (width >= 640 && height >= (400-2*h))
+		{
+			h *= 2;
 		}
+		h += 8;
 	}
-	return 0;
+	DEBUGPRINT(("Statusbar_GetHeightForSize(%d, %d) -> %d\n", width, height, h));
+	return h;
 }
 
 /*-----------------------------------------------------------------------*/
@@ -137,7 +142,7 @@ int Statusbar_GetHeightForSize(int width, int height)
  * height when screen is (re-)created, or zero if statusbar will
  * not be shown
  */
-int Statusbar_SetHeight(int width, int height)
+int Statusbar_SetHeight(int width, int height, bool force)
 {
 #if DEBUG
 	/* find out from where the set height is called */
@@ -146,7 +151,7 @@ int Statusbar_SetHeight(int width, int height)
 	backtrace_symbols_fd(addr, count, fileno(stderr));
 #endif
 	ScreenHeight = height;
-	StatusbarHeight = Statusbar_GetHeightForSize(width, height);
+	StatusbarHeight = Statusbar_GetHeightForSize(width, height, force);
 	DEBUGPRINT(("Statusbar_SetHeight(%d, %d) -> %d\n", width, height, StatusbarHeight));
 	return StatusbarHeight;
 }
@@ -208,9 +213,9 @@ static void Statusbar_OverlayInit(const SDL_Surface *surf)
 	if (OverlayUnderside && (
 	    OverlayUnderside->w != OverlayLedRect.w ||
 	    OverlayUnderside->h != OverlayLedRect.h ||
-	    OverlayUnderside->format->BitsPerPixel != surf->format->BitsPerPixel))
+	    OverlayUnderside->format != surf->format))
 	{
-		SDL_FreeSurface(OverlayUnderside);
+		SDL_DestroySurface(OverlayUnderside);
 		OverlayUnderside = NULL;
 	}
 	nOverlayState = OVERLAY_NONE;
@@ -233,18 +238,18 @@ void Statusbar_Init(SDL_Surface *surf)
 	assert(surf);
 
 	/* dark green and light green for leds themselves */
-	LedColor[ LED_STATE_OFF ]     = SDL_MapRGB(surf->format, 0x00, 0x40, 0x00);
-	LedColor[ LED_STATE_ON ]      = SDL_MapRGB(surf->format, 0x00, 0xe0, 0x00);
-	LedColor[ LED_STATE_ON_BUSY ] = SDL_MapRGB(surf->format, 0xff, 0xe0, 0x00);
-	LedColorBg   = SDL_MapRGB(surf->format, 0x00, 0x00, 0x00);
-	SysColorOff  = SDL_MapRGB(surf->format, 0x40, 0x00, 0x00);
-	SysColorOn   = SDL_MapRGB(surf->format, 0xe0, 0x00, 0x00);
-	DspColorOff  = SDL_MapRGB(surf->format, 0x00, 0x00, 0x40);
-	DspColorOn   = SDL_MapRGB(surf->format, 0x00, 0x00, 0xe0);
-	NdColorOff   = SDL_MapRGB(surf->format, 0x00, 0x00, 0x40);
-	NdColorCS8   = SDL_MapRGB(surf->format, 0xe0, 0x00, 0x00);
-	NdColorOn    = SDL_MapRGB(surf->format, 0x00, 0x00, 0xe0);
-	GrayBg       = SDL_MapRGB(surf->format, 0xb5, 0xb7, 0xaa);
+	LedColor[ LED_STATE_OFF ]     = SDL_MapSurfaceRGB(surf, 0x00, 0x40, 0x00);
+	LedColor[ LED_STATE_ON ]      = SDL_MapSurfaceRGB(surf, 0x00, 0xe0, 0x00);
+	LedColor[ LED_STATE_ON_BUSY ] = SDL_MapSurfaceRGB(surf, 0xff, 0xe0, 0x00);
+	LedColorBg   = SDL_MapSurfaceRGB(surf, 0x00, 0x00, 0x00);
+	SysColorOff  = SDL_MapSurfaceRGB(surf, 0x40, 0x00, 0x00);
+	SysColorOn   = SDL_MapSurfaceRGB(surf, 0xe0, 0x00, 0x00);
+	DspColorOff  = SDL_MapSurfaceRGB(surf, 0x00, 0x00, 0x40);
+	DspColorOn   = SDL_MapSurfaceRGB(surf, 0x00, 0x00, 0xe0);
+	NdColorOff   = SDL_MapSurfaceRGB(surf, 0x00, 0x00, 0x40);
+	NdColorCS8   = SDL_MapSurfaceRGB(surf, 0xe0, 0x00, 0x00);
+	NdColorOn    = SDL_MapSurfaceRGB(surf, 0x00, 0x00, 0xe0);
+	GrayBg       = SDL_MapSurfaceRGB(surf, 0xb5, 0xb7, 0xaa);
 
 	/* disable leds */
 	for (i = 0; i < NUM_DEVICE_LEDS; i++)
@@ -287,7 +292,7 @@ void Statusbar_Init(SDL_Surface *surf)
 	FullRect.y = surf->h - StatusbarHeight;
 	FullRect.w = surf->w;
 	FullRect.h = StatusbarHeight;
-	SDL_FillRect(surf, &FullRect, GrayBg);
+	SDL_FillSurfaceRect(surf, &FullRect, GrayBg);
 
 	/* led size */
 	LedRect.w = fonth/2;
@@ -310,10 +315,10 @@ void Statusbar_Init(SDL_Surface *surf)
 		xoffset += fontw/2;
 
 		ledbox.x = xoffset - 1;
-		SDL_FillRect(surf, &ledbox, LedColorBg);
+		SDL_FillSurfaceRect(surf, &ledbox, LedColorBg);
 
 		LedRect.x = xoffset;
-		SDL_FillRect(surf, &LedRect, LedColor[ LED_STATE_OFF ]);
+		SDL_FillSurfaceRect(surf, &LedRect, LedColor[ LED_STATE_OFF ]);
 
 		Led[i].offset = xoffset;
 		xoffset += LedRect.w + fontw;
@@ -330,8 +335,8 @@ void Statusbar_Init(SDL_Surface *surf)
 	NdLedRect.x = surf->w - 15*fontw - NdLedRect.w;
 	ledbox.x = NdLedRect.x - 1;
 	SDLGui_Text(ledbox.x - 3*fontw - fontw/2, MessageRect.y, "ND:");
-	SDL_FillRect(surf, &ledbox, LedColorBg);
-	SDL_FillRect(surf, &NdLedRect, NdColorOff);
+	SDL_FillSurfaceRect(surf, &ledbox, LedColorBg);
+	SDL_FillSurfaceRect(surf, &NdLedRect, NdColorOff);
 	nNdLed = 0;
 
 	/* draw dsp led box */
@@ -339,8 +344,8 @@ void Statusbar_Init(SDL_Surface *surf)
 	DspLedRect.x = surf->w - 8*fontw - DspLedRect.w;
 	ledbox.x = DspLedRect.x - 1;
 	SDLGui_Text(ledbox.x - 4*fontw - fontw/2, MessageRect.y, "DSP:");
-	SDL_FillRect(surf, &ledbox, LedColorBg);
-	SDL_FillRect(surf, &DspLedRect, DspColorOff);
+	SDL_FillSurfaceRect(surf, &ledbox, LedColorBg);
+	SDL_FillSurfaceRect(surf, &DspLedRect, DspColorOff);
 	bDspLed = false;
 
 	/* draw system led box */
@@ -348,8 +353,8 @@ void Statusbar_Init(SDL_Surface *surf)
 	SystemLedRect.x = surf->w - fontw - SystemLedRect.w;
 	ledbox.x = SystemLedRect.x - 1;
 	SDLGui_Text(ledbox.x - 4*fontw - fontw/2, MessageRect.y, "LED:");
-	SDL_FillRect(surf, &ledbox, LedColorBg);
-	SDL_FillRect(surf, &SystemLedRect, SysColorOff);
+	SDL_FillSurfaceRect(surf, &ledbox, LedColorBg);
+	SDL_FillSurfaceRect(surf, &SystemLedRect, SysColorOff);
 	bSystemLed = false;
 
 	/* and blit statusbar on screen */
@@ -510,7 +515,7 @@ void Statusbar_UpdateInfo(void)
 static SDL_Rect* Statusbar_DrawMessage(SDL_Surface *surf, const char *msg)
 {
 	int fontw, fonth, offset;
-	SDL_FillRect(surf, &MessageRect, GrayBg);
+	SDL_FillSurfaceRect(surf, &MessageRect, GrayBg);
 	if (*msg)
 	{
 		SDLGui_GetFontSize(&fontw, &fonth);
@@ -576,12 +581,7 @@ void Statusbar_OverlayBackup(SDL_Surface *surf)
 	if (!OverlayUnderside)
 	{
 		SDL_Surface *bak;
-		SDL_PixelFormat *fmt = surf->format;
-		bak = SDL_CreateRGBSurface(surf->flags,
-					   OverlayLedRect.w, OverlayLedRect.h,
-					   fmt->BitsPerPixel,
-					   fmt->Rmask, fmt->Gmask, fmt->Bmask,
-					   fmt->Amask);
+		bak = SDL_CreateSurface(OverlayLedRect.w, OverlayLedRect.h, surf->format);
 		assert(bak);
 		OverlayUnderside = bak;
 	}
@@ -632,8 +632,8 @@ static void Statusbar_OverlayDrawLed(SDL_Surface *surf, uint32_t color)
 	rect.y += 1;
 	rect.w -= 2;
 	rect.h -= 2;
-	SDL_FillRect(surf, &OverlayLedRect, LedColorBg);
-	SDL_FillRect(surf, &rect, color);
+	SDL_FillSurfaceRect(surf, &OverlayLedRect, LedColorBg);
+	SDL_FillSurfaceRect(surf, &rect, color);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -738,7 +738,7 @@ void Statusbar_Update(SDL_Surface *surf)
 		Led[i].oldstate = Led[i].state;
 		color = LedColor[ Led[i].state ];
 		rect.x = Led[i].offset;
-		SDL_FillRect(surf, &rect, color);
+		SDL_FillSurfaceRect(surf, &rect, color);
 		DEBUGPRINT(("LED[%d] = %d\n", i, Led[i].state));
 		last_rect = &rect;
 		updates++;
@@ -758,7 +758,7 @@ void Statusbar_Update(SDL_Surface *surf)
 		{
 			color = DspColorOff;
 		}
-		SDL_FillRect(surf, &DspLedRect, color);
+		SDL_FillSurfaceRect(surf, &DspLedRect, color);
 		last_rect = &DspLedRect;
 		updates++;
 	}
@@ -775,7 +775,7 @@ void Statusbar_Update(SDL_Surface *surf)
 		{
 			color = SysColorOff;
 		}
-		SDL_FillRect(surf, &SystemLedRect, color);
+		SDL_FillSurfaceRect(surf, &SystemLedRect, color);
 		last_rect = &SystemLedRect;
 		updates++;
 	}
@@ -791,7 +791,7 @@ void Statusbar_Update(SDL_Surface *surf)
 			case 2:  color = NdColorOn;  break;
 			default: color = NdColorOff; break;
 		}
-		SDL_FillRect(surf, &NdLedRect, color);
+		SDL_FillSurfaceRect(surf, &NdLedRect, color);
 		last_rect = &NdLedRect;
 		updates++;
 	}

@@ -13,7 +13,6 @@ const char IoMem_fileid[] = "Previous ioMem.c";
 #include "ioMem.h"
 #include "ioMemTables.h"
 #include "m68000.h"
-#include "sysdeps.h"
 
 #define IO_MASK 0x0001FFFF
 #define IO_SIZE 0x00020000

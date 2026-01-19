@@ -6,7 +6,7 @@
 /* when compiling Hatari */
 #define WINUAE_FOR_HATARI
 
-/* This define disables compilation of Atari specific code in the cpu core. */
+/* This define enables compilation of Previous' specific code in the cpu core. */
 /* This only works when also defining WINUAE_FOR_HATARI */
 #define WINUAE_FOR_PREVIOUS
 
@@ -220,9 +220,6 @@ typedef long uae_atomic;
 /* #undef HAVE_ST_BLOCKS */
 #endif /* ! WINUAE_FOR_HATARI */
 
-/* Define if utime(file, NULL) sets file's timestamp to the present.  */
-#define HAVE_UTIME_NULL 1
-
 /* Define as __inline if that's what the C compiler calls it.  */
 /* #undef inline */
 #define __inline__ __inline
@@ -238,16 +235,10 @@ typedef long uae_atomic;
 
 /* Define to `int' if <sys/types.h> doesn't define.  */
 /* #undef pid_t */
-
-/* Define if you need to in order for stat and other things to work.  */
-/* #undef _POSIX_SOURCE */
 #endif /* ! WINUAE_FOR_HATARI */
 
 /* Define as the return type of signal handlers (int or void).  */
 #define RETSIGTYPE void
-
-/* Define if you have the ANSI C header files.  */
-#define STDC_HEADERS 1
 
 /* Define if you can safely include both <sys/time.h> and <time.h>.  */
 #ifdef __GNUC__
@@ -260,9 +251,6 @@ typedef long uae_atomic;
 
 /* Define if your <sys/time.h> declares struct tm.  */
 /* #undef TM_IN_SYS_TIME */
-
-/* Define if the X Window System is missing or not being used.  */
-#define X_DISPLAY_MISSING 1
 
 #ifndef WINUAE_FOR_HATARI
 /* Define if you have the Andrew File System.  */
@@ -342,67 +330,20 @@ typedef long uae_atomic;
 /* The number of bytes in a __int64.  */
 #define SIZEOF___INT64 8
 
-/* The number of bytes in a char (1 on almost every platform, but ANSI C allows larger) */
-#include <limits.h>
-#if SCHAR_MAX == 127
-    #define SIZEOF_CHAR         1
-#elif SCHAR_MAX == 32767
-    #define SIZEOF_CHAR         2
-#else
-    #error "On a strange architecture with char > 2 bytes, further porting required"
-#endif
+/* The number of bytes in a char.  */
+#define SIZEOF_CHAR 1
 
-/* Sort out integer and pointer sizes */
-#if defined(_MSC_VER) || (defined(__INTEL_COMPILER) && defined(_WIN32))
-    #define SIZEOF_SHORT        2
-    #define SIZEOF_INT          4
-    #define SIZEOF_LONG         4
-    #define SIZEOF_LONG_LONG    8
-    #if defined(_M_X64)
-      #define SIZEOF_PTR        8
-   #else
-      #define SIZEOF_PTR        4
-   #endif
-#elif defined(__clang__) || defined(__INTEL_COMPILER) || defined(__GNUC__)
-    #define SIZEOF_SHORT        2
-    #define SIZEOF_INT          4
-    #if __LONG_MAX__ == 2147483647
-        #define SIZEOF_LONG     4
-    #else
-        #define SIZEOF_LONG     8
-    #endif
-    #define SIZEOF_LONG_LONG    8
-    #if defined(__x86_64)
-        #define SIZEOF_PTR      8
-    #else
-        #define SIZEOF_PTR      4
-    #endif
-#else
-    /* Didn't recognize the compiler, fall back on <limits.h> */
-  #if defined(INT_MAX) && defined(LONG_MAX)
-      #if INT_MAX == 32767
-          #define SIZEOF_INT    2
-      #elif INT_MAX == 2147483647
-          #define SIZEOF_INT    4
-      #else
-          #define SIZEOF_INT    8
-      #endif
-      #if LONG_MAX == 2147483647
-          #define SIZEOF_LONG   4
-      #else
-          #define SIZEOF_LONG   8
-      #endif
+/* The number of bytes in a int.  */
+#define SIZEOF_INT 4
 
-      /* SHORT_MAX isn't necessarily defined in a way accessible to the preprocessor, and there's no
-       * portable way to check LONG_LONG_MAX, so make some educated guesses
-       */
-      #warning "Assuming shorts are 2 bytes and long long are 8; the latter especially may be invalid on some systems"
-      #define SIZEOF_SHORT      2
-      #define SIZEOF_LONG_LONG  8
-  #else
-      #error "Unrecognized compiler / build environment; specify type sizes in src/cpu/sysconfig.h"
-  #endif
-#endif
+/* The number of bytes in a long.  */
+#define SIZEOF_LONG 4
+
+/* The number of bytes in a long long.  */
+#define SIZEOF_LONG_LONG 8
+
+/* The number of bytes in a short.  */
+#define SIZEOF_SHORT 2
 
 #define SIZEOF_FLOAT 4
 #define SIZEOF_DOUBLE 8
@@ -470,17 +411,11 @@ typedef long uae_atomic;
 /* Define if you have the mkfifo function.  */
 /* #undef HAVE_MKFIFO */
 
-/* Define if you have the readdir_r function.  */
-/* #undef HAVE_READDIR_R */
-
 /* Define if you have the rmdir function.  */
 #define HAVE_RMDIR 1
 
 /* Define if you have the select function.  */
 /* #undef HAVE_SELECT */
-
-/* Define if you have the sigaction function.  */
-/* #undef HAVE_SIGACTION */
 
 /* Define if you have the strchr function.  */
 /* #undef HAVE_STRCHR */
@@ -509,20 +444,6 @@ typedef long uae_atomic;
 /* Define if you have the vsprintf function.  */
 #define HAVE_VSPRINTF 1
 
-/* Define if you have the <curses.h> header file.  */
-/* #undef HAVE_CURSES_H */
-
-/* Define if you have the <cybergraphx/cybergraphics.h> header file.  */
-/* #undef HAVE_CYBERGRAPHX_CYBERGRAPHICS_H */
-
-/* Define if you have the <ddraw.h> header file.  */
-#ifndef _WIN32_WCE
-#define HAVE_DDRAW_H 1
-#endif
-
-/* Define if you have the <devices/ahi.h> header file.  */
-/* #undef HAVE_DEVICES_AHI_H */
-
 /* Define if you have the <dirent.h> header file.  */
 #define HAVE_DIRENT_H 1
 
@@ -530,12 +451,6 @@ typedef long uae_atomic;
 #ifndef _WIN32_WCE
 #define HAVE_FCNTL_H 1
 #endif
-
-/* Define if you have the <features.h> header file.  */
-/* #undef HAVE_FEATURES_H */
-
-/* Define if you have the <getopt.h> header file.  */
-/* #undef HAVE_GETOPT_H */
 
 /* Define if you have the <ggi/libggi.h> header file.  */
 /* #undef HAVE_GGI_LIBGGI_H */
@@ -587,12 +502,6 @@ typedef long uae_atomic;
 /* Define if you have the <sys/fs/s5param.h> header file.  */
 /* #undef HAVE_SYS_FS_S5PARAM_H */
 
-/* Define if you have the <sys/fs_types.h> header file.  */
-/* #undef HAVE_SYS_FS_TYPES_H */
-
-/* Define if you have the <sys/fstyp.h> header file.  */
-/* #undef HAVE_SYS_FSTYP_H */
-
 /* Define if you have the <sys/ioctl.h> header file.  */
 /* #undef HAVE_SYS_IOCTL_H */
 
@@ -607,12 +516,6 @@ typedef long uae_atomic;
 
 /* Define if you have the <sys/param.h> header file.  */
 /* #undef HAVE_SYS_PARAM_H */
-
-/* Define if you have the <sys/shm.h> header file.  */
-/* #undef HAVE_SYS_SHM_H */
-
-/* Define if you have the <sys/soundcard.h> header file.  */
-/* #undef HAVE_SYS_SOUNDCARD_H */
 
 /* Define if you have the <sys/stat.h> header file.  */
 #ifndef _WIN32_WCE

@@ -25,6 +25,8 @@
 #include <unistd.h>
 #include "ctl.h"
 
+#define NO_NEW_ADDR 1 /* required for Previous */
+
 /* XXX: only DHCP is supported */
 
 #define NB_ADDR 16
@@ -45,6 +47,7 @@ static const char    root_path[]   = "/";
 
 static char hostname[NAME_HOST_MAX];
 
+#ifndef NO_NEW_ADDR
 static BOOTPClient *get_new_addr(struct in_addr *paddr)
 {
     BOOTPClient *bc;
@@ -78,6 +81,7 @@ static BOOTPClient *find_addr(struct in_addr *paddr, const uint8_t *macaddr)
     paddr->s_addr = htonl(ntohl(special_addr.s_addr) | (i + CTL_HOST));
     return bc;
 }
+#endif
 
 static void dhcp_decode(const uint8_t *buf, int size,
                         int *pmsg_type)
@@ -121,7 +125,9 @@ static void dhcp_decode(const uint8_t *buf, int size,
 
 static void bootp_reply(struct bootp_t *bp)
 {
+#ifndef NO_NEW_ADDR
     BOOTPClient *bc;
+#endif
     struct mbuf *m;
     struct bootp_t *rbp;
     struct sockaddr_in saddr, daddr;
@@ -151,7 +157,7 @@ static void bootp_reply(struct bootp_t *bp)
     m->m_data += sizeof(struct udpiphdr);
     memset(rbp, 0, sizeof(struct bootp_t));
 
-#if 0
+#ifndef NO_NEW_ADDR
     if (dhcp_msg_type == DHCPDISCOVER) {
     new_addr:
         bc = get_new_addr(&daddr.sin_addr);

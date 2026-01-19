@@ -13,7 +13,6 @@ const char Dialog_fileid[] = "Previous dialog.c";
 #include "change.h"
 #include "dialog.h"
 #include "log.h"
-#include "sdlgui.h"
 #include "screen.h"
 #include "paths.h"
 #include "file.h"

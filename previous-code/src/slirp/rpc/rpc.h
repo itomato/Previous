@@ -126,6 +126,7 @@ void rpc_reset(void);
 void rpc_init(struct ft_t* ft);
 void rpc_uninit(void);
 
+const char* rpc_ip_str(char* buf, uint32_t addr, int count, size_t maxsize);
 void rpc_log(struct rpc_t* rpc, const char *format, ...);
 
 int rpc_read_file(const char* vfs_path, uint32_t offset, uint8_t* data, uint32_t len);

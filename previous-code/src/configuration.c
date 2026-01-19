@@ -16,14 +16,11 @@ const char Configuration_fileid[] = "Previous configuration.c";
 #include "configuration.h"
 #include "cfgopts.h"
 #include "file.h"
+#include "keymap.h"
 #include "log.h"
 #include "m68000.h"
 #include "paths.h"
-#include "screen.h"
-#include "video.h"
 #include "68kDisass.h"
-
-#include <SDL.h>
 
 
 CNF_PARAMS ConfigureParams;                 /* List of configuration for the emulator */
@@ -71,6 +68,7 @@ static const struct Config_Tag configs_Screen[] =
 	{ "nMonitorNum", Int_Tag, &ConfigureParams.Screen.nMonitorNum },
 	{ "bFullScreen", Bool_Tag, &ConfigureParams.Screen.bFullScreen },
 	{ "bShowStatusbar", Bool_Tag, &ConfigureParams.Screen.bShowStatusbar },
+	{ "bShowTitlebar", Bool_Tag, &ConfigureParams.Screen.bShowTitlebar },
 	{ "bShowDriveLed", Bool_Tag, &ConfigureParams.Screen.bShowDriveLed },
 	{ NULL , Error_Tag, NULL }
 };
@@ -113,6 +111,7 @@ static const struct Config_Tag configs_ShortCutWithMod[] =
 	{ "kQuit",        Key_Tag, &ConfigureParams.Shortcut.withModifier[SHORTCUT_QUIT] },
 	{ "kDimension",   Key_Tag, &ConfigureParams.Shortcut.withModifier[SHORTCUT_DIMENSION] },
 	{ "kStatusbar",   Key_Tag, &ConfigureParams.Shortcut.withModifier[SHORTCUT_STATUSBAR] },
+	{ "kTitlebar",    Key_Tag, &ConfigureParams.Shortcut.withModifier[SHORTCUT_TITLEBAR] },
 	{ NULL , Error_Tag, NULL }
 };
 
@@ -132,6 +131,7 @@ static const struct Config_Tag configs_ShortCutWithoutMod[] =
 	{ "kQuit",        Key_Tag, &ConfigureParams.Shortcut.withoutModifier[SHORTCUT_QUIT] },
 	{ "kDimension",   Key_Tag, &ConfigureParams.Shortcut.withoutModifier[SHORTCUT_DIMENSION] },
 	{ "kStatusbar",   Key_Tag, &ConfigureParams.Shortcut.withoutModifier[SHORTCUT_STATUSBAR] },
+	{ "kTitlebar",    Key_Tag, &ConfigureParams.Shortcut.withoutModifier[SHORTCUT_TITLEBAR] },
 	{ NULL , Error_Tag, NULL }
 };
 
@@ -467,23 +467,7 @@ void Configuration_SetDefault(void)
 	ConfigureParams.Mouse.bEnableMacClick = false;
 
 	/* Set defaults for Shortcuts */
-	ConfigureParams.Shortcut.withoutModifier[SHORTCUT_OPTIONS]    = SDLK_F12;
-	ConfigureParams.Shortcut.withoutModifier[SHORTCUT_FULLSCREEN] = SDLK_F11;
-
-	ConfigureParams.Shortcut.withModifier[SHORTCUT_PAUSE]         = SDLK_p;
-	ConfigureParams.Shortcut.withModifier[SHORTCUT_DEBUG_M68K]    = SDLK_d;
-	ConfigureParams.Shortcut.withModifier[SHORTCUT_DEBUG_I860]    = SDLK_i;
-
-	ConfigureParams.Shortcut.withModifier[SHORTCUT_OPTIONS]       = SDLK_o;
-	ConfigureParams.Shortcut.withModifier[SHORTCUT_FULLSCREEN]    = SDLK_f;
-	ConfigureParams.Shortcut.withModifier[SHORTCUT_MOUSEGRAB]     = SDLK_m;
-	ConfigureParams.Shortcut.withModifier[SHORTCUT_COLDRESET]     = SDLK_c;
-	ConfigureParams.Shortcut.withModifier[SHORTCUT_SCREENSHOT]    = SDLK_g;
-	ConfigureParams.Shortcut.withModifier[SHORTCUT_RECORD]        = SDLK_r;
-	ConfigureParams.Shortcut.withModifier[SHORTCUT_SOUND]         = SDLK_s;
-	ConfigureParams.Shortcut.withModifier[SHORTCUT_QUIT]          = SDLK_q;
-	ConfigureParams.Shortcut.withModifier[SHORTCUT_DIMENSION]     = SDLK_n;
-	ConfigureParams.Shortcut.withModifier[SHORTCUT_STATUSBAR]     = SDLK_b;
+	Keymap_InitShortcutDefaultKeys();
 
 	/* Set defaults for Memory */
 	memset(ConfigureParams.Memory.nMemoryBankSize, 16, 
@@ -502,6 +486,7 @@ void Configuration_SetDefault(void)
 	ConfigureParams.Screen.nMonitorType = MONITOR_TYPE_CPU;
 	ConfigureParams.Screen.nMonitorNum = 0;
 	ConfigureParams.Screen.bShowStatusbar = true;
+	ConfigureParams.Screen.bShowTitlebar = true;
 	ConfigureParams.Screen.bShowDriveLed = false;
 
 	/* Set defaults for Sound */
@@ -619,8 +604,8 @@ void Configuration_Apply(bool bReset)
 	/* Make sure NBIC is only used on Cubes and ADB only on Turbo */
 	Configuration_CheckPeripheralSettings();
 
-	/* Make sure we start with statusbar enabled (required for proper screen init) */
-	ConfigureParams.Screen.bShowStatusbar = true;
+	/* Make sure the overlay drive LED is disabled for Previous */
+	ConfigureParams.Screen.bShowDriveLed = false;
 
 	/* Clean file and directory names */
 	File_MakeAbsoluteName(ConfigureParams.Rom.szRom030FileName);
@@ -646,9 +631,9 @@ void Configuration_Apply(bool bReset)
 
 	/* make sure there are no trailing path separators */
 	for (i = 0; i < EN_MAX_SHARES; i++) {
-		File_CleanDirName(ConfigureParams.Ethernet.nfs[i].szPathName);
+		File_CleanFileName(ConfigureParams.Ethernet.nfs[i].szPathName);
 	}
-	File_CleanDirName(ConfigureParams.Printer.szPrintToFileName);
+	File_CleanFileName(ConfigureParams.Printer.szPrintToFileName);
 	
 	/* make path names absolute, but handle special file names */
 	File_MakeAbsoluteSpecialName(ConfigureParams.Log.sLogFileName);

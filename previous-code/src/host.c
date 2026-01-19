@@ -169,7 +169,7 @@ static char DARKMATTER[] = "darkmatter";
 
 void host_blank_count(int src, bool state) {
     if (state) {
-        SDL_AtomicAdd(&vblCounter[src], 1);
+        SDL_AddAtomicInt(&vblCounter[src], 1);
     }
     
     /* Check first 4 bytes of version string in darkmatter/daydream kernel */
@@ -177,7 +177,7 @@ void host_blank_count(int src, bool state) {
 }
 
 int host_reset_blank_counter(int src) {
-    return SDL_AtomicSet(&vblCounter[src], 0);
+    return SDL_SetAtomicInt(&vblCounter[src], 0);
 }
 
 void host_hardclock(int expected, int actual) {
@@ -295,22 +295,7 @@ void host_pause_time(bool pausing) {
  * Sleep for a given number of micro seconds.
  */
 void host_sleep_us(uint64_t us) {
-#if HAVE_NANOSLEEP
-    struct timespec	ts;
-    int		ret;
-    ts.tv_sec = us / 1000000ULL;
-    ts.tv_nsec = (us % 1000000ULL) * 1000;	/* micro sec -> nano sec */
-    /* wait until all the delay is elapsed, including possible interruptions by signals */
-    do {
-        errno = 0;
-        ret = nanosleep(&ts, &ts);
-    } while ( ret && ( errno == EINTR ) );		/* keep on sleeping if we were interrupted */
-#else
-    uint64_t timeout = us;
-    timeout += real_time();
-    host_sleep_ms( (uint32_t)(us / 1000ULL) );
-    while(real_time() < timeout) {}
-#endif
+    SDL_DelayNS(us * 1000);
 }
 
 void host_sleep_ms(uint32_t ms) {
@@ -318,31 +303,31 @@ void host_sleep_ms(uint32_t ms) {
 }
 
 void host_lock(lock_t* lock) {
-    SDL_AtomicLock(lock);
+    SDL_LockSpinlock(lock);
 }
 
 int host_trylock(lock_t* lock) {
-    return SDL_AtomicTryLock(lock);
+    return SDL_TryLockSpinlock(lock);
 }
 
 void host_unlock(lock_t* lock) {
-    SDL_AtomicUnlock(lock);
+    SDL_UnlockSpinlock(lock);
 }
 
 int host_atomic_set(atomic_int* a, int newValue) {
-    return SDL_AtomicSet(a, newValue);
+    return SDL_SetAtomicInt(a, newValue);
 }
 
 int host_atomic_get(atomic_int* a) {
-    return SDL_AtomicGet(a);
+    return SDL_GetAtomicInt(a);
 }
 
 int host_atomic_add(atomic_int* a, int value) {
-    return SDL_AtomicAdd(a, value);
+    return SDL_AddAtomicInt(a, value);
 }
 
 bool host_atomic_cas(atomic_int* a, int oldValue, int newValue) {
-    return SDL_AtomicCAS(a, oldValue, newValue);
+    return SDL_CompareAndSwapAtomicInt(a, oldValue, newValue);
 }
 
 thread_t* host_thread_create(thread_func_t func, const char* name, void* data) {
@@ -372,7 +357,7 @@ void host_mutex_destroy(mutex_t* mutex) {
 }
 
 int host_num_cpus(void) {
-    return SDL_GetCPUCount();
+    return SDL_GetNumLogicalCPUCores();
 }
 
 const char* host_report(uint64_t realTime, uint64_t hostTime) {

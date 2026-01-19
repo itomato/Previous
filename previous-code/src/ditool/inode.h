@@ -85,7 +85,7 @@
 #define	NIADDR	3		/* indirect addresses in inode */
 #if	defined(NeXT) || defined(MULTIMAX)
 #define MAX_FASTLINK_SIZE	((NDADDR + NIADDR) * sizeof (int32_t))
-#endif	// defined(NeXT) || defined(MULTIMAX)
+#endif	/* defined(NeXT) || defined(MULTIMAX) */
 
 struct 	icommon
 {
@@ -95,9 +95,9 @@ struct 	icommon
     uint16_t	ic_gid;		/*  6: owner's group id */
     uint32_t    ic_pad;     /*  8: padding */
     uint32_t    ic_size;	/* 12: number of bytes in file */
-    ufs_timeval	ic_atime;	/* 16: time last accessed */
-    ufs_timeval	ic_mtime;	/* 24: time last modified */
-    ufs_timeval	ic_ctime;	/* 32: last time inode changed */
+    struct ufs_timeval ic_atime;	/* 16: time last accessed */
+    struct ufs_timeval ic_mtime;	/* 24: time last modified */
+    struct ufs_timeval ic_ctime;	/* 32: last time inode changed */
 #if	defined(NeXT) || defined(MULTIMAX)
     union {
         struct {
@@ -110,14 +110,14 @@ struct 	icommon
                     /* 40: symbolic link name */
     } ic_Mun;
 #define ic_symlink	ic_Mun.ic_Msymlink
-#else	// defined(NeXT) || defined(MULTIMAX)
+#else	/* defined(NeXT) || defined(MULTIMAX) */
     int32_t	ic_db[NDADDR];	/* 40: disk block addresses */
     int32_t	ic_ib[NIADDR];	/* 88: indirect blocks */
-#endif	// defined(NeXT) || defined(MULTIMAX)
+#endif	/* defined(NeXT) || defined(MULTIMAX) */
     int32_t	ic_flags;	/* 100: status, currently unused */
 #if	defined(NeXT) || defined(MULTIMAX)
 #define	IC_FASTLINK	0x0001		/* Symbolic link in inode */
-#endif	// defined(NeXT) || defined(MULTIMAX)
+#endif	/* defined(NeXT) || defined(MULTIMAX) */
     int32_t	ic_blocks;	/* 104: blocks actually held */
     int32_t	ic_gen;		/* 108: generation number */
     int32_t	ic_spare[4];	/* 112: reserved, currently unused */
@@ -139,16 +139,16 @@ struct    idb {
 /* ugh! -- must be fixed */
 #if	__LITTLE_ENDIAN__
 #define	i_size		i_ic.ic_size.val[0]
-#endif	// __LITTLE_ENDIAN__
+#endif	/* __LITTLE_ENDIAN__ */
 #if	__BIG_ENDIAN__
 #define i_size		i_ic.ic_size.val[1]
-#endif	// __BIG_ENDIAN__
+#endif	/* __BIG_ENDIAN__ */
 #define	i_db		i_ic.ic_db
 #define	i_ib		i_ic.ic_ib
 #if	defined(NeXT) || defined(MULTIMAX)
 #define	i_symlink	i_ic.ic_symlink
 #define i_icflags	i_ic.ic_flags
-#endif	// defined(NeXT) || defined(MULTIMAX)
+#endif	/* defined(NeXT) || defined(MULTIMAX) */
 #define	i_atime		i_ic.ic_atime
 #define	i_mtime		i_ic.ic_mtime
 #define	i_ctime		i_ic.ic_ctime
@@ -169,16 +169,16 @@ struct    idb {
 #define	di_gid		di_ic.ic_gid
 #if	__LITTLE_ENDIAN__
 #define	di_size		di_ic.ic_size.val[0]
-#endif	// __LITTLE_ENDIAN__
+#endif	/* __LITTLE_ENDIAN__ */
 #if	__BIG_ENDIAN__
 #define di_size		di_ic.ic_size.val[1]
-#endif	// __BIG_ENDIAN__
+#endif	/* __BIG_ENDIAN__ */
 #define	di_db		di_ic.ic_db
 #define	di_ib		di_ic.ic_ib
 #if	defined(NeXT) || defined(MULTIMAX)
 #define	di_symlink	di_ic.ic_symlink
 #define	di_icflags	di_ic.ic_flags
-#endif	// defined(NeXT) || defined(MULTIMAX)
+#endif	/* defined(NeXT) || defined(MULTIMAX) */
 #define	di_atime	di_ic.ic_atime
 #define	di_mtime	di_ic.ic_mtime
 #define	di_ctime	di_ic.ic_ctime
@@ -208,7 +208,7 @@ ino_t		dirpref();
 #if	NeXT
 #define	IFREE		0x200		/* inode has been free'd */
 #define IRELEASE_TO_ZONE 0x8000
-#endif	// NeXT
+#endif	/* NeXT */
 
 /* modes */
 #define	IFMT		0170000		/* type of file */
@@ -355,9 +355,8 @@ struct ufid {
 	ino_t	ufid_ino;
 	int32_t	ufid_gen;
 };
-#endif	// KERNEL
+#endif	/* KERNEL */
 
 #pragma pack(pop)
 
 #endif
-

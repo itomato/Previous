@@ -1,5 +1,5 @@
 
-include_directories(. ../.. ../debug ../includes) 
+include_directories(. ../.. ../cpu ../includes) 
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-write-strings")
 

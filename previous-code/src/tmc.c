@@ -11,7 +11,6 @@ const char Tmc_fileid[] = "Previous tmc.c";
 #include "main.h"
 #include "configuration.h"
 #include "m68000.h"
-#include "sysdeps.h"
 #include "sysReg.h"
 #include "adb.h"
 #include "tmc.h"

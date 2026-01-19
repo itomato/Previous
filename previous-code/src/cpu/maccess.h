@@ -16,17 +16,7 @@
 
 #include "sysdeps.h"
 
-#if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
-
-#define be_swap32(x) ((uint32_t)(x))
-#define be_swap16(x) ((uint16_t)(x))
-
-#else
-
-#define be_swap32(x) bswap_32(x)
-#define be_swap16(x) bswap_16(x)
-
-#endif
+#include "endianswap.h"
 
 /* Can the actual CPU access unaligned memory? */
 #ifndef CPU_CAN_ACCESS_UNALIGNED
@@ -39,7 +29,7 @@
 #endif
 
 /* If the CPU can access unaligned memory, use these accelerated functions: */
-#if CPU_CAN_ACCESS_UNALIGNED
+#if CPU_CAN_ACCESS_UNALIGNED && !defined(ENABLE_UBSAN)
 
 static inline uae_u32 do_get_mem_long(void *a)
 {

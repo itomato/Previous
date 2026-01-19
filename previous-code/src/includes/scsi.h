@@ -29,7 +29,8 @@ extern SCSIBusStatus SCSIbus;
 
 /* Block size */
 #define SCSI_BLOCKSIZE 512
-#define SCSI_MAX_BLOCK 1024
+#define SCSI_CD_BLOCK  2048
+#define SCSI_MAX_BLOCK SCSI_CD_BLOCK
 
 /* This buffer temporarily stores data to be written to memory or disk */
 

@@ -8,12 +8,8 @@
 */
 const char ShortCut_fileid[] = "Hatari shortcut.c";
 
-#include <SDL.h>
-
 #include "main.h"
 #include "dialog.h"
-#include "file.h"
-#include "m68000.h"
 #include "dimension.hpp"
 #include "grab.h"
 #include "reset.h"
@@ -21,8 +17,6 @@ const char ShortCut_fileid[] = "Hatari shortcut.c";
 #include "configuration.h"
 #include "shortcut.h"
 #include "debugui.h"
-#include "sdlgui.h"
-#include "video.h"
 #include "snd.h"
 #include "statusbar.h"
 
@@ -94,8 +88,7 @@ static void ShortCut_Debug_I860(void)
 		Screen_ReturnFromFullScreen();
 
 	/* i860 thread silently pauses 68k emulation if necessary */
-	Statusbar_AddMessage("I860 Console Debugger", 100);
-	Statusbar_Update(sdlscrn);
+	Screen_StatusbarMessage("I860 Console Debugger", 100);
 
 	/* Call the debugger */
 	nd_start_debugger();
@@ -146,9 +139,16 @@ static void ShortCut_Dimension(void)
 static void ShortCut_StatusBar(void)
 {
 	ConfigureParams.Screen.bShowStatusbar = !ConfigureParams.Screen.bShowStatusbar;
-	ConfigureParams.Screen.bShowDriveLed  = false; /* for now unused in Previous */
-
 	Screen_StatusbarChanged();
+}
+
+/**
+ * Shortcut to show/hide titlebar
+ */
+static void ShortCut_TitleBar(void)
+{
+	ConfigureParams.Screen.bShowTitlebar = !ConfigureParams.Screen.bShowTitlebar;
+	Screen_TitlebarChanged();
 }
 
 
@@ -204,6 +204,9 @@ void ShortCut_ActKey(void)
 		break;
 	 case SHORTCUT_STATUSBAR:
 		ShortCut_StatusBar();
+		break;
+	case SHORTCUT_TITLEBAR:
+		ShortCut_TitleBar();
 		break;
 	 case SHORTCUT_KEYS:
 	 case SHORTCUT_NONE:
@@ -281,14 +284,14 @@ static SHORTCUTKEYIDX ShortCut_CheckKey(int symkey, int *keys)
  * If press is set, store the key array index.
  * Return true if key combo matched to a shortcut
  */
-bool ShortCut_CheckKeys(int modkey, int symkey, bool press)
+bool ShortCut_CheckKeys(int symkey, bool with_mod, bool press)
 {
 	SHORTCUTKEYIDX key;
 
-	if (symkey == SDLK_UNKNOWN)
+	if (symkey == 0)
 		return false;
 
-	if ((modkey&KMOD_CTRL) && (modkey&KMOD_ALT))
+	if (with_mod)
 		key = ShortCut_CheckKey(symkey, ConfigureParams.Shortcut.withModifier);
 	else
 		key = ShortCut_CheckKey(symkey, ConfigureParams.Shortcut.withoutModifier);

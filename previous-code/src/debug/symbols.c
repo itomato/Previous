@@ -1,7 +1,7 @@
 /*
  * Hatari - symbols.c
  * 
- * Copyright (C) 2010-2024 by Eero Tamminen
+ * Copyright (C) 2010-2025 by Eero Tamminen
  * 
  * This file is distributed under the GNU General Public License, version 2
  * or at your option any later version. Read the file gpl.txt for details.
@@ -107,13 +107,15 @@ const char* Symbols_GetByDspAddress(uint32_t addr, symtype_t type)
 /**
  * Load symbols for last opened program when symbol autoloading is enabled.
  *
+ * When either textAddr or textEnd is zero, basepage values are used instead.
+ *
  * If there's file with same name as the program, but with '.sym'
  * extension, that overrides / is loaded instead of the symbol table
  * in the program.
  *
  * Called when debugger is invoked.
  */
-void Symbols_LoadCurrentProgram(void)
+void Symbols_LoadCurrentProgram(uint32_t textAddr, uint32_t textEnd)
 {
 }
 

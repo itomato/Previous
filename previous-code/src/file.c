@@ -117,7 +117,7 @@ bool File_ChangeFileExtension(const char *Filename_old, const char *Extension_ol
 
 /*-----------------------------------------------------------------------*/
 /**
- * Check if filename is from root
+ * Check if host filename is from root
  *
  * Return TRUE if filename is '/', else give FALSE
  */
@@ -826,27 +826,6 @@ bool File_Write(uint8_t *data, uint32_t size, off_t offset, FILE *fp)
 		return false;
 	}
 	return true;
-}
-
-
-/*-----------------------------------------------------------------------*/
-/**
- * Remove any '/'s from end of pathnames
- */
-void File_CleanDirName(char *pszDirName)
-{
-	int len;
-#ifdef WIN32
-	int minlen = 3;
-#else
-	int minlen = 1;
-#endif
-	
-	len = strlen(pszDirName);
-	
-	/* Remove end slashes from pathname. */
-	while (len > minlen && pszDirName[--len] == PATHSEP)
-		pszDirName[len] = '\0';
 }
 
 

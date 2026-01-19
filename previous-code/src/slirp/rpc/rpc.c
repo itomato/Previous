@@ -94,12 +94,11 @@ static int rpc_call(struct rpc_t* rpc) {
 }
 
 static void rpc_read_auth(struct rpc_t* rpc) {
-    int i;
-    
     struct xdr_t* m_in = rpc->m_in;
     int len = rpc->auth.length;
     
     if (rpc->auth.flavor == RPC_AUTH_UNIX) {
+        uint32_t i;
         struct auth_unix_t* auth = &rpc->auth_unix;
         len -= 5 * 4;
         auth->time = xdr_read_long(m_in);
@@ -428,11 +427,12 @@ static void rpc_start_server(struct rpc_t* rpc, const char* path, const char* na
     
     rpc->ft = ft_init(path, "/");
     if (rpc->ft) {
-        int i;
+        size_t i;
+        char addrstr[16];
         struct rpc_prog_t* prog;
         
-        printf("[RPC] Starting '%s' at %d.%d.%d.%d, exporting '%s'.\n", rpc->hostname, 
-               (addr>>24)&0xFF, (addr>>16)&0xFF, (addr>>8)&0xFF, addr&0xFF, path);
+        printf("[RPC] Starting '%s' at %s, exporting '%s'.\n", rpc->hostname, 
+               rpc_ip_str(addrstr, addr, 4, sizeof(addrstr)), path);
         
         rpc->lock = host_mutex_create();
         netinfo_add_host(rpc->hostname, rpc->ip_addr);
@@ -669,7 +669,8 @@ void rpc_udp_map_to_local_port(struct in_addr* ipNBO, uint16_t* dportNBO) {
     uint16_t port  = 0;
     if (dport == PORT_RPC && (ipNBO->s_addr == htonl(CTL_NET | ~(uint32_t)CTL_NET_MASK) ||
                               ipNBO->s_addr == htonl(CTL_NET | ~(uint32_t)CTL_CLASS_MASK(CTL_NET)))) {
-        printf("[RPC] Broadcast to %s, port %d\n", inet_ntoa(*ipNBO), dport);
+        char addrstr[INET_ADDRSTRLEN];
+        printf("[RPC] Broadcast to %s, port %d\n", inet_ntop(AF_INET, ipNBO, addrstr, sizeof(addrstr)), dport);
         port = broadcasthost.udp_port;
     } else {
         struct rpc_t* rpc = rpc_find_server(htonl(ipNBO->s_addr));
@@ -696,6 +697,21 @@ void rpc_udp_map_from_local_port(struct in_addr* saddrNBO, uint16_t* sin_portNBO
         *sin_portNBO = htons(srcPort);
         saddrNBO->s_addr = htonl(rpc->ip_addr);
     }
+}
+
+const char* rpc_ip_str(char* buf, uint32_t addr, int count, size_t maxsize) {
+    switch (count) {
+        case 3:
+            snprintf(buf, maxsize, "%u.%u.%u", (addr>>24)&0xFF, (addr>>16)&0xFF, (addr>>8)&0xFF);
+            break;
+        case 4:
+            snprintf(buf, maxsize, "%u.%u.%u.%u", (addr>>24)&0xFF, (addr>>16)&0xFF, (addr>>8)&0xFF, addr&0xFF);
+            break;
+        default:
+            buf[0] = '\0';
+            break;
+    }
+    return buf;
 }
 
 void rpc_log(struct rpc_t* rpc, const char *format, ...) {

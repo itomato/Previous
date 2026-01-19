@@ -96,7 +96,7 @@
 
 #ifdef WINUAE_FOR_HATARI
 #include "uae/types.h"
-#elif HAVE_TCHAR_H
+#else
 #include <tchar.h>
 #endif
 
@@ -108,7 +108,7 @@
 
 #ifndef __STDC__
 #ifndef _MSC_VER
-#error "Your compiler does not appear to support ANSI C.  Porting effort is required in src/cpu/sysdeps.h."
+#error "Your compiler is not ANSI. Get a real one."
 #endif
 #endif
 
@@ -199,8 +199,8 @@ struct utimbuf
 #define VAL64(a) (a)
 #define UVAL64(a) (a)
 #elif SIZEOF_LONG == 8
-#define VAL64(a) (a ## L)
-#define UVAL64(a) (a ## UL)
+#define VAL64(a) (a ## l)
+#define UVAL64(a) (a ## ul)
 #endif
 
 #define uae_s64 uae_s64
@@ -222,7 +222,7 @@ typedef short uae_s16;
 typedef unsigned int uae_u16;
 typedef int uae_s16;
 #else
-#error "Cannot find a 2-byte type, port src/cpu/sysconfig.h to your architecture"
+#error No 2 byte type, you lose.
 #endif
 
 #if SIZEOF_INT == 4
@@ -232,7 +232,7 @@ typedef int uae_s32;
 typedef unsigned long uae_u32;
 typedef long uae_s32;
 #else
-#error "Cannot find a 4-byte type, port src/cpu/sysconfig.h to your architecture"
+#error No 4 byte type, you lose.
 #endif
 
 typedef uae_u32 uaecptr;
@@ -240,21 +240,21 @@ typedef uae_u32 uaecptr;
 #undef uae_s64
 #undef uae_u64
 
-#if SIZEOF_LONG == 8
-    #define uae_s64 long;
-    #define uae_u64 unsigned long;
-    #define VAL64(a) (a ## L)
-    #define UVAL64(a) (a ## UL)
-#elif SIZEOF_LONG_LONG == 8
-    #define uae_s64 long long
-    #define uae_u64 unsigned long long
-    #define VAL64(a) (a ## LL)
-    #define UVAL64(a) (a ## ULL)
+#if SIZEOF_LONG_LONG == 8
+#define uae_s64 long long
+#define uae_u64 unsigned long long
+#define VAL64(a) (a ## LL)
+#define UVAL64(a) (a ## uLL)
 #elif SIZEOF___INT64 == 8
-    #define uae_s64 __int64
-    #define uae_u64 unsigned __int64
-    #define VAL64(a) (a)
-    #define UVAL64(a) (a)
+#define uae_s64 __int64
+#define uae_u64 unsigned __int64
+#define VAL64(a) (a)
+#define UVAL64(a) (a)
+#elif SIZEOF_LONG == 8
+#define uae_s64 long;
+#define uae_u64 unsigned long;
+#define VAL64(a) (a ## l)
+#define UVAL64(a) (a ## ul)
 #endif
 
 #endif /* WINUAE_FOR_HATARI */
@@ -562,36 +562,6 @@ extern bool use_long_double;
  * Best to leave this as it is.
  */
 #define CPU_EMU_SIZE 0
-
-/*
- * Byte-swapping functions
- */
-
-/* Try to use system bswap_16/bswap_32 functions. */
-#if defined HAVE_BSWAP_16 && defined HAVE_BSWAP_32
-# ifdef HAVE_BYTESWAP_H
-#  include <byteswap.h>
-# endif
-#else
-/* Else, if using SDL, try SDL's endian functions. */
-# ifdef USE_SDL
-#  include <SDL_endian.h>
-#  ifndef bswap_16
-#    define bswap_16(x) SDL_Swap16(x)
-#  endif
-#  ifndef bswap_32
-#    define bswap_32(x) SDL_Swap32(x)
-#  endif
-# else
-/* Otherwise, we'll roll our own. */
-#  ifndef bswap_16
-#    define bswap_16(x) (((x) >> 8) | (((x) & 0xFF) << 8))
-#  endif
-#  ifndef bswap_32
-#    define bswap_32(x) (((x) << 24) | (((x) << 8) & 0x00FF0000) | (((x) >> 8) & 0x0000FF00) | ((x) >> 24))
-#  endif
-# endif
-#endif
 
 #ifndef __cplusplus
 

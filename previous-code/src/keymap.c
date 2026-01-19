@@ -115,7 +115,34 @@ const char Keymap_fileid[] = "Previous keymap.c";
 #define NEXTKEY_MOD_RALT        0x40
 
 
+/**
+ * Initialization.
+ */
 void Keymap_Init(void) {}
+
+/**
+ * Set defaults for shortcut keys
+ */
+void Keymap_InitShortcutDefaultKeys(void)
+{
+	ConfigureParams.Shortcut.withoutModifier[SHORTCUT_OPTIONS]    = SDLK_F12;
+	ConfigureParams.Shortcut.withoutModifier[SHORTCUT_FULLSCREEN] = SDLK_F11;
+
+	ConfigureParams.Shortcut.withModifier[SHORTCUT_OPTIONS]       = SDLK_O;
+	ConfigureParams.Shortcut.withModifier[SHORTCUT_FULLSCREEN]    = SDLK_F;
+	ConfigureParams.Shortcut.withModifier[SHORTCUT_PAUSE]         = SDLK_P;
+	ConfigureParams.Shortcut.withModifier[SHORTCUT_DEBUG_M68K]    = SDLK_D;
+	ConfigureParams.Shortcut.withModifier[SHORTCUT_DEBUG_I860]    = SDLK_I;
+	ConfigureParams.Shortcut.withModifier[SHORTCUT_MOUSEGRAB]     = SDLK_M;
+	ConfigureParams.Shortcut.withModifier[SHORTCUT_COLDRESET]     = SDLK_C;
+	ConfigureParams.Shortcut.withModifier[SHORTCUT_SCREENSHOT]    = SDLK_G;
+	ConfigureParams.Shortcut.withModifier[SHORTCUT_RECORD]        = SDLK_R;
+	ConfigureParams.Shortcut.withModifier[SHORTCUT_SOUND]         = SDLK_S;
+	ConfigureParams.Shortcut.withModifier[SHORTCUT_QUIT]          = SDLK_Q;
+	ConfigureParams.Shortcut.withModifier[SHORTCUT_DIMENSION]     = SDLK_N;
+	ConfigureParams.Shortcut.withModifier[SHORTCUT_STATUSBAR]     = SDLK_B;
+	ConfigureParams.Shortcut.withModifier[SHORTCUT_TITLEBAR]      = SDLK_T;
+}
 
 /*-----------------------------------------------------------------------*/
 /**
@@ -238,9 +265,9 @@ static uint8_t Keymap_GetKeyFromSymbol(SDL_Keycode sdlkey)
 		case SDLK_BACKSLASH:              return NEXTKEY_BACKSLASH;
 		case SDLK_RIGHTBRACKET:           return NEXTKEY_CLOSEBRACKET;
 		case SDLK_LEFTBRACKET:            return NEXTKEY_OPENBRACKET;
-		case SDLK_i:                      return NEXTKEY_i;
-		case SDLK_o:                      return NEXTKEY_o;
-		case SDLK_p:                      return NEXTKEY_p;
+		case SDLK_I:                      return NEXTKEY_i;
+		case SDLK_O:                      return NEXTKEY_o;
+		case SDLK_P:                      return NEXTKEY_p;
 		case SDLK_LEFT:                   return NEXTKEY_LEFT_ARROW;
 		case SDLK_KP_0:                   return NEXTKEY_KEYPAD_0;
 		case SDLK_KP_PERIOD:              return NEXTKEY_KEYPAD_PERIOD;
@@ -267,40 +294,40 @@ static uint8_t Keymap_GetKeyFromSymbol(SDL_Keycode sdlkey)
 		case SDLK_KP_MINUS:               return NEXTKEY_KEYPAD_MINUS;
 		case SDLK_KP_MULTIPLY:            return NEXTKEY_KEYPAD_MULTIPLY;
 		case SDLK_NUMLOCKCLEAR:           return NEXTKEY_BACKQUOTE;
-		case SDLK_BACKQUOTE:              return NEXTKEY_BACKQUOTE;
+		case SDLK_GRAVE:                  return NEXTKEY_BACKQUOTE;
 		case SDLK_KP_EQUALS:              return NEXTKEY_KEYPAD_EQUALS;
 		case SDLK_KP_DIVIDE:              return NEXTKEY_KEYPAD_DIVIDE;
 		case SDLK_RETURN:                 return NEXTKEY_RETURN;
-		case SDLK_QUOTE:                  return NEXTKEY_QUOTE;
+		case SDLK_APOSTROPHE:             return NEXTKEY_QUOTE;
 		case SDLK_SEMICOLON:              return NEXTKEY_SEMICOLON;
-		case SDLK_l:                      return NEXTKEY_l;
+		case SDLK_L:                      return NEXTKEY_l;
 		case SDLK_COMMA:                  return NEXTKEY_COMMA;
 		case SDLK_PERIOD:                 return NEXTKEY_PERIOD;
 		case SDLK_SLASH:                  return NEXTKEY_SLASH;
-		case SDLK_z:                      return NEXTKEY_z;
-		case SDLK_x:                      return NEXTKEY_x;
-		case SDLK_c:                      return NEXTKEY_c;
-		case SDLK_v:                      return NEXTKEY_v;
-		case SDLK_b:                      return NEXTKEY_b;
-		case SDLK_m:                      return NEXTKEY_m;
-		case SDLK_n:                      return NEXTKEY_n;
+		case SDLK_Z:                      return NEXTKEY_z;
+		case SDLK_X:                      return NEXTKEY_x;
+		case SDLK_C:                      return NEXTKEY_c;
+		case SDLK_V:                      return NEXTKEY_v;
+		case SDLK_B:                      return NEXTKEY_b;
+		case SDLK_M:                      return NEXTKEY_m;
+		case SDLK_N:                      return NEXTKEY_n;
 		case SDLK_SPACE:                  return NEXTKEY_SPACE;
-		case SDLK_a:                      return NEXTKEY_a;
-		case SDLK_s:                      return NEXTKEY_s;
-		case SDLK_d:                      return NEXTKEY_d;
-		case SDLK_f:                      return NEXTKEY_f;
-		case SDLK_g:                      return NEXTKEY_g;
-		case SDLK_k:                      return NEXTKEY_k;
-		case SDLK_j:                      return NEXTKEY_j;
-		case SDLK_h:                      return NEXTKEY_h;
+		case SDLK_A:                      return NEXTKEY_a;
+		case SDLK_S:                      return NEXTKEY_s;
+		case SDLK_D:                      return NEXTKEY_d;
+		case SDLK_F:                      return NEXTKEY_f;
+		case SDLK_G:                      return NEXTKEY_g;
+		case SDLK_K:                      return NEXTKEY_k;
+		case SDLK_J:                      return NEXTKEY_j;
+		case SDLK_H:                      return NEXTKEY_h;
 		case SDLK_TAB:                    return NEXTKEY_TAB;
-		case SDLK_q:                      return NEXTKEY_q;
-		case SDLK_w:                      return NEXTKEY_w;
-		case SDLK_e:                      return NEXTKEY_e;
-		case SDLK_r:                      return NEXTKEY_r;
-		case SDLK_u:                      return NEXTKEY_u;
-		case SDLK_y:                      return NEXTKEY_y;
-		case SDLK_t:                      return NEXTKEY_t;
+		case SDLK_Q:                      return NEXTKEY_q;
+		case SDLK_W:                      return NEXTKEY_w;
+		case SDLK_E:                      return NEXTKEY_e;
+		case SDLK_R:                      return NEXTKEY_r;
+		case SDLK_U:                      return NEXTKEY_u;
+		case SDLK_Y:                      return NEXTKEY_y;
+		case SDLK_T:                      return NEXTKEY_t;
 		case SDLK_ESCAPE:                 return NEXTKEY_ESC;
 		case SDLK_1:                      return NEXTKEY_1;
 		case SDLK_2:                      return NEXTKEY_2;
@@ -336,28 +363,28 @@ static uint8_t Keymap_GetModifiers(uint16_t mod)
 {
 	uint8_t modifiers = 0;
 
-	if (mod & KMOD_CTRL) {
+	if (mod & SDL_KMOD_CTRL) {
 		modifiers |= NEXTKEY_MOD_META;
 	}
-	if (mod & KMOD_LSHIFT) {
+	if (mod & SDL_KMOD_LSHIFT) {
 		modifiers |= NEXTKEY_MOD_LSHIFT;
 	}
-	if (mod & KMOD_RSHIFT) {
+	if (mod & SDL_KMOD_RSHIFT) {
 		modifiers |= NEXTKEY_MOD_RSHIFT;
 	}
-	if (mod & KMOD_LGUI) {
+	if (mod & SDL_KMOD_LGUI) {
 		modifiers |= ConfigureParams.Keyboard.bSwapCmdAlt?NEXTKEY_MOD_LALT:NEXTKEY_MOD_LCTRL;
 	}
-	if (mod & KMOD_RGUI) {
+	if (mod & SDL_KMOD_RGUI) {
 		modifiers |= ConfigureParams.Keyboard.bSwapCmdAlt?NEXTKEY_MOD_RALT:NEXTKEY_MOD_RCTRL;
 	}
-	if (mod & KMOD_LALT) {
+	if (mod & SDL_KMOD_LALT) {
 		modifiers |= ConfigureParams.Keyboard.bSwapCmdAlt?NEXTKEY_MOD_LCTRL:NEXTKEY_MOD_LALT;
 	}
-	if (mod & KMOD_RALT) {
+	if (mod & SDL_KMOD_RALT) {
 		modifiers |= ConfigureParams.Keyboard.bSwapCmdAlt?NEXTKEY_MOD_RCTRL:NEXTKEY_MOD_RALT;
 	}
-	if (mod & KMOD_CAPS) {
+	if (mod & SDL_KMOD_CAPS) {
 		modifiers |= NEXTKEY_MOD_LSHIFT;
 	}
 	return modifiers;
@@ -371,15 +398,15 @@ static uint8_t Keymap_GetModifiers(uint16_t mod)
 static void post_key_event(int sym, int scan)
 {
 	SDL_Event sdlevent;
-	sdlevent.type = SDL_KEYDOWN;
-	sdlevent.key.keysym.sym      = sym;
-	sdlevent.key.keysym.scancode = scan;
-	sdlevent.key.keysym.mod      = KMOD_NONE;
+	sdlevent.type = SDL_EVENT_KEY_DOWN;
+	sdlevent.key.key      = sym;
+	sdlevent.key.scancode = scan;
+	sdlevent.key.mod      = SDL_KMOD_NONE;
 	SDL_PushEvent(&sdlevent);
-	sdlevent.type = SDL_KEYUP;
-	sdlevent.key.keysym.sym      = sym;
-	sdlevent.key.keysym.scancode = scan;
-	sdlevent.key.keysym.mod      = KMOD_NONE;
+	sdlevent.type = SDL_EVENT_KEY_UP;
+	sdlevent.key.key      = sym;
+	sdlevent.key.scancode = scan;
+	sdlevent.key.mod      = SDL_KMOD_NONE;
 	SDL_PushEvent(&sdlevent);
 }
 
@@ -411,7 +438,7 @@ void Keymap_MouseWheel(const SDL_MouseWheelEvent *sdlwheel)
 /**
  * User pressed a key down
  */
-void Keymap_KeyDown(const SDL_Keysym *sdlkey)
+void Keymap_KeyDown(const SDL_KeyboardEvent *sdlkey)
 {
 	uint8_t next_mod, next_key;
 
@@ -420,7 +447,7 @@ void Keymap_KeyDown(const SDL_Keysym *sdlkey)
 		return;
 	}
 	if (ConfigureParams.Keyboard.nKeymapType == KEYMAP_SYMBOLIC) {
-		next_key = Keymap_GetKeyFromSymbol(sdlkey->sym);
+		next_key = Keymap_GetKeyFromSymbol(sdlkey->key);
 	} else {
 		next_key = Keymap_GetKeyFromScancode(sdlkey->scancode);
 	}
@@ -437,7 +464,7 @@ void Keymap_KeyDown(const SDL_Keysym *sdlkey)
 /**
  * User released a key
  */
-void Keymap_KeyUp(const SDL_Keysym *sdlkey)
+void Keymap_KeyUp(const SDL_KeyboardEvent *sdlkey)
 {
 	uint8_t next_mod, next_key;
 
@@ -446,7 +473,7 @@ void Keymap_KeyUp(const SDL_Keysym *sdlkey)
 		return;
 	}
 	if (ConfigureParams.Keyboard.nKeymapType == KEYMAP_SYMBOLIC) {
-		next_key = Keymap_GetKeyFromSymbol(sdlkey->sym);
+		next_key = Keymap_GetKeyFromSymbol(sdlkey->key);
 	} else {
 		next_key = Keymap_GetKeyFromScancode(sdlkey->scancode);
 	}

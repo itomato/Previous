@@ -50,10 +50,10 @@ static int proc_whoami(struct rpc_t* rpc) {
     uint32_t addr, addr_type;
     char hostname[NAME_HOST_MAX];
     char domain[NAME_DOMAIN_MAX];
-
+    
     struct xdr_t* m_in  = rpc->m_in;
     struct xdr_t* m_out = rpc->m_out;
-        
+    
     if (m_in->size < 5 * 4) return RPC_GARBAGE_ARGS;
     
     rpc_log(rpc, "WHOAMI");
@@ -68,7 +68,11 @@ static int proc_whoami(struct rpc_t* rpc) {
             return RPC_GARBAGE_ARGS;
     }
     
-    vfscpy(hostname, NAME_HOST, sizeof(hostname));
+    if (addr == (ntohl(special_addr.s_addr) | CTL_HOST)) {
+        vfscpy(hostname, NAME_HOST, sizeof(hostname));
+    } else {
+        vfscpy(hostname, "", sizeof(hostname));
+    }
     vfscpy(domain, "", sizeof(domain)); /* No NIS domain */
     xdr_write_string(m_out, hostname, sizeof(hostname));
     xdr_write_string(m_out, domain, sizeof(domain));
@@ -96,23 +100,16 @@ static int proc_getfile(struct rpc_t* rpc) {
     
     vfs_get_basepath_alias(rpc->ft->vfs, path, sizeof(path));
     if (strncmp("root", key, sizeof(key))) {
-        int len = strlen(path);
-        if (len > 0 && path[len-1] != '/' && strlen(key) > 0) {
-            vfscat(path, "/", sizeof(path));
+        vfs_join(path, key, sizeof(path));
+        if (strncmp("private", key, sizeof(key))) {
+            rpc_log(rpc, "GETFILE unknown key '%s'", key);
         }
-        vfscat(path, key, sizeof(path));
     }
-    
-    if (strlen(path)) {
-        xdr_write_string(m_out, rpc->hostname, MAXNAMELEN);
-        xdr_write_long(m_out, IP_ADDR_TYPE);
-        write_in_addr(m_out, rpc->ip_addr);
-        xdr_write_string(m_out, path, sizeof(path));
-        return RPC_SUCCESS;
-    } else {
-        rpc_log(rpc, "Unknown key: %s", key);
-        return RPC_GARBAGE_ARGS;
-    }
+    xdr_write_string(m_out, rpc->hostname, MAXNAMELEN);
+    xdr_write_long(m_out, IP_ADDR_TYPE);
+    write_in_addr(m_out, rpc->ip_addr);
+    xdr_write_string(m_out, path, sizeof(path));
+    return RPC_SUCCESS;
 }
 
 

@@ -13,7 +13,6 @@ const char Bmap_fileid[] = "Previous bmap.c";
 #include "m68000.h"
 #include "sysReg.h"
 #include "reset.h"
-#include "sysdeps.h"
 #include "bmap.h"
 
 #define LOG_BMAP_LEVEL  LOG_DEBUG

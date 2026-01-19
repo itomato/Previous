@@ -563,7 +563,8 @@ struct arphdr
 
 static void arp_input(const uint8_t *pkt, int pkt_len)
 {
-    const struct ethhdr *eh = (const struct ethhdr *)pkt;
+    /* XXX: unused for now, see below after arp_ok */
+    /* const struct ethhdr *eh = (const struct ethhdr *)pkt; */
     const struct arphdr *ah = (const struct arphdr *)(pkt + ETH_HLEN);
     uint8_t arp_reply[ETH_HLEN + sizeof(struct arphdr)];
     struct ethhdr *reh = (struct ethhdr *)arp_reply;

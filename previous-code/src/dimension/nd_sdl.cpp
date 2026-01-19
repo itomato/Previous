@@ -22,10 +22,10 @@ int NDSDL::repainter(void *_this) {
 }
 
 int NDSDL::repainter(void) {
-    SDL_SetThreadPriority(SDL_THREAD_PRIORITY_NORMAL);
+    SDL_SetCurrentThreadPriority(SDL_THREAD_PRIORITY_NORMAL);
 
     while (doRepaint) {
-        if (bEmulationActive && SDL_AtomicGet(&blitNDFB)) {
+        if (bEmulationActive && SDL_GetAtomicInt(&blitNDFB)) {
             repaint();
         } else {
             host_sleep_ms(100);
@@ -45,7 +45,7 @@ void NDSDL::repaint(void) {
         Screen_Blank(ndTexture);
     }
     SDL_RenderClear(ndRenderer);
-    SDL_RenderCopy(ndRenderer, ndTexture, NULL, NULL);
+    SDL_RenderTexture(ndRenderer, ndTexture, NULL, NULL);
     SDL_RenderPresent(ndRenderer);
 }
 
@@ -54,39 +54,33 @@ void NDSDL::init(void) {
     char name[32];
     SDL_Rect r = {0,0,1120,832};
 
-#ifdef ENABLE_RENDERING_THREAD
-    SDL_RendererFlags vsync_flag = SDL_RENDERER_PRESENTVSYNC;
-#else
-    uint32_t vsync_flag = 0;
-#endif
-
     if (!ndWindow) {
         SDL_GetWindowPosition(sdlWindow, &x, &y);
         SDL_GetWindowSize(sdlWindow, &w, &h);
         h = (w * 832) / 1120;
         snprintf(name, sizeof(name), "NeXTdimension (Slot %i)", slot);
-        ndWindow = SDL_CreateWindow(name, x+14*slot, y+14*slot, w, h, SDL_WINDOW_HIDDEN | SDL_WINDOW_ALLOW_HIGHDPI);
+        ndWindow = SDL_CreateWindow(name, w, h, SDL_WINDOW_HIDDEN | SDL_WINDOW_HIGH_PIXEL_DENSITY);
         
         if (!ndWindow) {
             fprintf(stderr,"[ND] Slot %i: Failed to create window! (%s)\n", slot, SDL_GetError());
             exit(-1);
         }
+        SDL_SetWindowPosition(ndWindow, x+14*slot, y+14*slot);
     }
     
     if (ConfigureParams.Screen.nMonitorType == MONITOR_TYPE_DUAL) {
+        titlebar(ConfigureParams.Screen.bShowTitlebar);
         if (!ndRenderer) {
-            ndRenderer = SDL_CreateRenderer(ndWindow, -1, SDL_RENDERER_ACCELERATED | vsync_flag);
+            ndRenderer = SDL_CreateRenderer(ndWindow, NULL);
             if (!ndRenderer) {
-                fprintf(stderr,"[ND] Slot %i: Failed to create accelerated renderer! (%s)\n", slot, SDL_GetError());
-                ndRenderer = SDL_CreateRenderer(ndWindow, -1, vsync_flag);
-                if (!ndRenderer) {
-                    fprintf(stderr,"[ND] Slot %i: Failed to create renderer! (%s)\n", slot, SDL_GetError());
-                    exit(-1);
-                }
+                fprintf(stderr,"[ND] Slot %i: Failed to create renderer! (%s)\n", slot, SDL_GetError());
+                exit(-1);
             }
-            SDL_RenderSetLogicalSize(ndRenderer, r.w, r.h);
+            SDL_SetRenderLogicalPresentation(ndRenderer, r.w, r.h, SDL_LOGICAL_PRESENTATION_STRETCH);
             ndTexture = SDL_CreateTexture(ndRenderer, SDL_PIXELFORMAT_BGRA32, SDL_TEXTUREACCESS_STREAMING, r.w, r.h);
+            SDL_SetTextureBlendMode(ndTexture, SDL_BLENDMODE_NONE);
 #ifdef ENABLE_RENDERING_THREAD
+            SDL_SetRenderVSync(ndRenderer, 1);
 
             snprintf(name, sizeof(name), "[Previous] Screen at slot %d", slot);
             repaintThread = SDL_CreateThread(NDSDL::repainter, name, this);
@@ -95,7 +89,7 @@ void NDSDL::init(void) {
 
         SDL_ShowWindow(ndWindow);
 #ifdef ENABLE_RENDERING_THREAD
-        SDL_AtomicSet(&blitNDFB, 1);
+        SDL_SetAtomicInt(&blitNDFB, 1);
 #endif
     } else {
         SDL_HideWindow(ndWindow);
@@ -104,7 +98,7 @@ void NDSDL::init(void) {
 
 void NDSDL::uninit(void) {
 #ifdef ENABLE_RENDERING_THREAD
-    SDL_AtomicSet(&blitNDFB, 0);
+    SDL_SetAtomicInt(&blitNDFB, 0);
 #endif
     SDL_HideWindow(ndWindow);
 }
@@ -118,12 +112,17 @@ void NDSDL::destroy(void) {
     SDL_DestroyTexture(ndTexture);
     SDL_DestroyRenderer(ndRenderer);
     SDL_DestroyWindow(ndWindow);
-    uninit();
 }
 
 void NDSDL::resize(float scale) {
     if (ndWindow) {
-        SDL_SetWindowSize(ndWindow, 1120*scale, 832*scale);
+        SDL_SetWindowSize(ndWindow, (int)SDL_lroundf(scale*1120), (int)SDL_lroundf(scale*832));
+    }
+}
+
+void NDSDL::titlebar(bool show) {
+    if (ndWindow) {
+        SDL_SetWindowBordered(ndWindow, show);
     }
 }
 
@@ -136,6 +135,14 @@ void nd_sdl_repaint(void) {
     }
 }
 #endif
+
+void nd_sdl_titlebar(bool show) {
+    FOR_EACH_SLOT(slot) {
+        IF_NEXT_DIMENSION(slot, nd) {
+            nd->sdl.titlebar(show);
+        }
+    }
+}
 
 void nd_sdl_resize(float scale) {
     FOR_EACH_SLOT(slot) {
@@ -157,14 +164,6 @@ void nd_sdl_hide(void) {
     FOR_EACH_SLOT(slot) {
         IF_NEXT_DIMENSION(slot, nd) {
             nd->sdl.uninit();
-        }
-    }
-}
-
-void nd_sdl_destroy(void) {
-    FOR_EACH_SLOT(slot) {
-        IF_NEXT_DIMENSION(slot, nd) {
-            nd->sdl.destroy();
         }
     }
 }

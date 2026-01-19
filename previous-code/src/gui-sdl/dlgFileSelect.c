@@ -129,7 +129,7 @@ static int ypos = -1;				/* First entry number to be displayed. If -1, file sele
 						/* else we continue from the previous position when SDLGui_FileSelect is called again */
 static bool refreshentries;			/* Do we have to update the file names in the dialog? */
 static int entries;				/* How many files are in the actual directory? */
-static int oldMouseY = 0;			/* Keep the latest Y mouse position for scrollbar move computing */
+static float oldMouseY = 0;			/* Keep the latest Y mouse position for scrollbar move computing */
 static int mouseClicked = 0;			/* used to know if mouse if down for the first time or not */
 static int mouseIsOut = 0;			/* used to keep info that mouse if above or under the scrollbar when mousebutton is down */
 static float scrollbar_Ypos = 0.0;		/* scrollbar height */
@@ -303,7 +303,8 @@ static void DlgFileSelect_ScrollDown(void)
  */
 static void DlgFileSelect_ManageScrollbar(void)
 {
-	int b, x, y;
+	int b;
+	float x, y;
 	int scrollY, scrollYmin, scrollYmax, scrollH_half;
 	float scrollMove;
 
@@ -385,7 +386,7 @@ static void DlgFileSelect_ManageScrollbar(void)
  */
 static bool acceptEvents(SDL_EventType evtype)
 {
-	if (evtype == SDL_MOUSEWHEEL || evtype == SDL_KEYDOWN)
+	if (evtype == SDL_EVENT_MOUSE_WHEEL || evtype == SDL_EVENT_KEY_DOWN)
 		return true;
 	return false;
 }
@@ -399,14 +400,14 @@ static void DlgFileSelect_HandleSdlEvents(SDL_Event *pEvent)
 	int oldypos = ypos;
 	switch (pEvent->type)
 	{
-	 case SDL_MOUSEWHEEL:
+	 case SDL_EVENT_MOUSE_WHEEL:
 		if (pEvent->wheel.y>0)
 			DlgFileSelect_ScrollUp();
 		else if (pEvent->wheel.y<0)
 			DlgFileSelect_ScrollDown();
 		break;
-	 case SDL_KEYDOWN:
-		switch (pEvent->key.keysym.sym)
+	 case SDL_EVENT_KEY_DOWN:
+		switch (pEvent->key.key)
 		{
 		 case SDLK_UP:
 			DlgFileSelect_ScrollUp();

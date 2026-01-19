@@ -32,7 +32,6 @@
 #include "memory.h"
 #include "newcpu.h"
 #include "fpp.h"
-#include "newcpu.h"
 
 #include "softfloat.h"
 

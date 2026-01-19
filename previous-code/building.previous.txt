@@ -12,8 +12,8 @@ other platforms you might need to also install libpcap, readline and zlib.
    install Xcode developer tools.
 
 2. Installing required packages:
-   Download the latest runtime binary of SDL2 from https://www.libsdl.org/ and 
-   copy SDL2.framework to /Library/Frameworks.
+   Download the latest runtime binary of SDL3 from https://www.libsdl.org/ and 
+   copy SDL3.framework to /Library/Frameworks.
 
    From the command line use the command "port install <package_name>" to 
    install the following packages:
@@ -43,10 +43,10 @@ other platforms you might need to also install libpcap, readline and zlib.
       ./configure --enable-rendering-thread
       make
 
-2. Some Linux distributions have pre-installed outdated versions of SDL2. You 
+2. Some Linux distributions have pre-installed outdated versions of SDL3. You 
    might have to build an up-to-date version yourself. To compile against your 
-   own build of SDL2 you have to set an environment variable:
-      setenv SDL2_DIR /path/to/custom/SDL2 ; ./configure
+   own build of SDL3 you have to set an environment variable:
+      setenv SDL3_DIR /path/to/custom/SDL3 ; ./configure
       make
 
 
@@ -84,10 +84,10 @@ replace with these steps:
       cmake .
       make
 
-3. Add SDL2.framework and png.framework to the application bundle:
+3. Add SDL3.framework and png.framework to the application bundle:
    The application bundle Previous.app is located in the src directory of the 
    source tree. Go inside the application bundle and go to the Contents folder.
-   Copy SDL2.framework and png.framework into the "Frameworks" folder.
+   Copy SDL3.framework and png.framework into the "Frameworks" folder.
 
 4. Change internal linking of Previous:
    Using Terminal go to the MacOS directory inside the application bundle and
@@ -122,7 +122,7 @@ POSIX functions that are not supported by MSVC.
 2. Installing required packages:
    Open the MinGW command prompt from the Start menu (MSYS2 MinGW x64) and 
    install the following packages using the command: "pacman -S <package_name>":
-      mingw-w64-x86_64-SDL2
+      mingw-w64-x86_64-SDL3
       mingw-w64-x86_64-readline
       mingw-w64-x86_64-zlib
       mingw-w64-x86_64-libpng
@@ -151,7 +151,7 @@ POSIX functions that are not supported by MSVC.
       libstdc++-6.dll
       libtermcap-0.dll
       libwinpthread-1.dll
-      SDL2.dll
+      SDL3.dll
       zlib1.dll
 
    It should now be possible to start and use Previous.exe.

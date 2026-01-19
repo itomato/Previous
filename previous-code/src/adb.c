@@ -11,7 +11,6 @@ const char Adb_fileid[] = "Previous adb.c";
 #include "main.h"
 #include "configuration.h"
 #include "m68000.h"
-#include "sysdeps.h"
 #include "sysReg.h"
 #include "rtcnvram.h"
 #include "adb.h"
@@ -902,9 +901,9 @@ static uint8_t ADB_GetKeyFromSymbol(SDL_Keycode sdlkey)
 		case SDLK_RIGHTBRACKET:           return APPLEKEY_CLOSEBRACKET;
 		case SDLK_LEFTBRACKET:            return APPLEKEY_OPENBRACKET;
 		case SDLK_LESS:                   return APPLEKEY_LESS;
-		case SDLK_i:                      return APPLEKEY_i;
-		case SDLK_o:                      return APPLEKEY_o;
-		case SDLK_p:                      return APPLEKEY_p;
+		case SDLK_I:                      return APPLEKEY_i;
+		case SDLK_O:                      return APPLEKEY_o;
+		case SDLK_P:                      return APPLEKEY_p;
 		case SDLK_LEFT:                   return APPLEKEY_LEFT_ARROW;
 		case SDLK_KP_0:                   return APPLEKEY_KEYPAD_0;
 		case SDLK_KP_PERIOD:              return APPLEKEY_KEYPAD_PERIOD;
@@ -931,40 +930,40 @@ static uint8_t ADB_GetKeyFromSymbol(SDL_Keycode sdlkey)
 		case SDLK_KP_MINUS:               return APPLEKEY_KEYPAD_MINUS;
 		case SDLK_KP_MULTIPLY:            return APPLEKEY_KEYPAD_MULTIPLY;
 		case SDLK_NUMLOCKCLEAR:           return APPLEKEY_BACKQUOTE;
-		case SDLK_BACKQUOTE:              return APPLEKEY_BACKQUOTE;
+		case SDLK_GRAVE:                  return APPLEKEY_BACKQUOTE;
 		case SDLK_KP_EQUALS:              return APPLEKEY_KEYPAD_EQUALS;
 		case SDLK_KP_DIVIDE:              return APPLEKEY_KEYPAD_DIVIDE;
 		case SDLK_RETURN:                 return APPLEKEY_RETURN;
-		case SDLK_QUOTE:                  return APPLEKEY_QUOTE;
+		case SDLK_APOSTROPHE:             return APPLEKEY_QUOTE;
 		case SDLK_SEMICOLON:              return APPLEKEY_SEMICOLON;
-		case SDLK_l:                      return APPLEKEY_l;
+		case SDLK_L:                      return APPLEKEY_l;
 		case SDLK_COMMA:                  return APPLEKEY_COMMA;
 		case SDLK_PERIOD:                 return APPLEKEY_PERIOD;
 		case SDLK_SLASH:                  return APPLEKEY_SLASH;
-		case SDLK_z:                      return APPLEKEY_z;
-		case SDLK_x:                      return APPLEKEY_x;
-		case SDLK_c:                      return APPLEKEY_c;
-		case SDLK_v:                      return APPLEKEY_v;
-		case SDLK_b:                      return APPLEKEY_b;
-		case SDLK_m:                      return APPLEKEY_m;
-		case SDLK_n:                      return APPLEKEY_n;
+		case SDLK_Z:                      return APPLEKEY_z;
+		case SDLK_X:                      return APPLEKEY_x;
+		case SDLK_C:                      return APPLEKEY_c;
+		case SDLK_V:                      return APPLEKEY_v;
+		case SDLK_B:                      return APPLEKEY_b;
+		case SDLK_M:                      return APPLEKEY_m;
+		case SDLK_N:                      return APPLEKEY_n;
 		case SDLK_SPACE:                  return APPLEKEY_SPACE;
-		case SDLK_a:                      return APPLEKEY_a;
-		case SDLK_s:                      return APPLEKEY_s;
-		case SDLK_d:                      return APPLEKEY_d;
-		case SDLK_f:                      return APPLEKEY_f;
-		case SDLK_g:                      return APPLEKEY_g;
-		case SDLK_k:                      return APPLEKEY_k;
-		case SDLK_j:                      return APPLEKEY_j;
-		case SDLK_h:                      return APPLEKEY_h;
+		case SDLK_A:                      return APPLEKEY_a;
+		case SDLK_S:                      return APPLEKEY_s;
+		case SDLK_D:                      return APPLEKEY_d;
+		case SDLK_F:                      return APPLEKEY_f;
+		case SDLK_G:                      return APPLEKEY_g;
+		case SDLK_K:                      return APPLEKEY_k;
+		case SDLK_J:                      return APPLEKEY_j;
+		case SDLK_H:                      return APPLEKEY_h;
 		case SDLK_TAB:                    return APPLEKEY_TAB;
-		case SDLK_q:                      return APPLEKEY_q;
-		case SDLK_w:                      return APPLEKEY_w;
-		case SDLK_e:                      return APPLEKEY_e;
-		case SDLK_r:                      return APPLEKEY_r;
-		case SDLK_u:                      return APPLEKEY_u;
-		case SDLK_y:                      return APPLEKEY_y;
-		case SDLK_t:                      return APPLEKEY_t;
+		case SDLK_Q:                      return APPLEKEY_q;
+		case SDLK_W:                      return APPLEKEY_w;
+		case SDLK_E:                      return APPLEKEY_e;
+		case SDLK_R:                      return APPLEKEY_r;
+		case SDLK_U:                      return APPLEKEY_u;
+		case SDLK_Y:                      return APPLEKEY_y;
+		case SDLK_T:                      return APPLEKEY_t;
 		case SDLK_ESCAPE:                 return APPLEKEY_ESC;
 		case SDLK_1:                      return APPLEKEY_1;
 		case SDLK_2:                      return APPLEKEY_2;
@@ -1003,12 +1002,12 @@ static uint8_t ADB_GetKeyFromSymbol(SDL_Keycode sdlkey)
 }
 
 
-void ADB_KeyDown(const SDL_Keysym *sdlkey)
+void ADB_KeyDown(const SDL_KeyboardEvent *sdlkey)
 {
 	uint8_t adb_key;
 	
 	if (ConfigureParams.Keyboard.nKeymapType == KEYMAP_SYMBOLIC) {
-		adb_key = ADB_GetKeyFromSymbol(sdlkey->sym);
+		adb_key = ADB_GetKeyFromSymbol(sdlkey->key);
 	} else {
 		adb_key = ADB_GetKeyFromScancode(sdlkey->scancode);
 	}
@@ -1018,12 +1017,12 @@ void ADB_KeyDown(const SDL_Keysym *sdlkey)
 	adb_keydown(adb_key);
 }
 
-void ADB_KeyUp(const SDL_Keysym *sdlkey)
+void ADB_KeyUp(const SDL_KeyboardEvent *sdlkey)
 {
 	uint8_t adb_key;
 	
 	if (ConfigureParams.Keyboard.nKeymapType == KEYMAP_SYMBOLIC) {
-		adb_key = ADB_GetKeyFromSymbol(sdlkey->sym);
+		adb_key = ADB_GetKeyFromSymbol(sdlkey->key);
 	} else {
 		adb_key = ADB_GetKeyFromScancode(sdlkey->scancode);
 	}

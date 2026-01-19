@@ -11,7 +11,6 @@ const char Snd_fileid[] = "Previous snd.c";
 #include "main.h"
 #include "configuration.h"
 #include "m68000.h"
-#include "sysdeps.h"
 #include "cycInt.h"
 #include "audio.h"
 #include "snd.h"
@@ -428,6 +427,7 @@ void SND_Out_Handler(void) {
     CycInt_AcknowledgeInterrupt();
     
     if (!sound_output_active) {
+        Audio_Output_Queue_Flush();
         return;
     }
     
@@ -468,8 +468,6 @@ void SND_In_Handler(void) {
         return;
     }
     
-    Audio_Input_Lock();
-    
     /* Process 256 samples at a time and then sync */
     while (size<256) {
         if (Audio_Input_Buffer_Get(&sample) < 0) {
@@ -496,8 +494,6 @@ void SND_In_Handler(void) {
         Log_Printf(LOG_WARN, "[Sound] Writing input data fast");
         size = 16; /* Short delay */
     }
-    
-    Audio_Input_Unlock();
     
     if (kms_can_receive_codec()) {
         CycInt_AddRelativeInterruptUs(size*SNDIN_SAMPLE_TIME, 0, INTERRUPT_SND_IN);

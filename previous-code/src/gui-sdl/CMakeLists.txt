@@ -1,5 +1,5 @@
 
-include_directories(. ../.. ../debug ../includes ${SDL2_INCLUDE_DIRS})
+include_directories(. ../.. ../debug ../includes ${SDL3_INCLUDE_DIRS})
 
 if(PCAP_FOUND)
     include_directories(${PCAP_INCLUDE_DIR})
@@ -17,4 +17,4 @@ add_library(GuiSdl
     dlgPrinter.c dlgRom.c dlgSCSI.c dlgSound.c dlgSystem.c sdlgui.c
 )
 
-target_link_libraries(GuiSdl PRIVATE ${SDL2_LIBRARIES})
+target_link_libraries(GuiSdl PRIVATE ${SDL3_LIBRARIES})

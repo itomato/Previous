@@ -13,9 +13,13 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* Name and version for window title: */
-#define PROG_NAME "Previous 3.9"
+#define PROG_NAME "Previous 4.0"
 
 #include "config.h"
+
+#if defined(_MSC_VER)
+#include "vs-fix.h"
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,10 +28,6 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 #include <math.h>
-
-#if defined(_MSC_VER)
-#include "vs-fix.h"
-#endif
 
 #if __GNUC__ >= 3
 # define likely(x)      __builtin_expect (!!(x), 1)
@@ -82,9 +82,8 @@ extern bool Main_ShowCursor(bool show);
 extern void Main_SetMouseGrab(bool grab);
 extern void Main_SendSpecialEvent(int type);
 extern void Main_ResetKeys(void);
-extern void Main_EventHandler(void);
 extern void Main_EventHandlerInterrupt(void);
-extern void Main_SetTitle(const char *title);
+extern void Main_EventHandler(void);
 extern void Main_ErrorExit(const char *msg1, const char *msg2, int errval);
 extern void Main_SpeedReset(void);
 extern const char* Main_SpeedMsg(void);

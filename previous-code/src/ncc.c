@@ -11,7 +11,6 @@ const char Ncc_fileid[] = "Previous ncc.c";
 
 #include "main.h"
 #include "m68000.h"
-#include "sysdeps.h"
 #include "ncc.h"
 
 #define LOG_NCC_LEVEL LOG_DEBUG

@@ -92,6 +92,7 @@ static int baseclock;
 #endif
 int m68k_pc_indirect;
 bool m68k_interrupt_delay;
+int slow_cpu_access;
 static bool m68k_accurate_ipl;
 static bool m68k_reset_delay;
 static bool ismoves_nommu;
@@ -2487,10 +2488,15 @@ void m68k_cancel_idle(void)
 
 static void m68k_set_stop(int stoptype)
 {
-	if (regs.stopped)
+	if (regs.stopped) {
 		return;
+	}
 	regs.stopped = stoptype;
 #ifndef WINUAE_FOR_HATARI
+	if (regs.intmask == 7) {
+		gui_data.cpu_stopped = 1;
+		gui_led(LED_CPU, 0, -1);
+	}
 	if (cpu_last_stop_vpos >= 0) {
 		cpu_last_stop_vpos = vpos;
 	}
@@ -2501,6 +2507,10 @@ static void m68k_unset_stop(void)
 {
 	regs.stopped = 0;
 #ifndef WINUAE_FOR_HATARI
+	if (gui_data.cpu_stopped) {
+		gui_data.cpu_stopped = 0;
+		gui_led(LED_CPU, 0, -1);
+	}
 	if (cpu_last_stop_vpos >= 0) {
 		cpu_stopped_lines += vpos - cpu_last_stop_vpos;
 		cpu_last_stop_vpos = vpos;
@@ -3945,8 +3955,9 @@ static void cpu_halt_clear(void)
 {
 	regs.halted = 0;
 #ifndef WINUAE_FOR_HATARI
-	if (gui_data.cpu_halted) {
+	if (gui_data.cpu_halted || gui_data.cpu_stopped) {
 		gui_data.cpu_halted = 0;
+		gui_data.cpu_stopped = 0;
 		gui_led(LED_CPU, 0, -1);
 	}
 #endif
@@ -7694,14 +7705,15 @@ void m68k_disasm_file (FILE *f, uaecptr addr, uaecptr *nextpc, uaecptr lastpc, i
  * Functions called from debug/68Disass.c, we need to check if MMU is enabled to do some address
  * translations on 'addr' if needed, depending on the CPU/MMU family
  */
-void m68k_disasm_file_wrapper (FILE *f, uaecptr addr, uaecptr *nextpc, uaecptr lastpc, int cnt)
+void m68k_disasm_file_wrapper (FILE *f, uaecptr addr, uaecptr *nextpc, int cnt)
 {
-	uaecptr new_addr = addr;
-
-	if ( currprefs.cpu_model == 68030 && currprefs.mmu_model )		/* 68030 with MMU */
-		new_addr = mmu030_translate(addr, regs.s != 0, false, false);
-
-	m68k_disasm_file(TraceFile, new_addr, nextpc, lastpc, cnt);
+	if (currprefs.mmu_model) {
+		/* 68030 with MMU */
+		if (currprefs.cpu_model == 68030)
+			addr = mmu030_translate(addr, regs.s != 0, false, false);
+		/* TODO: 040 / 060 */
+	}
+	m68k_disasm_file(f, addr, nextpc, addr, cnt);
 }
 #endif
 

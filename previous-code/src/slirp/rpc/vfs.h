@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <sys/time.h>
 
 #ifdef _WIN32
 typedef uint32_t fsblkcnt_t;
@@ -87,19 +88,22 @@ struct vfs_t {
     uint32_t gid;
 };
 
-int vfscpy(char* dst, const char* src, int size);
-int vfscat(char* dst, const char* src, int size);
+size_t vfscpy(char* dst, const char* src, size_t size);
+size_t vfscat(char* dst, const char* src, size_t size);
+
+size_t vfs_join(char* path, const char* name, size_t size);
+
+size_t vfs_to_host_path(struct vfs_t* vfs, struct path_t* path);
+size_t vfs_to_vfs_path(struct vfs_t* vfs, struct path_t* path);
 
 void vfs_path_canonicalize(char* vfs_path);
 uint32_t vfs_file_id(uint64_t ino);
-
-int vfs_to_host_path(struct vfs_t* vfs, struct path_t* path);
-int vfs_to_vfs_path(struct vfs_t* vfs, struct path_t* path);
 
 uint32_t vfs_get_parent_gid(struct vfs_t* vfs, const struct path_t* path);
 int vfs_get_fstat(struct vfs_t* vfs, const struct path_t* path, struct stat* fstat);
 void vfs_get_sattr(struct vfs_t* vfs, const struct path_t* path, struct sattr_t* sattr);
 void vfs_set_sattr(struct vfs_t* vfs, const struct path_t* path, struct sattr_t* sattr);
+void vfs_stat_to_sattr(const struct stat* fstat, struct sattr_t* sattr);
 
 int vfs_chmod(const struct path_t* path, mode_t mode);
 int vfs_utimes(const struct path_t* path, struct timeval times[2]);
@@ -109,7 +113,7 @@ uint64_t vfs_get_fhandle(const struct path_t* path);
 int vfs_readlink(const struct path_t* path, struct path_t* result);
 int vfs_read(const struct path_t* path, uint32_t offset, uint8_t* data, uint32_t* len);
 int vfs_write(const struct path_t* path, uint32_t offset, uint8_t* data, uint32_t len);
-int vfs_touch(const struct path_t* path);
+int vfs_create(const struct path_t* path, uint8_t* data, uint32_t len);
 int vfs_remove(const struct path_t* path);
 int vfs_rename(const struct path_t* path_from, const struct path_t* path_to);
 int vfs_link(const struct path_t* path_from, const struct path_t* path_to, int soft);
@@ -120,7 +124,7 @@ int vfs_statfs(const struct path_t* path, struct statvfs* fsstat);
 int vfs_access(const struct path_t* path, int mode);
 
 void vfs_set_process_uid_gid(struct vfs_t* vfs, uint32_t uid, uint32_t gid);
-void vfs_get_basepath_alias(struct vfs_t* vfs, char* path, int maxlen);
+void vfs_get_basepath_alias(struct vfs_t* vfs, char* path, size_t maxlen);
 
 struct vfs_t* vfs_init(const char* host_path, const char* vfs_path_alias);
 struct vfs_t* vfs_uninit(struct vfs_t* vfs);

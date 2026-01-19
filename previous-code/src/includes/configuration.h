@@ -101,6 +101,7 @@ typedef enum {
   SHORTCUT_QUIT,
   SHORTCUT_DIMENSION,
   SHORTCUT_STATUSBAR,
+  SHORTCUT_TITLEBAR,
   SHORTCUT_KEYS,  /* number of shortcuts */
   SHORTCUT_NONE
 } SHORTCUTKEYIDX;
@@ -265,6 +266,7 @@ typedef struct
   int nMonitorNum;
   bool bFullScreen;
   bool bShowStatusbar;
+  bool bShowTitlebar;
   bool bShowDriveLed;
 } CNF_SCREEN;
 

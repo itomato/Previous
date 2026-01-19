@@ -4,11 +4,11 @@
  This file is distributed under the GNU General Public License, version 2
  or at your option any later version. Read the file gpl.txt for details.
  
- This file listens for the the Application to launch and for the window to open
+ This file listens for the application to launch and for the window to open
  and then modifies the menu items and toolbar buttons to avoid conflicts
- with the openstep operating system and to remove fullscreen which does not
+ with the guest operating system and to remove fullscreen which does not
  work correctly when activated by macOS. Rather fullscreen should be activated
- via the shortcut (Control + Option + F)
+ via the shortcut (Control + Option + F).
  
  Contributed by Jeffrey Bergier on 2024/11/01
  */
@@ -36,7 +36,7 @@
 
 /* MARK: Subscribe to notifications */
 
-+(void)load;
++(void)load
 {
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(applicationDidFinishLaunching:)
@@ -49,7 +49,7 @@
 }
 
 /* MARK: Menu Shortcut Customizing */
-+(void)applicationDidFinishLaunching:(NSNotification*)aNotification;
++(void)applicationDidFinishLaunching:(NSNotification*)aNotification
 {
 	NSInteger processd = 0;
 	NSInteger modified = 0;
@@ -97,11 +97,14 @@
 #if PRINT_DEBUG_LOG
 	NSLog(@"%@: Processed Main Menu: %ld total -> %ld processed -> %ld modified",
 		  self, [menuItems count], processd, modified);
+#else
+	(void)processd;
+	(void)modified;
 #endif
 }
 
 /* MARK: Window Zoom Button Disabling */
-+(void)windowDidBecomeKey:(NSNotification*)aNotification;
++(void)windowDidBecomeKey:(NSNotification*)aNotification
 {
 	NSWindow *window = [aNotification object];
 	if ([window collectionBehavior] & NSWindowCollectionBehaviorFullScreenNone) { return; }
@@ -125,7 +128,7 @@
 
 -(BOOL)PREV_setKeyEquivalentModifierMask:(NSEventModifierFlags)desiredMask
 						  ifExpectedMask:(NSEventModifierFlags)expectedMask
-						  andExpectedKey:(NSString*)expectedKey;
+						  andExpectedKey:(NSString*)expectedKey
 {
 	if ([[self keyEquivalent] isEqualToString:expectedKey]
 		&& [self keyEquivalentModifierMask] == expectedMask)
@@ -136,7 +139,7 @@
 	return NO;
 }
 
--(BOOL)PREV_removeFromMenu;
+-(BOOL)PREV_removeFromMenu
 {
 	[[self menu] removeItem:self];
 	return YES;
@@ -146,7 +149,7 @@
 
 @implementation NSMenu (Previous)
 
--(NSArray*)PREV_itemArrayWithSubitems;
+-(NSArray*)PREV_itemArrayWithSubitems
 {
 	NSMutableArray *output = [[NSMutableArray new] autorelease];
 	for (NSMenuItem *item in [self itemArray]) {

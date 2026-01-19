@@ -12,7 +12,6 @@ const char Scsi_fileid[] = "Previous scsi.c";
 #include "ioMem.h"
 #include "ioMemTables.h"
 #include "configuration.h"
-#include "sysdeps.h"
 #include "m68000.h"
 #include "statusbar.h"
 #include "scsi.h"
@@ -161,7 +160,16 @@ static const uint8_t inquiry_bytes[54] =
       0,  0,  0,  0,  0,  0                 /*        (may be shorter than 24 bytes) */
 };
 
+static void inquiry_copy(uint8_t* data, size_t offset, size_t maxlen, const char* str) {
+    size_t len = strlen(str);
+    if (len > maxlen) len = maxlen;
+    memcpy(data + offset, str, len);
+}
+
 struct known_disk {
+    SCSI_DEVTYPE dev;
+    uint8_t type;
+    uint8_t rmb;
     char vend[8];
     char name[16];
     char vers[24];
@@ -176,8 +184,10 @@ struct known_disk {
 
 static const struct known_disk known_disks[] =
 {
-    { "MAXTOR", "XT-8380S", "B3C", 31, 1626, 10, 22, 1024 },
-    { "MAXTOR", "XT-8760S", "B3C", 31, 1626, 16, 26, 1024 }
+    { SD_HARDDISK, DEVTYPE_DISK,     0x00, "MAXTOR", "XT-8380S",       "B3C",  31, 1626, 10, 22, 1024 },
+    { SD_HARDDISK, DEVTYPE_DISK,     0x00, "MAXTOR", "XT-8760S",       "B3C",  31, 1626, 16, 26, 1024 },
+    { SD_CD,       DEVTYPE_READONLY, 0x80, "SONY",   "CD-ROM CDU-541", "2.6a", 31,    0,  0,  0, 2048 },
+    { SD_FLOPPY,   DEVTYPE_DISK,     0x80, "PLI",    "SUPER FLOPPY",   "1.50", 31,    0,  0,  0,  512 }
 };
 
 
@@ -188,9 +198,9 @@ static int SCSI_LookupDisk(int target) {
     
     SCSIdisk[target].size = (size < 0) ? 0 : size;
     
-    if (SCSIdisk[target].devtype == SD_HARDDISK) {
-        for (i = 0; i < ARRAY_SIZE(known_disks); i++) {
-            if (KNOWN_SIZE(known_disks, i) == size) {
+    for (i = 0; i < ARRAY_SIZE(known_disks); i++) {
+        if (known_disks[i].dev == SCSIdisk[target].devtype) {
+            if (KNOWN_SIZE(known_disks, i) == size || (known_disks[i].rmb & 0x80)) {
                 if (known_disks[i].bs <= SCSI_MAX_BLOCK) {
                     Log_Printf(LOG_WARN, "[SCSI] Known disk found (%s %s)", known_disks[i].vend, known_disks[i].name);
                     SCSIdisk[target].blocksize = known_disks[i].bs;
@@ -264,11 +274,11 @@ static void SCSI_GuessGeometry(SCSI_DEVTYPE type, uint32_t sectors, uint32_t *nc
 }
 
 #define SCSI_SEEK_TIME_HD       20000  /* 20 ms max seek time */
-#define SCSI_SECTOR_TIME_HD     350    /* 1.4 MB/sec */
+#define SCSI_SECTOR_TIME_HD     700    /* 1.4 MB/sec */
 #define SCSI_SEEK_TIME_FD       200000 /* 200 ms max seek time */
-#define SCSI_SECTOR_TIME_FD     5500   /* 90 kB/sec */
+#define SCSI_SECTOR_TIME_FD     11000  /* 90 kB/sec */
 #define SCSI_SEEK_TIME_CD       500000 /* 500 ms max seek time */
-#define SCSI_SECTOR_TIME_CD     3250   /* 150 kB/sec */
+#define SCSI_SECTOR_TIME_CD     6500   /* 150 kB/sec */
 
 static int64_t SCSI_GetTime(uint8_t target) {
     int64_t seektime, sectortime;
@@ -296,8 +306,8 @@ static int64_t SCSI_GetTime(uint8_t target) {
     } else {
         seekoffset = SCSIdisk[target].lba - SCSIdisk[target].lastlba;
     }
-    disksize = SCSIdisk[target].size / SCSIdisk[target].blocksize;
     
+    disksize = SCSIdisk[target].size / SCSIdisk[target].blocksize;
     if (disksize < 1) { /* Make sure no zero divide occurs */
         disksize = 1;
     }
@@ -312,9 +322,10 @@ static int64_t SCSI_GetTime(uint8_t target) {
     if (sectors < 1) {
         sectors = 1;
     }
-    
     sectortime *= sectors;
-
+    sectortime *= SCSIdisk[target].blocksize;
+    sectortime /= 1024;
+    
     return seektime + sectortime;
 }
 
@@ -617,35 +628,20 @@ static void SCSI_Inquiry(uint8_t *cdb) {
             case SD_HARDDISK:
                 scsi_buffer.data[0] = DEVTYPE_DISK;
                 scsi_buffer.data[1] &= ~0x80;
-                scsi_buffer.data[16] = 'H';
-                scsi_buffer.data[17] = 'D';
-                scsi_buffer.data[18] = 'D';
-                scsi_buffer.data[19] = ' ';
-                scsi_buffer.data[20] = ' ';
-                scsi_buffer.data[21] = ' ';
-                Log_Printf(LOG_SCSI_LEVEL, "[SCSI] Disk is HDD");
+                inquiry_copy(scsi_buffer.data, 16, 16, "HDD");
+                Log_Printf(LOG_SCSI_LEVEL, "[SCSI] Disk is unknown HDD");
                 break;
             case SD_CD:
                 scsi_buffer.data[0] = DEVTYPE_READONLY;
                 scsi_buffer.data[1] |= 0x80;
-                scsi_buffer.data[16] = 'C';
-                scsi_buffer.data[17] = 'D';
-                scsi_buffer.data[18] = '-';
-                scsi_buffer.data[19] = 'R';
-                scsi_buffer.data[20] = 'O';
-                scsi_buffer.data[21] = 'M';
-                Log_Printf(LOG_SCSI_LEVEL, "[SCSI] Disk is CD-ROM");
+                inquiry_copy(scsi_buffer.data, 16, 16, "CD-ROM");
+                Log_Printf(LOG_SCSI_LEVEL, "[SCSI] Disk is unknown CD-ROM");
                 break;
             case SD_FLOPPY:
                 scsi_buffer.data[0] = DEVTYPE_DISK;
                 scsi_buffer.data[1] |= 0x80;
-                scsi_buffer.data[16] = 'F';
-                scsi_buffer.data[17] = 'L';
-                scsi_buffer.data[18] = 'O';
-                scsi_buffer.data[19] = 'P';
-                scsi_buffer.data[20] = 'P';
-                scsi_buffer.data[21] = 'Y';
-                Log_Printf(LOG_SCSI_LEVEL, "[SCSI] Disk is Floppy");
+                inquiry_copy(scsi_buffer.data, 16, 16, "FLOPPY");
+                Log_Printf(LOG_SCSI_LEVEL, "[SCSI] Disk is unknown Floppy");
                 break;
                 
             default:
@@ -653,16 +649,16 @@ static void SCSI_Inquiry(uint8_t *cdb) {
         }
     } else {
         l = 5 + known_disks[i].len;
-        scsi_buffer.data[0] = DEVTYPE_DISK;
-        scsi_buffer.data[1] = 0x00;
+        scsi_buffer.data[0] = known_disks[i].type;
+        scsi_buffer.data[1] = known_disks[i].rmb;
         scsi_buffer.data[2] = 0x01;
         scsi_buffer.data[3] = 0x01;
         scsi_buffer.data[4] = known_disks[i].len;
         scsi_buffer.data[5] = scsi_buffer.data[6] = scsi_buffer.data[7] = 0x00;
         memset(scsi_buffer.data +  8, 0x20, 8 + 16);
-        memcpy(scsi_buffer.data +  8, known_disks[i].vend, strlen(known_disks[i].vend));
-        memcpy(scsi_buffer.data + 16, known_disks[i].name, strlen(known_disks[i].name));
-        memcpy(scsi_buffer.data + 32, known_disks[i].vers, strlen(known_disks[i].vers));
+        inquiry_copy(scsi_buffer.data,  8,  8, known_disks[i].vend);
+        inquiry_copy(scsi_buffer.data, 16, 16, known_disks[i].name);
+        inquiry_copy(scsi_buffer.data, 32, 24, known_disks[i].vers);
     }
     
     if (SCSIdisk[target].lun != LUN_DISK) {
@@ -1086,15 +1082,13 @@ void SCSI_Insert(uint8_t i) {
     SCSIdisk[i].sense.code = SCSIdisk[i].sense.key = SCSIdisk[i].sense.info = 0;
     SCSIdisk[i].sense.valid = false;
     SCSIdisk[i].lba = SCSIdisk[i].lastlba = SCSIdisk[i].blockcounter = 0;
-    SCSIdisk[i].blocksize = SCSI_BLOCKSIZE;
-    SCSIdisk[i].known = -1;
+    SCSIdisk[i].blocksize = (SCSIdisk[i].devtype == SD_CD) ? SCSI_CD_BLOCK : SCSI_BLOCKSIZE;
+    SCSIdisk[i].known = SCSI_LookupDisk(i); /* Sets size and blocksize */
     
     SCSIdisk[i].shadow = NULL;
     
     if (SCSIdisk[i].devtype != SD_NONE && ConfigureParams.SCSI.target[i].bDiskInserted) {
         Log_Printf(LOG_WARN, "SCSI disk %i: Insert %s", i, ConfigureParams.SCSI.target[i].szImageName);
-        
-        SCSIdisk[i].known = SCSI_LookupDisk(i); /* Sets size and blocksize */
         
         if (ConfigureParams.SCSI.target[i].nDeviceType == SD_CD) {
             ConfigureParams.SCSI.target[i].bWriteProtected = true;

@@ -1,6 +1,6 @@
 
 
-                                  Previous 3.9
+                                  Previous 4.0
 
 
 
@@ -36,7 +36,7 @@ this program; if not, see <https://www.gnu.org/licenses/>.
 
 Previous is a NeXT Computer emulator based on the Atari emulator Hatari. It uses 
 the latest m68k emulation core from WinUAE and the i860 emulator from Jason 
-Eckhardt. Previous works on all Systems which are supported by the SDL2 library.
+Eckhardt. Previous works on all Systems which are supported by the SDL3 library.
 
 Previous emulates the following machines:
   NeXT Computer (original 68030 Cube)
@@ -98,7 +98,7 @@ system.
 For using Previous, you need to have installed the following libraries:
 
 Required:
-  > The SDL2 library v2.26.0 or later (http://www.libsdl.org)
+  > The SDL3 library v3.2.0 or later (http://www.libsdl.org)
 
 Optional:
   > The zlib compression library (https://www.zlib.net)
@@ -452,6 +452,15 @@ Previous v3.9:
   > Fixes bug that could cause a crash when calling the READDIR procedure.
   > Fixes bug that caused certain file mode bits to be unreadable through NFS.
 
+Previous v4.0:
+  > Adds support for reading partition data without disk label using ditool.
+  > Adds support for hiding the status bar from the start.
+  > Adds option to hide the title bar, resulting in a borderless window.
+  > Improves accuracy of SCSI CD-ROM drive and changes to correct block size.
+  > Improves accuracy of SCSI floppy drive.
+  > Improves reliability and error handling of ditool.
+  > Fixes bug that could cause a crash when quitting Previous.
+
 
  7) Running Previous
  -------------------
@@ -490,6 +499,7 @@ R: Records all sound output to an AIFF file and stops recording when pressed
    again. The file is saved inside the directory specified for printer output.
 F: Toggles between fullscreen and windowed mode (same as F11).
 B: Hides the statusbar and shows it when pressed again.
+T: Hides the titlebar and shows it when pressed again.
 S: Disables sound output and re-enables it when pressed again.
 Q: Requests to quit Previous. All unsaved changes will be lost.
 
@@ -509,9 +519,11 @@ versions of BuildDisk.
  8) Contributors
  ---------------
 
-Previous was written by Andreas Grabher, Simon Schubiger and Gilles Fetis.
+Previous was written by Andreas Grabher, Simon Schubiger and Gilles Fétis.
 
-Many thanks go to the members of the NeXT International Forums for their help. 
+Many thanks go to the members of the NeXT International Forums and the members
+of the NeXTcommunity for their help and motivation. 
+
 Special thanks go to Gavin Thomas Nicol, Piotr Twarecki, Toni Wilen, Michael 
 Bosshard, Thomas Huth, Olivier Galibert, Jason Eckhardt, Jason Stevens, Daniel 
 L'Hommedieu, Tomaz Slivnik, Vaughan Kaufman, Peter Leonard, Brent Spillner, 
@@ -524,5 +536,5 @@ This emulator would not exist without their help.
  9) Contact
  ----------
 
-If you want to contact the authors of Previous, please have a look at the NeXT 
-International Forums (http://www.nextcomputers.org/forums).
+If you want to contact the authors of Previous you can visit the NeXTcommunity 
+at http://nextcommunity.net/forums.

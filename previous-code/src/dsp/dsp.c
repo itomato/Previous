@@ -622,7 +622,7 @@ int DSP_GetRegisterAddress(const char *regname, uint32_t **addr, uint32_t *mask)
 	typedef struct {
 		const char name[MAX_REGNAME_LEN];
 		uint32_t *addr;
-		size_t bits;
+		int bits;
 		uint32_t mask;
 	} reg_addr_t;
 

@@ -81,7 +81,7 @@ static int disable_noflags;
 static int do_always_dynamic_cycles;
 static int func_noret;
 
-#ifdef WINUAE_FOR_HATARI
+#ifndef WINUAE_FOR_PREVIOUS
 static int CurrentInstrCycles;		/* Hatari only : Number of cycles for the current instruction in cpuemu_xx */
 static int CurrentInstrCycles_pos;	/* Hatari only : Stores where we have to patch in the current cycles value */
 #endif
@@ -728,12 +728,12 @@ static void returntail (bool iswrite)
 
 static void returncycles(int cycles)
 {
-#ifdef WINUAE_FOR_HATARI
-	CurrentInstrCycles = cycles;
-#endif
 #ifdef WINUAE_FOR_PREVIOUS
     out ("return %d;\n", adjust_cycles(cycles));
 #else // WINUAE_FOR_PREVIOUS
+#ifdef WINUAE_FOR_HATARI
+	CurrentInstrCycles = cycles;
+#endif
 
 	if (using_nocycles) {
 		if (func_noret) {
@@ -10111,8 +10111,9 @@ static void generate_func (const char *extra)
 		out("#endif\n\n");
 	}
 
-	if (generate_stbl)
-		fprintf(stblfile, "{ 0, 0 }};\n");
+	if (generate_stbl) {
+		fprintf(stblfile, "{ 0 }};\n");
+	}
 }
 
 #if CPU_TESTER

@@ -10,7 +10,7 @@
 #ifndef PREV_HOST_H
 #define PREV_HOST_H
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <stdbool.h>
 #include <time.h>
 
@@ -34,11 +34,11 @@ enum {
     ND_VIDEO,
 };
 
-typedef SDL_atomic_t       atomic_int;
+typedef SDL_AtomicInt      atomic_int;
 typedef SDL_SpinLock       lock_t;
 typedef SDL_Thread         thread_t;
 typedef SDL_ThreadFunction thread_func_t;
-typedef SDL_mutex          mutex_t;
+typedef SDL_Mutex          mutex_t;
 
 extern void        host_reset(void);
 extern void        host_blank_count(int src, bool state);

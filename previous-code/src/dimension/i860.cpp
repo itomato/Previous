@@ -78,7 +78,7 @@ i860_cpu_device::i860_cpu_device(NextDimension* nd) : nd(nd) {
 }
 
 int i860_cpu_device::thread(void* data) {
-    SDL_SetThreadPriority(SDL_THREAD_PRIORITY_LOW);
+    SDL_SetCurrentThreadPriority(SDL_THREAD_PRIORITY_LOW);
     ((i860_cpu_device*)data)->run();
     return 0;
 }

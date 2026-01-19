@@ -24,12 +24,9 @@
 
 #include "options_cpu.h"
 #include "memory.h"
-#include "custom.h"
 #include "newcpu.h"
 #include "fpp.h"
 #include "savestate.h"
-#include "cpu_prefetch.h"
-#include "cpummu.h"
 #include "cpummu030.h"
 #include "debug.h"
 

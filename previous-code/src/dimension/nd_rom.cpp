@@ -8,7 +8,6 @@
 #include "main.h"
 #include "configuration.h"
 #include "m68000.h"
-#include "sysdeps.h"
 #include "file.h"
 #include "dimension.hpp"
 #include "nd_mem.hpp"

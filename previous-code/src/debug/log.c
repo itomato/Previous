@@ -26,7 +26,6 @@ const char Log_fileid[] = "Hatari log.c";
 #include "configuration.h"
 #include "dialog.h"
 #include "log.h"
-#include "screen.h"
 #include "file.h"
 #include "str.h"
 
@@ -377,7 +376,7 @@ void Log_AlertDlg(LOGTYPE nType, const char *psFormat, ...)
 	}
 
 	/* Show alert dialog box: */
-	if (sdlscrn && nType <= AlertDlgLogLevel)
+	if (nType <= AlertDlgLogLevel)
 	{
 		char buf[MAX_MSG_LEN];
 		va_start(argptr, psFormat);
@@ -534,7 +533,6 @@ const char* Log_SetExceptionDebugMask (const char *FlagsStr)
 	ConfigureParams.Debugger.nExceptionDebugMask = mask;
 	return errstr;
 }
-
 
 #if ENABLE_TRACING
 

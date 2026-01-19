@@ -236,6 +236,6 @@ void Str_UnEscape(char *s1)
 			*s2++ = '\\';
 		}
 	}
-	assert(s2 < s1);
+	assert(s2 <= s1);
 	*s2 = '\0';
 }

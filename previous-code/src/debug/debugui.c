@@ -44,6 +44,9 @@ const char DebugUI_fileid[] = "Hatari debugui.c";
 #include "profile.h"
 #include "symbols.h"
 #include "vars.h"
+#ifdef WIN32
+#include "../gui-win/opencon.h"
+#endif
 
 FILE *debugOutput;
 
@@ -138,7 +141,7 @@ static int DebugUI_SetLogFile(int nArgc, char *psArgs[])
 }
 
 /**
- * Helper to output given value as binary number
+ * Helper: output given value as binary number
  */
 void DebugUI_PrintBinary(FILE *fp, int minwidth, uint32_t value)
 {
@@ -160,7 +163,7 @@ void DebugUI_PrintBinary(FILE *fp, int minwidth, uint32_t value)
 }
 
 /**
- * Helper to print given value in all supported number bases
+ * Helper: print given value in all supported number bases
  */
 static void DebugUI_PrintValue(uint32_t value)
 {
@@ -349,12 +352,18 @@ static int DebugUI_ChangeDir(int argc, char *argv[])
  */
 static int DebugUI_Echo(int argc, char *argv[])
 {
+	bool delimiter = false;
+
 	if (argc < 2)
 		return DebugUI_PrintCmdHelp(argv[0]);
+
 	for (int i = 1; i < argc; i++)
 	{
 		Str_UnEscape(argv[i]);
+		if (delimiter)
+			fputc(' ', debugOutput);
 		fputs(argv[i], debugOutput);
+		delimiter = true;
 	}
 	return DEBUGGER_CMDDONE;
 }
@@ -811,12 +820,12 @@ static char *DebugUI_GetCommand(char *input)
 	fprintf(stderr, "> ");
 	if (!input)
 	{
-		input = malloc(256);
+		input = malloc(MAX_DEBUG_CMD_LEN);
 		if (!input)
 			return NULL;
 	}
 	input[0] = '\0';
-	if (fgets(input, 256, stdin) == NULL)
+	if (fgets(input, MAX_DEBUG_CMD_LEN, stdin) == NULL)
 	{
 		free(input);
 		return NULL;
@@ -864,7 +873,8 @@ static const dbgcommand_t uicommand[] =
 	{ DebugUI_Echo, NULL,
 	  "echo", "",
 	  "output given string(s)",
-	  "<strings>\n",
+	  "<string(s)>\n"
+	  "\tUse e.g. 'echo \\ec' to clear screen in a breakpoint.",
 	  false },
 	{ DebugUI_Evaluate, Vars_MatchCpuVariable,
 	  "evaluate", "e",
@@ -1100,19 +1110,22 @@ void DebugUI(debug_reason_t reason)
 
 	if (welcome)
 	{
+#ifdef WIN32
+		/* in case user forgot -W option */
+		Win_ForceCon();
+#endif
 		fputs(welcome, stderr);
 		welcome = NULL;
 	}
 	DebugCpu_InitSession();
 	DebugDsp_InitSession();
-	Symbols_LoadCurrentProgram();
+	Symbols_LoadCurrentProgram(0, 0);
 	DebugInfo_ShowSessionInfo();
 
 	/* override paused message so that user knows to look into console
 	 * on how to continue in case he invoked the debugger by accident.
 	 */
-	Statusbar_AddMessage("M68K Console Debugger", 100);
-	Statusbar_Update(sdlscrn);
+	Screen_StatusbarMessage("M68K Console Debugger", 100);
 
 	/* disable normal GUI alerts while on console */
 	alertLevel = Log_SetAlertLevel(LOG_FATAL);
@@ -1157,10 +1170,10 @@ void DebugUI(debug_reason_t reason)
  */
 bool DebugUI_ParseFile(const char *path, bool reinit, bool verbose)
 {
-	int recurse;
 	static int recursing;
+	int recurse, offset, len;
 	char *olddir, *dir, *cmd, *expanded, *slash;
-	char input[256];
+	char input[MAX_DEBUG_CMD_LEN];
 	FILE *fp;
 
 	if (verbose)
@@ -1200,15 +1213,40 @@ bool DebugUI_ParseFile(const char *path, bool reinit, bool verbose)
 	recurse = recursing;
 	recursing = true;
 
-	while (fgets(input, sizeof(input), fp) != NULL)
+	offset = 0;
+	while (fgets(input+offset, sizeof(input)-offset, fp) != NULL)
 	{
+		/* trim (potentially appended) line */
+		cmd = Str_Trim(input+offset);
+		/* ignore empty lines */
+		if (!offset && !*cmd)
+			continue;
+
+		/* line ends in '\\'? */
+		len = strlen(cmd);
+		if (cmd[len-1] == '\\')
+		{
+			/* => continued line */
+			const char *next;
+
+			/* comment lines are not added to input */
+			if (*cmd == '#')
+				continue;
+
+			/* add next line from '\' char onwards */
+			next = strrchr(input+offset, '\\');
+			offset += next - input - offset;
+			continue;
+		}
+		offset = 0;
+
 		/* ignore empty and comment lines */
 		cmd = Str_Trim(input);
 		if (!*cmd || *cmd == '#')
 			continue;
 
 		/* returns new string if input needed expanding! */
-		expanded = DebugUI_EvaluateExpressions(input);
+		expanded = DebugUI_EvaluateExpressions(cmd);
 		if (!expanded)
 			continue;
 

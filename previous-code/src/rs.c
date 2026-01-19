@@ -17,7 +17,7 @@ const char Rs_fileid[] = "Previous rs.c";
 
 
 /* Reed-Solomon(36,32) in GF(2**8), generator polynomial (x-1)*(x-2)*(x-4)*(x-8)
- GF's polynom is the usual 11d
+ * GF's polynom is the usual 11d
  */
 
 /* Partial remainders, e.g. t_rem[i] = (i*x^4) % ((x-1)*(x-2)*(x-4)*(x-8)) */
@@ -163,8 +163,9 @@ static int rs_decode_string(uint8_t *sector, int off, int step)
 	if(ref_ecc == ecc)
 		return 0;
 	
-	// Syndrome polynomial
-	// syn[i] = value of the codebook polynom at 2**(i-1)
+	/* Syndrome polynomial
+	 * syn[i] = value of the codebook polynom at 2**(i-1)
+	 */
 	uint8_t syn[5];
 	memset(syn, 0, 5);
 	syn[0] = 1;
@@ -179,7 +180,7 @@ static int rs_decode_string(uint8_t *sector, int off, int step)
 		}
 	}
 	
-	// Berlekamp-Massey
+	/* Berlekamp-Massey */
 	
 	uint8_t sigma[5];
 	uint8_t omega[5];
@@ -200,22 +201,22 @@ static int rs_decode_string(uint8_t *sector, int off, int step)
 	
 	int l;
 	for(l=1; l<5; l++) {
-		// 1- Determine the l-order coefficient syn*sigma
+		/* 1- Determine the l-order coefficient syn*sigma */
 		uint8_t delta = 0;
 		for(i=0; i<=l; i++)
 			if(sigma[i] && syn[l-i])
 				delta ^= t_exp[t_log[sigma[i]] + t_log[syn[l-i]]];
 		
-		// 2- Select update method a/b
+		/* 2- Select update method a/b */
 		int limit = (l+1)/2;
 		int exact = l & 1;
 		if(!delta || d > limit || (d == limit && exact && !b)) {
-			// 2.1- Method a
-			// b and d unchanged
-			// tau and gamma multiplied by x
-			// sigma = sigma - delta * tau
-			// omega = omega - delta * gamma
-			
+			/* 2.1- Method a
+			 * b and d unchanged
+			 * tau and gamma multiplied by x
+			 * sigma = sigma - delta * tau
+			 * omega = omega - delta * gamma
+			 */
 			for(i=0; i<l; i++) {
 				tau[l-i] = tau[l-i-1];
 				gamma[l-i] = gamma[l-i-1];
@@ -232,13 +233,14 @@ static int rs_decode_string(uint8_t *sector, int off, int step)
 				}
 			}
 		} else {
-			// 2.2- Method b
+			/* 2.2- Method b */
 			d = l-d;
 			b = !b;
-			// tau(n+1)   = sigma(n) / delta
-			// gamma(n+1) = omega(n) / delta
-			// sigma(n+1) = sigma(n) - delta*x*tau(n)
-			// omega(n+1) = omega(n) - delta*x*gamma(n)
+			/* tau(n+1)   = sigma(n) / delta
+			 * gamma(n+1) = omega(n) / delta
+			 * sigma(n+1) = sigma(n) - delta*x*tau(n)
+			 * omega(n+1) = omega(n) - delta*x*gamma(n)
+			 */
 			uint8_t ldelta = t_log[delta];
 			uint8_t ildelta = ldelta ^ 255;
 			for(i=l; i>0; i--) {
@@ -261,11 +263,11 @@ static int rs_decode_string(uint8_t *sector, int off, int step)
 		}
 	}
 	
-	// Find the roots of sigma to get the error positions (they're the inverses of 2**position)
-	// Compute the error(s)
-	
+	/* Find the roots of sigma to get the error positions (they're the inverses of 2**position)
+	 * Compute the error(s)
+	 */
 	if(sigma[3] || sigma[4]) {
-		// Should not happen
+		/* Should not happen */
 		return -1;
 	}
 	
@@ -284,10 +286,11 @@ static int rs_decode_string(uint8_t *sector, int off, int step)
 		if(epos1 > 35)
 			return -1;
 		
-		// sigma = c.(x-1/r1)(x-1/r2) = c.x*x - c*x*(1/r1+1/r2) + c/(r1*r2)
-		
-		// s0 = s2/(r1*r2) -> r1*r2*s0 = s2 -> r1 = s2 / (r1*s0)
-		// -> r2 = sigma[2]/(r1*sigma[0])
+		/* sigma = c.(x-1/r1)(x-1/r2) = c.x*x - c*x*(1/r1+1/r2) + c/(r1*r2)
+		 *
+		 * s0 = s2/(r1*r2) -> r1*r2*s0 = s2 -> r1 = s2 / (r1*s0)
+		 * -> r2 = sigma[2]/(r1*sigma[0])
+		 */
 		epos2 = ls2 - epos1 - t_log[sigma[0]];
 		if(epos2 < 0)
 			epos2 += 255;
@@ -317,7 +320,7 @@ static int rs_decode_string(uint8_t *sector, int off, int step)
 		return 2;
 		
 	} else if(sigma[1] && sigma[0]) {
-		// sigma = c.(x-1/r1) -> r1=sigma[1]/sigma[0]
+		/* sigma = c.(x-1/r1) -> r1=sigma[1]/sigma[0] */
 		int epos = t_log[sigma[1]] - t_log[sigma[0]];
 		
 		if(epos > 35)
@@ -328,7 +331,7 @@ static int rs_decode_string(uint8_t *sector, int off, int step)
 		return 1;
 		
 	} else {
-		// Should not happen
+		/* Should not happen */
 		return -1;
 	}
 }

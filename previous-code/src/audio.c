@@ -12,18 +12,17 @@ const char Audio_fileid[] = "Previous audio.c";
 #include "statusbar.h"
 #include "configuration.h"
 #include "m68000.h"
-#include "sysdeps.h"
 #include "audio.h"
 #include "dma.h"
 #include "snd.h"
 #include "host.h"
 #include "grab.h"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 
-static SDL_AudioDeviceID Audio_Input_Device  = 0;
-static SDL_AudioDeviceID Audio_Output_Device = 0;
+static SDL_AudioStream* Audio_Input_Stream  = NULL;
+static SDL_AudioStream* Audio_Output_Stream = NULL;
 
 static bool bSoundOutputWorking = false; /* Is sound output OK */
 static bool bSoundInputWorking  = false; /* Is sound input OK */
@@ -39,28 +38,28 @@ void Audio_Output_Queue_Put(uint8_t* data, int len) {
 	if (len > 0) {
 		Grab_Sound(data, len);
 		if (bSoundOutputWorking) {
-			int chunkSize = SOUND_BUFFER_SAMPLES;
-			do {
-				if (len < chunkSize) chunkSize = len;
-				SDL_QueueAudio(Audio_Output_Device, data, chunkSize);
-				data += chunkSize;
-				len  -= chunkSize;
-			} while (len > 0);
+			SDL_PutAudioStreamData(Audio_Output_Stream, data, len);
 		}
 	}
 }
 
 int Audio_Output_Queue_Size(void) {
 	if (bSoundOutputWorking) {
-		return SDL_GetQueuedAudioSize(Audio_Output_Device) / 4;
+		return SDL_GetAudioStreamQueued(Audio_Output_Stream) / 4;
 	} else {
 		return 0;
 	}
 }
 
+void Audio_Output_Queue_Flush(void) {
+	if (bSoundOutputWorking) {
+		SDL_FlushAudioStream(Audio_Output_Stream);
+	}
+}
+
 void Audio_Output_Queue_Clear(void) {
 	if (bSoundOutputWorking) {
-		SDL_ClearQueuedAudio(Audio_Output_Device);
+		SDL_ClearAudioStream(Audio_Output_Stream);
 	}
 }
 
@@ -73,71 +72,45 @@ void Audio_Output_Queue_Clear(void) {
  */
 #define AUDIO_RECBUF_INIT 32 /* 16000 byte = 1 second */
 
-#define REC_BUFFER_SIZE (1<<16)
-#define REC_BUFFER_MASK (REC_BUFFER_SIZE-1)
-static uint8_t  recBuffer[REC_BUFFER_SIZE];
-static uint32_t recBufferWr = 0;
-static uint32_t recBufferRd = 0;
-static lock_t   recBufferLock;
+static uint8_t  recBuffer[1024];
+static int recBufferReadPtr = 0;
+static int recBufferSize    = 0;
 
 static void Audio_Input_InitBuf(void) {
 	Log_Printf(LOG_WARN, "[Audio] Initializing input buffer with %d ms of silence.", AUDIO_RECBUF_INIT>>4);
-	recBufferRd = 0;
-	for (recBufferWr = 0; recBufferWr < AUDIO_RECBUF_INIT; recBufferWr++) {
-		recBuffer[recBufferWr] = 0;
+	recBufferReadPtr = 0;
+	for (recBufferSize = 0; recBufferSize < AUDIO_RECBUF_INIT; recBufferSize++) {
+		recBuffer[recBufferSize] = 0;
 	}
 }
 
 int Audio_Input_Buffer_Size(void) {
 	if (bSoundInputWorking) {
-		if (recBufferRd <= recBufferWr) {
-			return recBufferWr - recBufferRd;
-		} else {
-			return REC_BUFFER_SIZE - (recBufferRd - recBufferWr);
-		}
+		return SDL_GetAudioStreamAvailable(Audio_Input_Stream);
 	}
 	return 0;
 }
 
 int Audio_Input_Buffer_Get(int16_t* sample) {
 	if (bSoundInputWorking) {
-		if ((recBufferRd&REC_BUFFER_MASK)==(recBufferWr&REC_BUFFER_MASK)) {
-			return -1;
+		if (recBufferReadPtr >= recBufferSize) { /* Try to re-fill buffer in case it is empty. */
+			recBufferReadPtr = 0;
+			recBufferSize    = SDL_GetAudioStreamData(Audio_Input_Stream, recBuffer, sizeof(recBuffer));
+			if (recBufferSize&1) {
+				Log_Printf(LOG_WARN, "[Audio] Recording buffer has invalid size (%d).", recBufferSize);
+				recBufferSize--;
+			}
+		}
+		if (recBufferReadPtr < recBufferSize) {
+			*sample = ((recBuffer[recBufferReadPtr]<<8)|recBuffer[recBufferReadPtr+1]);
+			recBufferReadPtr += 2;
 		} else {
-			*sample = ((recBuffer[recBufferRd&REC_BUFFER_MASK]<<8)|recBuffer[(recBufferRd&REC_BUFFER_MASK)+1]);
-			recBufferRd += 2;
-			recBufferRd &= REC_BUFFER_MASK;
+			return -1;
 		}
 	} else {
 		*sample = 0; /* silence */
 	}
 	return 0;
-}
-
-static void Audio_Input_CallBack(void *userdata, uint8_t *stream, int len) {
-	Log_Printf(LOG_WARN, "Audio_Input_CallBack %d", len);
-	if(len == 0) return;
-	Audio_Input_Lock();
-	while(len--) {
-		recBuffer[recBufferWr++&REC_BUFFER_MASK] = *stream++;
-	}
-	recBufferWr &= REC_BUFFER_MASK;
-	recBufferWr &= ~1; /* Just to be sure */
-	Audio_Input_Unlock();
-}
-
-void Audio_Input_Lock(void) {
-	host_lock(&recBufferLock);
-}
-
-void Audio_Input_Unlock(void) {
-	host_unlock(&recBufferLock);
-}
-
-static bool check_audio(int requested, int granted, const char* attribute) {
-	if(requested != granted)
-		Log_Printf(LOG_WARN, "[Audio] Device %s mismatch: requested: %d, granted: %d.", attribute, requested, granted);
-	return requested == granted;
 }
 
 /*-----------------------------------------------------------------------*/
@@ -146,93 +119,55 @@ static bool check_audio(int requested, int granted, const char* attribute) {
  */
 void Audio_Output_Init(void)
 {
-	SDL_AudioSpec request;    /* We fill in the desired SDL audio options here */
-	SDL_AudioSpec granted;
+	SDL_AudioSpec request = {SDL_AUDIO_S16BE, 2, SOUND_OUT_FREQUENCY};
 
 	bSoundOutputWorking = false;
 
 	/* Init the SDL's audio subsystem: */
 	if (SDL_WasInit(SDL_INIT_AUDIO) == 0) {
-		if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0) {
+		if (SDL_InitSubSystem(SDL_INIT_AUDIO) == false) {
 			Log_Printf(LOG_WARN, "[Audio] Could not init audio output: %s\n", SDL_GetError());
 			Statusbar_AddMessage("Error: Can't open SDL audio subsystem.", 5000);
 			return;
 		}
 	}
 
-	/* Set up SDL audio: */
-	request.freq     = SOUND_OUT_FREQUENCY; /* 44,1 kHz */
-	request.format   = AUDIO_S16MSB;        /* 16-Bit signed, big endian */
-	request.channels = 2;                   /* stereo */
-	request.callback = NULL;
-	request.userdata = NULL;
-	request.samples  = SOUND_BUFFER_SAMPLES; /* buffer size in samples */
-
-	if (Audio_Output_Device == 0) {
-		Audio_Output_Device = SDL_OpenAudioDevice(NULL, 0, &request, &granted, 0);
+	if (Audio_Output_Stream == NULL) {
+		Audio_Output_Stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &request, NULL, NULL);
 	}
-	if (Audio_Output_Device == 0) {
+	if (Audio_Output_Stream == NULL) {
 		Log_Printf(LOG_WARN, "[Audio] Could not open audio output device: %s\n", SDL_GetError());
 		Statusbar_AddMessage("Error: Can't open audio output device. No sound output.", 5000);
 		return;
 	}
 
-	bSoundOutputWorking  = true;
-	bSoundOutputWorking &= check_audio(request.freq,     granted.freq,     "freq");
-	bSoundOutputWorking &= check_audio(request.format,   granted.format,   "format");
-	bSoundOutputWorking &= check_audio(request.channels, granted.channels, "channels");
-	bSoundOutputWorking &= check_audio(request.samples,  granted.samples,  "samples");
-
-	if (!bSoundOutputWorking) {
-		SDL_CloseAudioDevice(Audio_Output_Device);
-		Audio_Output_Device = 0;
-		Statusbar_AddMessage("Error: Can't open audio output device. No sound output.", 5000);
-	}
+	bSoundOutputWorking = true;
 }
 
 void Audio_Input_Init(void) {
-	SDL_AudioSpec request;    /* We fill in the desired SDL audio options here */
-	SDL_AudioSpec granted;
+	SDL_AudioSpec request = {SDL_AUDIO_S16BE, 1, SOUND_IN_FREQUENCY};
 
 	bSoundInputWorking = false;
 
 	/* Init the SDL's audio subsystem: */
 	if (SDL_WasInit(SDL_INIT_AUDIO) == 0) {
-		if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0) {
+		if (SDL_InitSubSystem(SDL_INIT_AUDIO) == false) {
 			Log_Printf(LOG_WARN, "[Audio] Could not init audio input: %s\n", SDL_GetError());
 			Statusbar_AddMessage("Error: Can't open SDL audio subsystem.", 5000);
 			return;
 		}
 	}
 
-	/* Set up SDL audio: */
-	request.freq     = SOUND_IN_FREQUENCY; /* 8kHz */
-	request.format   = AUDIO_S16MSB;       /* 16-Bit signed, big endian */
-	request.channels = 1;                  /* mono */
-	request.callback = Audio_Input_CallBack;
-	request.userdata = NULL;
-	request.samples  = SOUND_BUFFER_SAMPLES; /* buffer size in samples */
-
-	if (Audio_Input_Device == 0) {
-		Audio_Input_Device = SDL_OpenAudioDevice(NULL, 1, &request, &granted, 0); /* Open audio device */
+	if (Audio_Input_Stream == NULL) {
+		Audio_Input_Stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_RECORDING, &request, NULL, NULL);
 	}
-	if (Audio_Input_Device == 0) {
+	if (Audio_Input_Stream == NULL) {
 		Log_Printf(LOG_WARN, "[Audio] Could not open audio input device: %s\n", SDL_GetError());
 		Statusbar_AddMessage("Error: Can't open audio input device. Recording silence.", 5000);
 		return;
 	}
 
-	bSoundInputWorking  = true;
-	bSoundInputWorking &= check_audio(request.freq,     granted.freq,     "freq");
-	bSoundInputWorking &= check_audio(request.format,   granted.format,   "format");
-	bSoundInputWorking &= check_audio(request.channels, granted.channels, "channels");
-	bSoundInputWorking &= check_audio(request.samples,  granted.samples,  "samples");
-
-	if (!bSoundInputWorking) {
-		SDL_CloseAudioDevice(Audio_Input_Device);
-		Audio_Input_Device = 0;
-		Statusbar_AddMessage("Error: Can't open audio input device. Recording silence.", 5000);
-	}
+	bSoundInputWorking = true;
 }
 
 /*-----------------------------------------------------------------------*/
@@ -244,8 +179,8 @@ void Audio_Output_UnInit(void) {
 		/* Stop */
 		Audio_Output_Enable(false);
 
-		SDL_CloseAudioDevice(Audio_Output_Device);
-		Audio_Output_Device = 0;
+		SDL_DestroyAudioStream(Audio_Output_Stream);
+		Audio_Output_Stream = NULL;
 
 		bSoundOutputWorking = false;
 	}
@@ -256,8 +191,8 @@ void Audio_Input_UnInit(void) {
 		/* Stop */
 		Audio_Input_Enable(false);
 
-		SDL_CloseAudioDevice(Audio_Input_Device);
-		Audio_Input_Device = 0;
+		SDL_DestroyAudioStream(Audio_Input_Stream);
+		Audio_Input_Stream = NULL;
 
 		bSoundInputWorking = false;
 	}
@@ -270,12 +205,12 @@ void Audio_Input_UnInit(void) {
 void Audio_Output_Enable(bool bEnable) {
 	if (bEnable && !bPlayingBuffer) {
 		/* Start playing */
-		SDL_PauseAudioDevice(Audio_Output_Device, false);
+		SDL_ResumeAudioStreamDevice(Audio_Output_Stream);
 		bPlayingBuffer = true;
 	}
 	else if (!bEnable && bPlayingBuffer) {
 		/* Stop from playing */
-		SDL_PauseAudioDevice(Audio_Output_Device, true);
+		SDL_PauseAudioStreamDevice(Audio_Output_Stream);
 		bPlayingBuffer = false;
 	}
 }
@@ -284,12 +219,12 @@ void Audio_Input_Enable(bool bEnable) {
 	if (bEnable && !bRecordingBuffer) {
 		/* Start recording */
 		Audio_Input_InitBuf();
-		SDL_PauseAudioDevice(Audio_Input_Device, false);
+		SDL_ResumeAudioStreamDevice(Audio_Input_Stream);
 		bRecordingBuffer = true;
 	}
 	else if (!bEnable && bRecordingBuffer) {
 		/* Stop recording */
-		SDL_PauseAudioDevice(Audio_Input_Device, true);
+		SDL_PauseAudioStreamDevice(Audio_Input_Stream);
 		bRecordingBuffer = false;
 	}
 }

@@ -12,7 +12,6 @@
 #include "main.h"
 #include "configuration.h"
 #include "m68000.h"
-#include "sysdeps.h"
 #include "dimension.hpp"
 #include "nd_mem.hpp"
 #include "nd_nbic.hpp"
