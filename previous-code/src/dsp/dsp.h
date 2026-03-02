@@ -92,7 +92,5 @@ extern void DSP_Data3_Write(void);
 
 extern void DSP_SetIRQB(void);
 
-/* See statusbar.c */
-extern void Statusbar_SetDspLed(bool state);
 
 #endif /* DSP_H */

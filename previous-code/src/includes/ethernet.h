@@ -49,7 +49,7 @@ typedef struct {
 extern EthernetBuffer enet_tx_buffer;
 extern EthernetBuffer enet_rx_buffer;
 
-extern void ENET_IO_Handler(void);
+extern void Ethernet_IO_Handler(void);
 extern void Ethernet_Reset(bool hard);
 extern void Ethernet_UnInit(void);
 extern void enet_receive(uint8_t *pkt, int len);

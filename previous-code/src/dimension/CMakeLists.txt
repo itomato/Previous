@@ -1,5 +1,5 @@
 
-include_directories(. ../.. ../debug ../includes ${SDL3_INCLUDE_DIRS}) 
+include_directories(. ../.. ../debug ../includes ../gui-sdl ${SDL3_INCLUDE_DIRS}) 
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-write-strings")
 

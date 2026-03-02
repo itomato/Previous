@@ -15,7 +15,6 @@
 #include "dimension.hpp"
 #include "i860cfg.h"
 #include "nd_sdl.hpp"
-#include "host.h"
 
 
 #define LOG_VID_LEVEL   LOG_NONE

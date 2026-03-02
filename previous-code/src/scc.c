@@ -312,7 +312,7 @@ static void scc_hard_reset(void) {
     scc[1].wreg[14] = (scc[1].wreg[14]&~0x3F)|0x20;
 
     set_interrupt(INT_SCC, RELEASE_INT);
-    CycInt_RemovePendingInterrupt(INTERRUPT_SCC_IO);
+    CycInt_RemovePendingEvent(EVENT_SCC_IO);
 }
 
 
@@ -361,8 +361,6 @@ int     scc_pio_channel = 0;
 void SCC_IO_Handler(void) {
     int i;
     
-    CycInt_AcknowledgeInterrupt();
-    
     if (scc_pio) {
         scc_pio = false;
         scc_send(scc_pio_channel, scc_pio_data);
@@ -374,7 +372,7 @@ void SCC_IO_Handler(void) {
                         scc_send_dma(i, dma_scc_read_memory());
                     }
                 }
-                CycInt_AddRelativeInterruptCycles(50, INTERRUPT_SCC_IO);
+                CycInt_AddCyclesEvent(50, EVENT_SCC_IO);
             }
         }
     }
@@ -395,7 +393,7 @@ static void scc_data_write(int ch, uint8_t val) {
     scc_pio = true;
     scc_pio_data = val;
     scc_pio_channel = ch;
-    CycInt_AddRelativeInterruptCycles(50, INTERRUPT_SCC_IO);
+    CycInt_AddCyclesEvent(50, EVENT_SCC_IO);
 }
 
 
@@ -445,7 +443,7 @@ static uint8_t scc_read_intvec(int ch) {
 static void scc_write_mode(int ch, uint8_t val) {
     if (val&WR1_REQENABLE) {
         scc_pio = false;
-        CycInt_AddRelativeInterruptCycles(50, INTERRUPT_SCC_IO);
+        CycInt_AddCyclesEvent(50, EVENT_SCC_IO);
     }
     /* FIXME: check if this is correct */
     if (!(val&WR1_TXIE)) {

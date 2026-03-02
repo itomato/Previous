@@ -71,7 +71,7 @@ extern bool dma_sndin_intr(void);
 extern void dma_printer_read_memory(void);
 
 /* M2M DMA IO handler */
-extern void M2MDMA_IO_Handler(void);
+extern void DMA_M2M_IO_Handler(void);
 
 /* Function for video interrupt */
 extern void dma_video_interrupt(void);

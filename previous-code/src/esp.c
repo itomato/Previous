@@ -529,7 +529,7 @@ void esp_start_command(uint8_t cmd) {
             Log_Printf(LOG_WARN, "ESP Command: Illegal command for actual ESP state ($%02X)!\n",cmd);
             esp_command_clear();
             intstatus |= INTR_ILL;
-            CycInt_AddRelativeInterruptUs(ESP_DELAY, 20, INTERRUPT_ESP);
+            CycInt_AddTimeEvent(ESP_DELAY, 20, EVENT_ESP_INTERRUPT);
             return;
         }
     }
@@ -637,15 +637,14 @@ void esp_start_command(uint8_t cmd) {
             Log_Printf(LOG_WARN, "ESP Command: Illegal command!\n");
             esp_command_clear();
             intstatus |= INTR_ILL;
-            CycInt_AddRelativeInterruptUs(ESP_DELAY, 20, INTERRUPT_ESP);
+            CycInt_AddTimeEvent(ESP_DELAY, 20, EVENT_ESP_INTERRUPT);
             break;
     }
 }
 
 
 /* This is the handler function for ESP delayed interrupts */
-void ESP_InterruptHandler(void) {
-    CycInt_AcknowledgeInterrupt();
+void ESP_Interrupt_Handler(void) {
     esp_raise_irq();
 }
 
@@ -724,7 +723,7 @@ void esp_reset_hard(void) {
     status &= ~(STAT_VGC | STAT_PE | STAT_GE); /* clear transfer complete aka valid group code, parity error, gross error */
     esp_reset_soft();
     esp_finish_command();
-    CycInt_RemovePendingInterrupt(INTERRUPT_ESP);
+    CycInt_RemovePendingEvent(EVENT_ESP_INTERRUPT);
 }
 
 
@@ -743,7 +742,7 @@ void esp_reset_soft(void) {
     esp_command_clear();
     esp_state = DISCONNECTED;
     esp_io_state = ESP_IO_STATE_DONE;
-    CycInt_RemovePendingInterrupt(INTERRUPT_ESP_IO);
+    CycInt_RemovePendingEvent(EVENT_ESP_IO);
 }
 
 
@@ -756,7 +755,7 @@ void esp_bus_reset(void) {
         SCSIbus.phase = PHASE_DO;
         Log_Printf(LOG_ESPCMD_LEVEL,"[ESP] SCSI bus reset raising IRQ (configuration=$%02X)\n",configuration);
         /* CHECK: how is this delay defined? */
-        CycInt_AddRelativeInterruptUsCycles(ConfigureParams.System.nMachineType == NEXT_CUBE030 ? 50 : 335, 0, INTERRUPT_ESP);
+        CycInt_AddCycleTimeEvent(ConfigureParams.System.nMachineType == NEXT_CUBE030 ? 50 : 335, 0, EVENT_ESP_INTERRUPT);
     } else {
         Log_Printf(LOG_ESPCMD_LEVEL,"[ESP] SCSI bus reset not interrupting (configuration=$%02X)\n",configuration);
         esp_finish_command();
@@ -789,7 +788,7 @@ void esp_select(bool atn) {
         esp_state = DISCONNECTED;
         int seltout = (selecttimeout * 8192 * clockconv) / ESP_CLOCK_FREQ; /* timeout in microseconds */
         Log_Printf(LOG_ESPCMD_LEVEL, "[ESP] Select: Target %i, timeout after %i microseconds",target,seltout);
-        CycInt_AddRelativeInterruptUs(seltout, 0, INTERRUPT_ESP);
+        CycInt_AddTimeEvent(seltout, 0, EVENT_ESP_INTERRUPT);
         return;
     }
     
@@ -826,7 +825,7 @@ void esp_select(bool atn) {
     intstatus = INTR_BS | INTR_FC;
     
     esp_state = INITIATOR;
-    CycInt_AddRelativeInterruptUs(ESP_DELAY, 20, INTERRUPT_ESP);
+    CycInt_AddTimeEvent(ESP_DELAY, 20, EVENT_ESP_INTERRUPT);
 }
 
 
@@ -842,12 +841,12 @@ bool esp_transfer_done(bool write) {
             intstatus = INTR_FC;
         }
         status |= STAT_TC;
-        CycInt_AddRelativeInterruptUs(ESP_DELAY, 20, INTERRUPT_ESP);
+        CycInt_AddTimeEvent(ESP_DELAY, 20, EVENT_ESP_INTERRUPT);
         return true;
     } else if ((write && SCSIbus.phase!=PHASE_DI) || (!write && SCSIbus.phase!=PHASE_DO)) { /* Phase change detected */
         esp_command_clear();
         intstatus = INTR_BS;
-        CycInt_AddRelativeInterruptUs(ESP_DELAY, 20, INTERRUPT_ESP);
+        CycInt_AddTimeEvent(ESP_DELAY, 20, EVENT_ESP_INTERRUPT);
         return true;
     } /* else continue transfering data, no interrupt */
     return false;
@@ -856,23 +855,23 @@ bool esp_transfer_done(bool write) {
 
 /* Transfer information */
 void esp_transfer_info(void) {
-    if(mode_dma) {
+    if (mode_dma) {
         esp_io_state=ESP_IO_STATE_TRANSFERING;
-        CycInt_AddRelativeInterruptUs(SCSIdisk_Time(), 100, INTERRUPT_ESP_IO);
+        CycInt_AddTimeEvent(SCSIdisk_Time(), 100, EVENT_ESP_IO);
     } else {
         Log_Printf(LOG_ESPCMD_LEVEL, "[ESP] start PIO transfer");
         switch (SCSIbus.phase) {
             case PHASE_DI:
                 esp_fifo_write(SCSIdisk_Send_Data());
-                CycInt_AddRelativeInterruptCycles(20, INTERRUPT_ESP);
+                CycInt_AddCyclesEvent(20, EVENT_ESP_INTERRUPT);
                 break;
             case PHASE_MI:
-                CycInt_AddRelativeInterruptCycles(20, INTERRUPT_ESP);
+                CycInt_AddCyclesEvent(20, EVENT_ESP_INTERRUPT);
                 break;
             case PHASE_ST:
                 /* FIXME: What should happen here? */
                 Log_Printf(LOG_WARN, "[ESP] Error! Transfer info status phase");
-                CycInt_AddRelativeInterruptCycles(20, INTERRUPT_ESP);
+                CycInt_AddCyclesEvent(20, EVENT_ESP_INTERRUPT);
                 break;
             default:
                 Log_Printf(LOG_WARN, "[ESP] PIO transfer (unimplemented)");
@@ -882,8 +881,6 @@ void esp_transfer_info(void) {
     }
 }
 void ESP_IO_Handler(void) {
-    CycInt_AcknowledgeInterrupt();
-    
     switch (esp_io_state) {
         case ESP_IO_STATE_TRANSFERING:
             switch (SCSIbus.phase) {
@@ -915,7 +912,7 @@ void ESP_IO_Handler(void) {
             return;
     }
     
-    CycInt_AddRelativeInterruptUs(100, 0, INTERRUPT_ESP_IO);
+    CycInt_UpdateTimeEvent(100, 0, EVENT_ESP_IO);
 }
 
 
@@ -960,7 +957,7 @@ void esp_initiator_command_complete(void) {
         if (SCSIbus.phase!=PHASE_MI) { /* Stop sequence if no phase change to msg in occured */
             esp_command_clear();
             intstatus = INTR_BS;
-            CycInt_AddRelativeInterruptUs(ESP_DELAY, 20, INTERRUPT_ESP);
+            CycInt_AddTimeEvent(ESP_DELAY, 20, EVENT_ESP_INTERRUPT);
             return;
         }
         
@@ -969,7 +966,7 @@ void esp_initiator_command_complete(void) {
     }
 
     intstatus = INTR_FC;
-    CycInt_AddRelativeInterruptUs(ESP_DELAY, 20, INTERRUPT_ESP);
+    CycInt_AddTimeEvent(ESP_DELAY, 20, EVENT_ESP_INTERRUPT);
 }
 
 
@@ -978,7 +975,7 @@ void esp_message_accepted(void) {
     SCSIbus.phase = PHASE_DO;
     intstatus = INTR_DC;
     esp_state = DISCONNECTED; /* CHECK: only disconnected if message was cmd complete? */
-    CycInt_AddRelativeInterruptUs(ESP_DELAY, 20, INTERRUPT_ESP);
+    CycInt_AddTimeEvent(ESP_DELAY, 20, EVENT_ESP_INTERRUPT);
 }
 
 void ESP_Reset(void) {

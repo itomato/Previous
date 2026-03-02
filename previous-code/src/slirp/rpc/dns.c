@@ -438,7 +438,7 @@ int vdns_match(struct mbuf *m, uint32_t addr, int dport) {
        addr == (CTL_NET | CTL_DNS))
         return vdns_query((uint8_t*)(&m->m_data[40]), m->m_len-40) != NULL;
     else
-        return false;
+        return 0;
 }
 
 void vdns_udp_map_to_local_port(struct in_addr* ipNBO, uint16_t* dportNBO) {

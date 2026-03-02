@@ -25,7 +25,6 @@
 #include <slirp.h>
 #include <stdlib.h>
 
-#include "host.h"
 #include "csocket.h"
 
 #ifdef _WIN32

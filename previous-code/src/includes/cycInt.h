@@ -15,62 +15,41 @@ extern "C" {
 #endif
 
 /* Interrupt handlers in system */
-typedef enum
-{
-  INTERRUPT_NULL,
-  INTERRUPT_VIDEO_VBL,
-  INTERRUPT_HARDCLOCK,
-  INTERRUPT_MOUSE,
-  INTERRUPT_ESP,
-  INTERRUPT_ESP_IO,
-  INTERRUPT_M2M_IO,
-  INTERRUPT_MO,
-  INTERRUPT_MO_IO,
-  INTERRUPT_ECC_IO,
-  INTERRUPT_ENET_IO,
-  INTERRUPT_FLP_IO,
-  INTERRUPT_SND_OUT,
-  INTERRUPT_SND_IN,
-  INTERRUPT_LP_IO,
-  INTERRUPT_SCC_IO,
-  INTERRUPT_EVENT_LOOP,
-  INTERRUPT_ND_VBL,
-  INTERRUPT_ND_VIDEO_VBL,
-  MAX_INTERRUPTS
-} interrupt_id;
+typedef enum {
+	EVENT_NULL,
+	EVENT_HARDCLOCK_INTERRUPT,
+	EVENT_ESP_INTERRUPT,
+	EVENT_ESP_IO,
+	EVENT_MO_INTERRUPT,
+	EVENT_MO_IO,
+	EVENT_MO_ECC_IO,
+	EVENT_FLOPPY_IO,
+	EVENT_ETHERNET_IO,
+	EVENT_PRINTER_IO,
+	EVENT_SCC_IO,
+	EVENT_DMA_M2M_IO,
+	EVENT_KMS_MOUSE_MOTION,
+	EVENT_SND_INPUT,
+	EVENT_SND_OUTPUT,
+	EVENT_VIDEO_VBL,
+	EVENT_ND_VBL,
+	EVENT_ND_VIDEO_VBL,
+	EVENT_MAIN_EVENT,
+	NUM_EVENTS
+} event_id;
 
-/* Event timer structure - keeps next timer to occur in structure so don't need
- * to check all entries */
-
-enum {
-    CYC_INT_NONE,
-    CYC_INT_CPU,
-    CYC_INT_US,
-};
-
-typedef struct
-{
-    int     type;   /* Type of time (CPU Cycles, microseconds) or NONE for inactive */
-    int64_t time;   /* number of CPU cycles to go until interupt or absolute microsecond timeout until interrupt */
-    void (*pFunction)(void);
-} INTERRUPTHANDLER;
-
-extern INTERRUPTHANDLER PendingInterrupt;
-
-extern int64_t nCyclesMainCounter;
-extern int64_t nCyclesOver;
-
-extern int usCheckCycles;
+extern uint64_t nCyclesMainCounter;
 
 extern void CycInt_Reset(void);
-extern void CycInt_MemorySnapShot_Capture(bool bSave);
-extern void CycInt_AcknowledgeInterrupt(void);
-extern void CycInt_AddRelativeInterruptCycles(int64_t CycleTime, interrupt_id Handler);
-extern void CycInt_AddRelativeInterruptUs(int64_t us, int64_t usreal, interrupt_id Handler);
-extern void CycInt_AddRelativeInterruptUsCycles(int64_t us, int64_t usreal, interrupt_id Handler);
-extern void CycInt_RemovePendingInterrupt(interrupt_id Handler);
-extern bool CycInt_InterruptActive(interrupt_id Handler);
-extern bool CycInt_SetNewInterruptUs(void);
+extern void CycInt_AddCycles(int Cycles);
+extern void CycInt_AddCyclesEvent(uint64_t Cycles, event_id i);
+extern void CycInt_UpdateCyclesEvent(uint64_t Cycles, event_id i);
+extern void CycInt_AddTimeEvent(uint64_t RealTime, uint64_t FastTime, event_id i);
+extern void CycInt_UpdateTimeEvent(uint64_t RealTime, uint64_t FastTime, event_id i);
+extern void CycInt_AddCycleTimeEvent(uint64_t CycleTime, uint64_t FastTime, event_id i);
+extern void CycInt_UpdateCycleTimeEvent(uint64_t CycleTime, uint64_t FastTime, event_id i);
+extern void CycInt_RemovePendingEvent(event_id i);
+extern bool CycInt_EventPending(event_id i);
 
 #ifdef __cplusplus
 }

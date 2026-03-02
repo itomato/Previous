@@ -861,7 +861,7 @@ void ecc_write(void) {
     }
     ecc_buffer[eccin].size=0; /* FIXME: find a better place for this */
     ecc_buffer[eccin].limit=MO_SECTORSIZE_DATA; /* and this */
-    CycInt_AddRelativeInterruptUsCycles(ECC_DELAY, 80, INTERRUPT_ECC_IO);
+    CycInt_AddCycleTimeEvent(ECC_DELAY, 80, EVENT_MO_ECC_IO);
 }
 void ecc_read(void) {
     if (ecc_state!=ECC_STATE_DONE) {
@@ -873,7 +873,7 @@ void ecc_read(void) {
     if (osp.ctrlr_csr2&MOCSR2_ECC_BLOCKS) {
         ecc_repeat=true;
     }
-    CycInt_AddRelativeInterruptUsCycles(ECC_DELAY, 80, INTERRUPT_ECC_IO);
+    CycInt_AddCycleTimeEvent(ECC_DELAY, 80, EVENT_MO_ECC_IO);
 }
 void ecc_verify(void) {
     if (ecc_state!=ECC_STATE_DONE) {
@@ -882,7 +882,7 @@ void ecc_verify(void) {
     }
     ecc_mode=ECC_MODE_VERIFY;
     ecc_state=ECC_STATE_ECCING;
-    CycInt_AddRelativeInterruptUsCycles(ECC_DELAY, 80, INTERRUPT_ECC_IO);
+    CycInt_AddCycleTimeEvent(ECC_DELAY, 80, EVENT_MO_ECC_IO);
 }
 void ecc_sequence_done(void) {
     if (ecc_repeat==true) {
@@ -893,7 +893,7 @@ void ecc_sequence_done(void) {
         } else {
             ecc_state=ECC_STATE_ECCING;
         }
-        CycInt_AddRelativeInterruptUsCycles(ECC_DELAY, 80, INTERRUPT_ECC_IO);
+        CycInt_AddCycleTimeEvent(ECC_DELAY, 80, EVENT_MO_ECC_IO);
         return;
     }
 
@@ -903,10 +903,8 @@ void ecc_sequence_done(void) {
     }
 }
 
-void ECC_IO_Handler(void) {
+void MO_ECC_IO_Handler(void) {
     static uint32_t old_size;
-    
-    CycInt_AcknowledgeInterrupt();
     
     switch (ecc_state) {
         case ECC_STATE_FILLING:
@@ -997,7 +995,7 @@ void ECC_IO_Handler(void) {
             return;
     }
     
-    CycInt_AddRelativeInterruptUsCycles(ECC_DELAY, 80, INTERRUPT_ECC_IO);
+    CycInt_UpdateCycleTimeEvent(ECC_DELAY, 80, EVENT_MO_ECC_IO);
 }
 
 
@@ -1526,7 +1524,7 @@ void mo_start_spiraling(void) {
         return;
     }
     if (!mo[0].spiraling && !mo[1].spiraling) { /* periodic disk operation already active? */
-        CycInt_AddRelativeInterruptUsCycles(SECTOR_IO_DELAY, 400, INTERRUPT_MO_IO);
+        CycInt_AddCycleTimeEvent(SECTOR_IO_DELAY, 400, EVENT_MO_IO);
     }
     mo[dnum].spiraling=true;
 
@@ -1561,7 +1559,6 @@ void mo_spiraling_operation(void) {
             mo[i].sec_offset%=MO_SEC_PER_TRACK;
         }
     }
-    CycInt_AddRelativeInterruptUsCycles(SECTOR_IO_DELAY, 400, INTERRUPT_MO_IO);
 }
 
 void mo_self_diagnostic(void) {
@@ -1569,9 +1566,9 @@ void mo_self_diagnostic(void) {
 }
 
 void MO_IO_Handler(void) {
-    CycInt_AcknowledgeInterrupt();
-
     mo_spiraling_operation();
+    
+    CycInt_UpdateCycleTimeEvent(SECTOR_IO_DELAY, 400, EVENT_MO_IO);
 }
 
 void mo_unimplemented_cmd(void) {
@@ -1649,7 +1646,7 @@ void mo_set_signals_delayed(bool complete, bool attn, int delay) {
             if (delayed_drive!=dnum) {
                 Log_Printf(LOG_WARN, "[MO] Warning: Delayed interrupt from other drive (%i) in progress!",delayed_drive);
                 mo_set_signals(delayed_compl, delayed_attn, delayed_drive);
-                CycInt_RemovePendingInterrupt(INTERRUPT_MO);
+                CycInt_RemovePendingEvent(EVENT_MO_INTERRUPT);
             } else {
                 Log_Printf(LOG_WARN, "[MO] Warning: Delayed interrupt already in progress!");
             }
@@ -1657,15 +1654,13 @@ void mo_set_signals_delayed(bool complete, bool attn, int delay) {
         delayed_drive=dnum;
         delayed_compl=complete;
         delayed_attn=attn;
-        CycInt_AddRelativeInterruptUsCycles(delay, CMD_DELAY, INTERRUPT_MO);
+        CycInt_AddCycleTimeEvent(delay, CMD_DELAY, EVENT_MO_INTERRUPT);
     } else {
         mo_set_signals(complete, attn, dnum);
     }
 }
 
-void MO_InterruptHandler(void) {
-    CycInt_AcknowledgeInterrupt();
-    
+void MO_Interrupt_Handler(void) {
     mo_set_signals(delayed_compl,delayed_attn,delayed_drive);
     
     delayed_compl=false;
@@ -1702,9 +1697,9 @@ void MO_Reset(void) {
     ecc_state=ECC_STATE_DONE;
     
     /* Stop all periodic operations */
-    CycInt_RemovePendingInterrupt(INTERRUPT_MO);
-    CycInt_RemovePendingInterrupt(INTERRUPT_MO_IO);
-    CycInt_RemovePendingInterrupt(INTERRUPT_ECC_IO);
+    CycInt_RemovePendingEvent(EVENT_MO_INTERRUPT);
+    CycInt_RemovePendingEvent(EVENT_MO_IO);
+    CycInt_RemovePendingEvent(EVENT_MO_ECC_IO);
 }
 
 void MO_Insert(int drive) {

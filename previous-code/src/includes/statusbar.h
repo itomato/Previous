@@ -7,7 +7,9 @@
 #ifndef PREV_STATUSBAR_H
 #define PREV_STATUSBAR_H
 
-#include <SDL3/SDL.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef enum {
 	DEVICE_LED_ENET,
@@ -24,19 +26,17 @@ typedef enum {
 	MAX_LED_STATE
 } drive_led_t;
 
-
-extern int Statusbar_SetHeight(int ScreenWidth, int ScreenHeight, bool force);
-extern int Statusbar_GetHeight(void);
+/* These functions must be provided through host or cross-platform API. */
 extern void Statusbar_BlinkLed(drive_index_t drive);
 extern void Statusbar_SetSystemLed(bool state);
 extern void Statusbar_SetDspLed(bool state);
 extern void Statusbar_SetNdLed(int state);
 
-extern void Statusbar_Init(SDL_Surface *screen);
 extern void Statusbar_UpdateInfo(void);
 extern void Statusbar_AddMessage(const char *msg, uint32_t msecs);
-extern void Statusbar_OverlayBackup(SDL_Surface *screen);
-extern void Statusbar_Update(SDL_Surface *screen);
-extern void Statusbar_OverlayRestore(SDL_Surface *screen);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* PREV_STATUSBAR_H */

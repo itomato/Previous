@@ -13,6 +13,7 @@ const char Enet_slirp_fileid[] = "Previous enet_slirp.c";
 #include "ethernet.h"
 #include "enet_slirp.h"
 #include "queue.h"
+#include "timing.h"
 #include "host.h"
 #include "libslirp.h"
 #include "rpc/rpc.h"
@@ -102,18 +103,18 @@ static void slirp_rip_tick(void)
 
 static int tick_func(void *arg)
 {
-    uint64_t time = host_get_save_time();
+    uint64_t time = Timing_GetSaveTime();
     uint64_t last_time = 0;
     uint64_t next_time = time + SLIRP_RIP_SEC;
 
-    while(slirp_started)
+    while (slirp_started)
     {
         host_sleep_us(SLIRP_TICK_US);
         slirp_tick();
         
         /* for routing information protocol */
         last_time = time;
-        time = host_get_save_time();
+        time = Timing_GetSaveTime();
         if (time < last_time) /* if time counter wrapped */
         {
             next_time = time; /* reset next_time */

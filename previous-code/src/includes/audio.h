@@ -8,6 +8,7 @@
 #ifndef PREV_AUDIO_H
 #define PREV_AUDIO_H
 
+/* These functions must be provided through host or cross-platform API. */
 extern void Audio_Output_Enable(bool bEnable);
 extern void Audio_Output_Init(void);
 extern void Audio_Output_UnInit(void);

@@ -47,7 +47,7 @@ static void ShortCut_FullScreen(void)
 static void ShortCut_MouseGrab(void)
 {
 	bGrabMouse = !bGrabMouse;        /* Toggle flag */
-	Main_SetMouseGrab(bGrabMouse);
+	Screen_SetMouseGrab(bGrabMouse);
 }
 
 

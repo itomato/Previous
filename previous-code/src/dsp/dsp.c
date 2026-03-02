@@ -30,6 +30,7 @@
 #include "m68000.h"
 #include "sysReg.h"
 #include "dma.h"
+#include "statusbar.h"
 
 #if ENABLE_DSP_EMU
 #include "debugdsp.h"

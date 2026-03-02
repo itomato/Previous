@@ -18,6 +18,7 @@ const char DlgFileSelect_fileid[] = "Hatari dlgFileSelect.c";
 
 #include "main.h"
 #include "scandir.h"
+#include "screen.h"
 #include "sdlgui.h"
 #include "file.h"
 #include "paths.h"
@@ -710,7 +711,7 @@ char* SDLGui_FileSelect(const char *title, const char *path_and_name, char **zip
 	fsdlg[SGFSDLG_TITLE].w = len;
 
 	/* Save mouse state and enable cursor */
-	bOldMouseVisibility = Main_ShowCursor(true);
+	bOldMouseVisibility = Screen_ShowCursor(true);
 
 	SDLGui_CenterDlg(fsdlg);
 	if (bAllowNew)
@@ -1105,7 +1106,7 @@ char* SDLGui_FileSelect(const char *title, const char *path_and_name, char **zip
 		retpath = NULL;
 
 clean_exit:
-	Main_ShowCursor(bOldMouseVisibility);
+	Screen_ShowCursor(bOldMouseVisibility);
 
 	if (browsingzip && zipfiles != NULL)
 	{

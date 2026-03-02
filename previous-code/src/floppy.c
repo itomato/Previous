@@ -177,14 +177,14 @@ static void floppy_start(void) {
     
     /* Single poll interrupt after reset */
     flp_io_state = FLP_STATE_INTERRUPT;
-    CycInt_AddRelativeInterruptUs(1000*1000, 0, INTERRUPT_FLP_IO);
+    CycInt_AddTimeEvent(1000*1000, 0, EVENT_FLOPPY_IO);
 }
 
 static void floppy_stop(void) {
     flp.sra &= ~SRA_INT;
     set_interrupt(INT_PHONE, RELEASE_INT);
     flp_io_state = FLP_STATE_DONE;
-    CycInt_RemovePendingInterrupt(INTERRUPT_FLP_IO);
+    CycInt_RemovePendingEvent(EVENT_FLOPPY_IO);
 }
 
 static void floppy_reset(void) {
@@ -457,7 +457,7 @@ static void floppy_read(void) {
         flp_io_drv = drive;
         flp_io_state = FLP_STATE_READ;
     }
-    CycInt_AddRelativeInterruptUs(get_seek_time(drive) + get_sector_time(drive), 100, INTERRUPT_FLP_IO);
+    CycInt_AddTimeEvent(get_seek_time(drive) + get_sector_time(drive), 100, EVENT_FLOPPY_IO);
 }
 
 static void floppy_write(void) {
@@ -516,7 +516,7 @@ static void floppy_write(void) {
         flp_io_drv = drive;
         flp_io_state = FLP_STATE_WRITE;
     }
-    CycInt_AddRelativeInterruptUs(get_seek_time(drive) + get_sector_time(drive), 100, INTERRUPT_FLP_IO);
+    CycInt_AddTimeEvent(get_seek_time(drive) + get_sector_time(drive), 100, EVENT_FLOPPY_IO);
 }
 
 static void floppy_format(void) {
@@ -560,7 +560,7 @@ static void floppy_format(void) {
         flp_sector_counter = num_sectors;
         flp_io_drv = drive;
         flp_io_state = FLP_STATE_FORMAT;
-        CycInt_AddRelativeInterruptUs(get_sector_time(drive), 100, INTERRUPT_FLP_IO);
+        CycInt_AddTimeEvent(get_sector_time(drive), 100, EVENT_FLOPPY_IO);
     }
 }
 
@@ -579,7 +579,7 @@ static void floppy_read_id(void) {
     send_rw_status(drive);
     
     flp_io_state = FLP_STATE_INTERRUPT;
-    CycInt_AddRelativeInterruptUs(get_sector_time(drive), 100, INTERRUPT_FLP_IO);
+    CycInt_AddTimeEvent(get_sector_time(drive), 100, EVENT_FLOPPY_IO);
 }
 
 static void floppy_recalibrate(void) {
@@ -598,7 +598,7 @@ static void floppy_recalibrate(void) {
         flp.sra &= ~SRA_TRK0_N;
         
         flp_io_state = FLP_STATE_INTERRUPT;
-        CycInt_AddRelativeInterruptUs(get_seek_time(drive), 100, INTERRUPT_FLP_IO);
+        CycInt_AddTimeEvent(get_seek_time(drive), 100, EVENT_FLOPPY_IO);
     }
 }
 
@@ -625,7 +625,7 @@ static void floppy_seek(uint8_t relative) {
     }
         
     flp_io_state = FLP_STATE_INTERRUPT;
-    CycInt_AddRelativeInterruptUs(get_seek_time(drive), 100, INTERRUPT_FLP_IO);
+    CycInt_AddTimeEvent(get_seek_time(drive), 100, EVENT_FLOPPY_IO);
 }
 
 static void floppy_interrupt_status(void) {
@@ -658,9 +658,9 @@ static void floppy_configure(void) {
 
     if (cmd_data[1]&0x10) {
         Log_Printf(LOG_FLP_CMD_LEVEL, "[Floppy] Configure: disable polling");
-        if (CycInt_InterruptActive(INTERRUPT_FLP_IO)) {
+        if (CycInt_EventPending(EVENT_FLOPPY_IO)) {
             Log_Printf(LOG_WARN, "[Floppy] Disable pending reset poll interrupt");
-            CycInt_RemovePendingInterrupt(INTERRUPT_FLP_IO);
+            CycInt_RemovePendingEvent(EVENT_FLOPPY_IO);
         }
     }
     if (cmd_data[2]) {
@@ -681,7 +681,7 @@ static void floppy_unimplemented(void) {
     result_size = 1;
     
     flp_io_state = FLP_STATE_INTERRUPT;
-    CycInt_AddRelativeInterruptUs(1000, 100, INTERRUPT_FLP_IO);
+    CycInt_AddTimeEvent(1000, 100, EVENT_FLOPPY_IO);
 }
 
 static void floppy_execute_cmd(void) {
@@ -1014,10 +1014,8 @@ static void floppy_format_sector(void) {
 }
 
 
-void FLP_IO_Handler(void) {
+void Floppy_IO_Handler(void) {
     uint32_t old_size;
-    
-    CycInt_AcknowledgeInterrupt();
     
     switch (flp_io_state) {
         case FLP_STATE_WRITE:
@@ -1093,7 +1091,7 @@ void FLP_IO_Handler(void) {
             return;
     }
     
-    CycInt_AddRelativeInterruptUs(get_sector_time(flp_io_drv), 250, INTERRUPT_FLP_IO);
+    CycInt_UpdateTimeEvent(get_sector_time(flp_io_drv), 250, EVENT_FLOPPY_IO);
 }
 
 

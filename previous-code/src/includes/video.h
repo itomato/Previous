@@ -10,6 +10,6 @@
 
 extern void Video_Reset(void);
 extern bool Video_Enabled(void);
-extern void Video_InterruptHandler(void);
+extern void Video_VBL_Handler(void);
 
 #endif /* PREV_VIDEO_H */

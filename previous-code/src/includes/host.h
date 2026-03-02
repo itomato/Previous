@@ -11,68 +11,43 @@
 #define PREV_HOST_H
 
 #include <SDL3/SDL.h>
-#include <stdbool.h>
-#include <time.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define REALTIME_INT_LVL 1
-
-#ifdef __MINGW32__
-#define FMT_ll "I64"
-#define FMT_zu "u"
-#else
-#define FMT_ll "ll"
-#define FMT_zu "zu"
-#endif
-
-enum {
-    MAIN_DISPLAY,
-    ND_DISPLAY,
-    ND_VIDEO,
-};
-
+/* These types must be provided through host or cross-platform API. */
 typedef SDL_AtomicInt      atomic_int;
 typedef SDL_SpinLock       lock_t;
 typedef SDL_Thread         thread_t;
 typedef SDL_ThreadFunction thread_func_t;
+typedef SDL_Semaphore      semaphore_t;
 typedef SDL_Mutex          mutex_t;
 
-extern void        host_reset(void);
-extern void        host_blank_count(int src, bool state);
-extern int         host_reset_blank_counter(int src);
-extern uint64_t    host_time_us(void);
-extern uint64_t    host_time_ms(void);
-extern uint64_t    host_time_sec(void);
-extern void        host_time(uint64_t* realTime, uint64_t* hostTime);
-extern time_t      host_unix_time(void);
-extern void        host_set_unix_time(time_t now);
-extern struct tm*  host_unix_tm(void);
-extern void        host_set_unix_tm(struct tm* now);
-extern uint64_t    host_get_save_time(void);
-extern void        host_sleep_ms(uint32_t ms);
-extern void        host_sleep_us(uint64_t us);
-extern int         host_num_cpus(void);
-extern void        host_hardclock(int expected, int actual);
-extern int64_t     host_real_time_offset(void);
-extern void        host_pause_time(bool pausing);
-extern const char* host_report(uint64_t realTime, uint64_t hostTime);
-
-extern void        host_lock(lock_t* lock);
-extern void        host_unlock(lock_t* lock);
-extern int         host_trylock(lock_t* lock);
-extern int         host_atomic_set(atomic_int* a, int newValue);
-extern int         host_atomic_get(atomic_int* a);
-extern int         host_atomic_add(atomic_int* a, int value);
-extern bool        host_atomic_cas(atomic_int* a, int oldValue, int newValue);
-extern mutex_t*    host_mutex_create(void);
-extern void        host_mutex_lock(mutex_t* mutex);
-extern void        host_mutex_unlock(mutex_t* mutex);
-extern void        host_mutex_destroy(mutex_t* mutex);
-extern thread_t*   host_thread_create(thread_func_t, const char* name, void* data);
-extern int         host_thread_wait(thread_t* thread);
+/* These functions must be provided through host or cross-platform API. */
+extern void         host_lock(lock_t* lock);
+extern int          host_trylock(lock_t* lock);
+extern void         host_unlock(lock_t* lock);
+extern int          host_atomic_set(atomic_int* a, int newValue);
+extern int          host_atomic_get(atomic_int* a);
+extern int          host_atomic_add(atomic_int* a, int value);
+extern int          host_atomic_cas(atomic_int* a, int oldValue, int newValue);
+extern thread_t*    host_thread_create(thread_func_t, const char* name, void* data);
+extern void         host_thread_priority(int priority);
+extern int          host_thread_wait(thread_t* thread);
+extern semaphore_t* host_semaphore_create(uint32_t value);
+extern void         host_semaphore_signal(semaphore_t* semaphore);
+extern int          host_semaphore_wait_timeout(semaphore_t* semaphore, int32_t ms);
+extern void         host_semaphore_destroy(semaphore_t* semaphore);
+extern mutex_t*     host_mutex_create(void);
+extern void         host_mutex_lock(mutex_t* mutex);
+extern void         host_mutex_unlock(mutex_t* mutex);
+extern void         host_mutex_destroy(mutex_t* mutex);
+extern void         host_sleep_ms(uint32_t ms);
+extern void         host_sleep_us(uint64_t us);
+extern uint64_t     host_get_counter(void);
+extern uint64_t     host_get_counter_frequency(void);
+extern int          host_num_cpus(void);
 
 #ifdef __cplusplus
 }

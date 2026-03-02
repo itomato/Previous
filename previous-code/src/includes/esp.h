@@ -88,7 +88,7 @@ extern void esp_lower_irq(void);
 extern bool esp_transfer_done(bool write);
 
 
-extern void ESP_InterruptHandler(void);
+extern void ESP_Interrupt_Handler(void);
 extern void ESP_IO_Handler(void);
 
 extern bool ESP_Send_Ready(void);

@@ -4,28 +4,19 @@
   This file is distributed under the GNU General Public License, version 2
   or at your option any later version. Read the file gpl.txt for details.
 
-  This code handles our table with callbacks for cycle accurate program
-  interruption. We add any pending callback handler into a table so that we do
-  not need to test for every possible interrupt event. We then scan
-  the list if used entries in the table and copy the one with the least cycle
-  count into the global 'PendingInterrupt' variable. This is then
-  decremented by the execution loop - rather than decrement each and every
-  entry (as the others cannot occur before this one).
-  We support three time units: CPU cycles, ticks, and microseconds.
-  Ticks are bound to CPU cycles and run at TICK_RATE MHz. Microseconds are either
-  bound to the host CPU's performance counter in real-time mode or to the emulated
-  CPU cycles if non-realtime mode.
+  This code handles cycle accurate program interruption. We add any pending
+  callback handler into a queue so that we do not need to test for every
+  possible event. We support two time units: CPU cycles and microseconds. 
+  Microseconds are either bound to the host CPU's performance counter in 
+  realtime mode or to the emulated CPU cycles if non-realtime mode.
 */
 
 const char CycInt_fileid[] = "Previous cycInt.c";
 
-#include <stdint.h>
-#include <assert.h>
 #include "main.h"
-#include "host.h"
 #include "cycInt.h"
-#include "m68000.h"
-#include "screen.h"
+#include "configuration.h"
+#include "timing.h"
 #include "video.h"
 #include "sysReg.h"
 #include "esp.h"
@@ -37,225 +28,257 @@ const char CycInt_fileid[] = "Previous cycInt.c";
 #include "printer.h"
 #include "kms.h"
 #include "scc.h"
-#include "configuration.h"
-#include "main.h"
 #include "dimension.hpp"
 
-void (*PendingInterruptFunction)(void);
-int64_t PendingInterruptCounter;
-int     usCheckCycles;
 
-int64_t nCyclesOver;
-int64_t nCyclesMainCounter; /* Main cycles counter, counts emulated CPU cycles since reset */
+#define CHECK_INTERVAL 100
 
+uint64_t nCyclesMainCounter; /* Main cycles counter, counts emulated CPU cycles since reset */
 
-/* List of possible interrupt handlers to be store in 'PendingInterruptTable',
- * used for 'MemorySnapShot' */
-static void (* const pIntHandlerFunctions[MAX_INTERRUPTS])(void) =
+typedef enum {
+	TYPE_NONE,
+	TYPE_CYCLES,
+	TYPE_TIME
+} event_type;
+
+typedef struct {
+	void (*func)(void);
+	event_type type;
+	uint64_t time;
+	event_id prev;
+	event_id next;
+} cycint_event;
+
+static cycint_event EventList[NUM_EVENTS];
+
+static uint64_t nCheckCycles;
+static uint64_t nTimeNow;
+static event_id nCyclesFirst;
+static event_id nTimeFirst;
+
+/* List of possible event handlers to be stored in event function pointers */
+static void (*const pEventHandlers[NUM_EVENTS])(void) =
 {
 	NULL,
-	Video_InterruptHandler,
-	Hardclock_InterruptHandler,
-	Mouse_Handler,
-	ESP_InterruptHandler,
+	Hardclock_Interrupt_Handler,
+	ESP_Interrupt_Handler,
 	ESP_IO_Handler,
-	M2MDMA_IO_Handler,
-	MO_InterruptHandler,
+	MO_Interrupt_Handler,
 	MO_IO_Handler,
-	ECC_IO_Handler,
-	ENET_IO_Handler,
-	FLP_IO_Handler,
-	SND_Out_Handler,
-	SND_In_Handler,
+	MO_ECC_IO_Handler,
+	Floppy_IO_Handler,
+	Ethernet_IO_Handler,
 	Printer_IO_Handler,
 	SCC_IO_Handler,
-	Main_EventHandlerInterrupt,
-	nd_display_vbl_handler,
-	nd_video_vbl_handler
+	DMA_M2M_IO_Handler,
+	KMS_Mouse_Motion_Handler,
+	SND_In_Handler,
+	SND_Out_Handler,
+	Video_VBL_Handler,
+	ND_VBL_Handler,
+	ND_Video_VBL_Handler,
+	Main_EventHandler
 };
 
-static INTERRUPTHANDLER InterruptHandlers[MAX_INTERRUPTS];
-INTERRUPTHANDLER        PendingInterrupt;
-static int              ActiveInterrupt=0;
-
-static void CycInt_SetNewInterrupt(void);
 
 /*-----------------------------------------------------------------------*/
 /**
- * Reset interrupts, handlers
+ * Reset events and handlers.
  */
 void CycInt_Reset(void) {
-	int i;
+	event_id i;
 
 	/* Reset counts */
-	PendingInterrupt.time = 0;
-	ActiveInterrupt       = 0;
-	nCyclesOver           = 0;
-	nCyclesMainCounter    = 0;
-	usCheckCycles         = 0;
+	nCyclesMainCounter = 0;
+	nCheckCycles       = ConfigureParams.System.bRealtime ? 0 : UINT64_MAX;
+	nTimeNow           = 0;
+	
+	/* Reset entry points */
+	nCyclesFirst = EVENT_NULL;
+	nTimeFirst   = EVENT_NULL;
 
-	/* Reset interrupt table */
-	for (i=0; i<MAX_INTERRUPTS; i++) {
-		InterruptHandlers[i].type      = CYC_INT_NONE;
-		InterruptHandlers[i].time      = INT64_MAX;
-		InterruptHandlers[i].pFunction = pIntHandlerFunctions[i];
+	/* Reset event table */
+	for (i = EVENT_NULL; i < NUM_EVENTS; i++) {
+		EventList[i].func = pEventHandlers[i];
+		EventList[i].type = TYPE_NONE;
+		EventList[i].time = UINT64_MAX;
+		EventList[i].prev = EVENT_NULL;
+		EventList[i].next = EVENT_NULL;
 	}
 }
 
 /*-----------------------------------------------------------------------*/
 /**
- * Find next interrupt to occur, and store to global variables for decrement
- * in instruction decode loop.
- * (SC) Microsecond interrupts are skipped here and handled in the decode loop.
+ * Add cycles and process pending events.
  */
-static void CycInt_SetNewInterrupt(void) {
-	int64_t      LowestCycleCount = INT64_MAX;
-	interrupt_id LowestInterrupt  = INTERRUPT_NULL;
-
-	/* Find next interrupt to go off */
-	for(int i = INTERRUPT_NULL+1; i < MAX_INTERRUPTS; i++) {
-		/* Is interrupt pending? */
-		if(InterruptHandlers[i].type == CYC_INT_CPU && InterruptHandlers[i].time < LowestCycleCount) {
-			LowestCycleCount = InterruptHandlers[i].time;
-			LowestInterrupt  = i;
-		}
+void CycInt_AddCycles(int Cycles) {
+	nCyclesMainCounter += Cycles;
+	while (EventList[nCyclesFirst].time <= nCyclesMainCounter) {
+		event_id i = nCyclesFirst;
+		EventList[i].type = TYPE_NONE;
+		nCyclesFirst = EventList[i].next;
+		EventList[nCyclesFirst].prev = EVENT_NULL;
+		EventList[i].func();
 	}
-
-	/* Set new counts, active interrupt */
-	PendingInterrupt = InterruptHandlers[LowestInterrupt];
-	ActiveInterrupt  = LowestInterrupt;
-}
-
-/*-----------------------------------------------------------------------*/
-/**
- * Adjust all interrupt timings, MUST call CycInt_SetNewInterrupt after this.
- */
-static void CycInt_UpdateInterrupt(void) {
-	int i;
-
-	/* Adjust table by subtracting cycles that have passed since last update */
-	for (i = 0; i < MAX_INTERRUPTS; i++) {
-		if (InterruptHandlers[i].type == CYC_INT_CPU)
-			InterruptHandlers[i].time -= nCyclesOver;
-	}
-	nCyclesOver = 0;
-}
-
-/*-----------------------------------------------------------------------*/
-/**
- * Check all microsecond interrupt timings
- */
-bool CycInt_SetNewInterruptUs(void) {
-	int64_t now = host_time_us();
-	if (ConfigureParams.System.bRealtime) {
-		for(int i = 0; i < MAX_INTERRUPTS; i++) {
-			if (InterruptHandlers[i].type == CYC_INT_US && now > InterruptHandlers[i].time) {
-				PendingInterrupt = InterruptHandlers[i];
-				PendingInterrupt.time = -1;
-				ActiveInterrupt       = i;
-				return true;
+	if (nCheckCycles <= nCyclesMainCounter) {
+		nTimeNow = Timing_GetTime();
+		while (nTimeFirst) {
+			int64_t diff = EventList[nTimeFirst].time - nTimeNow;
+			if (diff > 0) {
+				if (diff < CHECK_INTERVAL) {
+					nCheckCycles = nCyclesMainCounter + diff * ConfigureParams.System.nCpuFreq;
+					return;
+				}
+				break;
+			} else {
+				event_id i = nTimeFirst;
+				EventList[i].type = TYPE_NONE;
+				nTimeFirst = EventList[i].next;
+				EventList[nTimeFirst].prev = EVENT_NULL;
+				EventList[i].func();
 			}
 		}
+		nCheckCycles = nCyclesMainCounter + CHECK_INTERVAL * ConfigureParams.System.nCpuFreq;
 	}
-	return false;
 }
 
 /*-----------------------------------------------------------------------*/
 /**
- * Adjust all interrupt timings as 'ActiveInterrupt' has occured, and
- * remove from active list.
+ * Add event to the queue.
  */
-void CycInt_AcknowledgeInterrupt(void) {
-	/* Update list cycle counts */
-	CycInt_UpdateInterrupt();
+static inline event_id CycInt_AddEvent(event_id first, event_id i) {
+	event_id next, prev;
 
-	/* Disable interrupt entry which has just occured */
-	InterruptHandlers[ActiveInterrupt].type = CYC_INT_NONE;
+	next = first;
+	prev = EVENT_NULL;
 
-	/* Set new */
-	CycInt_SetNewInterrupt();
+	while (EventList[next].time < EventList[i].time) {
+		prev = next;
+		next = EventList[next].next;
+	}
+	if (next == first) {
+		first = i;
+	}
+	EventList[i].prev = prev;
+	EventList[i].next = next;
+	if (prev) {
+		EventList[prev].next = i;
+	}
+	if (next) {
+		EventList[next].prev = i;
+	}
+	return first;
 }
 
 /*-----------------------------------------------------------------------*/
 /**
- * Add interrupt to occur from now.
+ * Set or update cycle event and add it to the queue.
  */
-void CycInt_AddRelativeInterruptCycles(int64_t CycleTime, interrupt_id Handler) {
-	assert(CycleTime >= 0);
-
-	/* Update list cycle counts with current PendingInterruptCount before adding a new int, */
-	/* because CycInt_SetNewInterrupt can change the active int / PendingInterruptCount */
-	if ( ActiveInterrupt > 0 )
-		CycInt_UpdateInterrupt();
-
-	InterruptHandlers[Handler].type = CYC_INT_CPU;
-	InterruptHandlers[Handler].time = CycleTime;
-
-	/* Set new active int and compute a new value for PendingInterruptCount*/
-	CycInt_SetNewInterrupt();
+void CycInt_AddCyclesEvent(uint64_t Cycles, event_id i) {
+	if (EventList[i].type) {
+		CycInt_RemovePendingEvent(i);
+	}
+	EventList[i].type = TYPE_CYCLES;
+	EventList[i].time = nCyclesMainCounter + Cycles;
+	nCyclesFirst = CycInt_AddEvent(nCyclesFirst, i);
+}
+void CycInt_UpdateCyclesEvent(uint64_t Cycles, event_id i) {
+	if (EventList[i].type) {
+		CycInt_RemovePendingEvent(i);
+	}
+	EventList[i].type = TYPE_CYCLES;
+	EventList[i].time += Cycles;
+	nCyclesFirst = CycInt_AddEvent(nCyclesFirst, i);
 }
 
 /*-----------------------------------------------------------------------*/
 /**
- * Add interrupt to occur us microsencods from now
- * Use usreal if we are in realtime mode
+ * Set or update microsecond time event and add it to the queue.
  */
-void CycInt_AddRelativeInterruptUs(int64_t us, int64_t usreal, interrupt_id Handler) {
-	assert(us >= 0);
-
-	if(ConfigureParams.System.bRealtime) {
-		/* Update list cycle counts with current PendingInterruptCount before adding a new int, */
-		/* because CycInt_SetNewInterrupt can change the active int / PendingInterruptCount */
-		if ( ActiveInterrupt > 0 ) CycInt_UpdateInterrupt();
-
-		if ( usreal > 0 ) us = usreal;
-
-		InterruptHandlers[Handler].type = CYC_INT_US;
-		InterruptHandlers[Handler].time = host_time_us() + us;
-
-		/* Set new active int and compute a new value for PendingInterruptCount*/
-		CycInt_SetNewInterrupt();
+void CycInt_AddTimeEvent(uint64_t RealTime, uint64_t FastTime, event_id i) {
+	if (EventList[i].type) {
+		CycInt_RemovePendingEvent(i);
+	}
+	if (ConfigureParams.System.bRealtime) {
+		RealTime = FastTime ? FastTime : RealTime;
+		EventList[i].type = TYPE_TIME;
+		EventList[i].time = Timing_GetTime() + RealTime;
+		nTimeFirst = CycInt_AddEvent(nTimeFirst, i);
+		if (RealTime < CHECK_INTERVAL && i == nTimeFirst) {
+			nCheckCycles = nCyclesMainCounter + RealTime * ConfigureParams.System.nCpuFreq;
+		}
 	} else {
-		CycInt_AddRelativeInterruptCycles(us * ConfigureParams.System.nCpuFreq, Handler);
+		EventList[i].type = TYPE_CYCLES;
+		EventList[i].time = nCyclesMainCounter + RealTime * ConfigureParams.System.nCpuFreq;
+		nCyclesFirst = CycInt_AddEvent(nCyclesFirst, i);
+	}
+}
+void CycInt_UpdateTimeEvent(uint64_t RealTime, uint64_t FastTime, event_id i) {
+	if (EventList[i].type) {
+		CycInt_RemovePendingEvent(i);
+	}
+	if (ConfigureParams.System.bRealtime) {
+		RealTime = FastTime ? FastTime : RealTime;
+		nTimeNow = Timing_GetTime();
+		if ((nTimeNow - EventList[i].time) > (RealTime >> 1)) {
+			EventList[i].time = nTimeNow;
+		}
+		EventList[i].type = TYPE_TIME;
+		EventList[i].time += RealTime;
+		nTimeFirst = CycInt_AddEvent(nTimeFirst, i);
+	} else {
+		EventList[i].type = TYPE_CYCLES;
+		EventList[i].time += RealTime * ConfigureParams.System.nCpuFreq;
+		nCyclesFirst = CycInt_AddEvent(nCyclesFirst, i);
 	}
 }
 
 /*-----------------------------------------------------------------------*/
 /**
- * Add interrupt to occur microseconds from now. Convert to cycles.
- * Use usreal if we are in realtime mode.
+ * Convert microseconds to cycles and set or update cycle event.
  */
-void CycInt_AddRelativeInterruptUsCycles(int64_t us, int64_t usreal, interrupt_id Handler) {
-
-	if (ConfigureParams.System.bRealtime && usreal > 0) {
-		us = usreal;
+void CycInt_AddCycleTimeEvent(uint64_t CycleTime, uint64_t FastTime, event_id i) {
+	if (ConfigureParams.System.bRealtime && FastTime) {
+		CycleTime = FastTime;
 	}
-
-	CycInt_AddRelativeInterruptCycles(us * ConfigureParams.System.nCpuFreq, Handler);
+	CycInt_AddCyclesEvent(CycleTime * ConfigureParams.System.nCpuFreq, i);
+}
+void CycInt_UpdateCycleTimeEvent(uint64_t CycleTime, uint64_t FastTime, event_id i) {
+	if (ConfigureParams.System.bRealtime && FastTime) {
+		CycleTime = FastTime;
+	}
+	CycInt_UpdateCyclesEvent(CycleTime * ConfigureParams.System.nCpuFreq, i);
 }
 
 /*-----------------------------------------------------------------------*/
 /**
- * Remove a pending interrupt from our table
+ * Remove event from the corresponding queue.
  */
-void CycInt_RemovePendingInterrupt(interrupt_id Handler) {
-	/* Update list cycle counts, including the handler we want to remove */
-	/* to be able to resume it later */
-	CycInt_UpdateInterrupt();
-
-	/* Stop interrupt after CycInt_UpdateInterrupt */
-	InterruptHandlers[Handler].type = CYC_INT_NONE;
-
-	/* Set new */
-	CycInt_SetNewInterrupt();
+void CycInt_RemovePendingEvent(event_id i) {
+	if (EventList[i].type == TYPE_CYCLES) {
+		if (i == nCyclesFirst) {
+			nCyclesFirst = EventList[i].next;
+		}
+	} else if (EventList[i].type == TYPE_TIME) {
+		if (i == nTimeFirst) {
+			nTimeFirst = EventList[i].next;
+		}
+	} else {
+		return;
+	}
+	if (EventList[i].prev) {
+		EventList[EventList[i].prev].next = EventList[i].next;
+	}
+	if (EventList[i].next) {
+		EventList[EventList[i].next].prev = EventList[i].prev;
+	}
+	EventList[i].type = TYPE_NONE;
 }
-
 
 /*-----------------------------------------------------------------------*/
 /**
- * Return true if interrupt is active in list
+ * Return true if the event is queued.
  */
-bool CycInt_InterruptActive(interrupt_id Handler)
-{
-	return InterruptHandlers[Handler].type != CYC_INT_NONE;
+bool CycInt_EventPending(event_id i) {
+	return (EventList[i].type != TYPE_NONE);
 }

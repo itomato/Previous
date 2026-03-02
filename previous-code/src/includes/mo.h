@@ -12,9 +12,9 @@ extern void MO_Reset(void);
 extern void MO_Insert(int disk);
 extern void MO_Eject(int disk);
 
-extern void MO_InterruptHandler(void);
+extern void MO_Interrupt_Handler(void);
 extern void MO_IO_Handler(void);
-extern void ECC_IO_Handler(void);
+extern void MO_ECC_IO_Handler(void);
 
 typedef struct {
     uint8_t data[1296];

@@ -27,6 +27,7 @@
 #include <math.h>
 
 #include "main.h"
+#include "statusbar.h"
 #include "dsp_core.h"
 #include "dsp_cpu.h"
 #include "ioMem.h"

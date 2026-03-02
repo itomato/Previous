@@ -29,7 +29,6 @@
 
 #include "i860cfg.h"
 #include "host.h"
-#include "nd_sdl.hpp"
 
 typedef uint64_t UINT64;
 typedef int64_t  INT64;

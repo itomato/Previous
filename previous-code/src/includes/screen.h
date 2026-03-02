@@ -12,28 +12,21 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#include <SDL3/SDL.h>
-
 extern volatile bool bGrabMouse;
 extern volatile bool bInFullScreen;
-extern SDL_Window  *sdlWindow;
-extern SDL_Surface *sdlscrn;
 
-extern void Screen_Init(void);
-extern void Screen_UnInit(void);
+/* These functions must be provided through host or cross-platform API. */
 extern void Screen_EnterFullScreen(void);
 extern void Screen_ReturnFromFullScreen(void);
+extern void Screen_SetMouseGrab(bool grab);
 extern void Screen_ShowMainWindow(void);
-extern void Screen_SizeChanged(void);
 extern void Screen_ModeChanged(void);
 extern void Screen_TitlebarChanged(void);
 extern void Screen_StatusbarChanged(void);
 extern void Screen_StatusbarMessage(const char *msg, uint32_t msecs);
-extern void Screen_UpdateRects(SDL_Surface *screen, int numrects, SDL_Rect *rects);
-extern void Screen_UpdateRect(SDL_Surface *screen, int32_t x, int32_t y, int32_t w, int32_t h);
-extern void Screen_BlitDimension(uint32_t* vram, SDL_Texture* tex);
-extern void Screen_Blank(SDL_Texture* tex);
-extern bool Screen_Repaint(void);
+extern void Screen_StatusbarUpdate(void);
+extern bool Screen_ShowCursor(bool show);
+extern void Screen_CenterCursor(void);
 
 #ifdef __cplusplus
 }

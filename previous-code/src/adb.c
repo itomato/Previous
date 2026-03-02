@@ -74,7 +74,7 @@ static void adb_kbd_put(uint8_t event) {
 	}
 }
 
-static bool adb_kbd_get(uint8_t* event) {	
+static bool adb_kbd_get(uint8_t* event) {
 	if (adb_kbd.write != adb_kbd.read) {
 		adb_kbd.next = adb_kbd.read + 1;
 		if (adb_kbd.next >= ADB_KBD_EVENTS) {
@@ -88,16 +88,16 @@ static bool adb_kbd_get(uint8_t* event) {
 	return false;
 }
 
-static void adb_keyup(uint8_t key) {
-	if (key == 0x7f) {
+void adb_keyup(uint8_t key) {
+	if (key == APPLEKEY_POWER) {
 		rtc_stop_pdown_request();
 	} else if (key < 0x7f) {
 		adb_kbd_put(0x80 | key);
 	}
 }
 
-static void adb_keydown(uint8_t key) {
-	if (key == 0x7f) {
+void adb_keydown(uint8_t key) {
+	if (key == APPLEKEY_POWER) {
 		rtc_request_power_down();
 	} else if (key < 0x7f) {
 		adb_kbd_put(key);
@@ -158,13 +158,21 @@ static bool adb_mouse_get(uint8_t* event) {
 	return false;
 }
 
-static void adb_mouse_move(int x, int y) {
+void adb_mouse_move(int x, int y) {
+	if (x == 0 && y == 0)
+		return;
+	
+	if      (x < -8) x = -8;
+	else if (x >  8) x =  8;
+	if      (y < -8) y = -8;
+	else if (y >  8) y =  8;
+	
 	adb_mouse.x = x;
 	adb_mouse.y = y;
 	adb_mouse.event = true;
 }
 
-static void adb_mouse_button(bool left, bool down) {
+void adb_mouse_button(bool left, bool down) {
 	if (left) {
 		adb_mouse.left  = down;
 	} else {
@@ -255,7 +263,7 @@ static void adb_timeout(void) {
 	adb_interrupt(ADB_INT_ACCESS);
 }
 
-static uint32_t adb_read_data(uint8_t* data) {	
+static uint32_t adb_read_data(uint8_t* data) {
 	data[0] = adb.data0 >> 24;
 	data[1] = adb.data0 >> 16;
 	data[2] = adb.data0 >> 8;
@@ -684,366 +692,4 @@ void adb_reset(void) {
 	
 	adb_kbd_reset();
 	adb_mouse_reset();
-}
-
-
-/* ADB host input conversion */
-
-#define APPLEKEY_a               0x00
-#define APPLEKEY_s               0x01
-#define APPLEKEY_d               0x02
-#define APPLEKEY_f               0x03
-#define APPLEKEY_h               0x04
-#define APPLEKEY_g               0x05
-#define APPLEKEY_z               0x06
-#define APPLEKEY_x               0x07
-#define APPLEKEY_c               0x08
-#define APPLEKEY_v               0x09
-#define APPLEKEY_LESS            0x0a
-#define APPLEKEY_b               0x0b
-#define APPLEKEY_q               0x0c
-#define APPLEKEY_w               0x0d
-#define APPLEKEY_e               0x0e
-#define APPLEKEY_r               0x0f
-#define APPLEKEY_y               0x10
-#define APPLEKEY_t               0x11
-#define APPLEKEY_1               0x12
-#define APPLEKEY_2               0x13
-#define APPLEKEY_3               0x14
-#define APPLEKEY_4               0x15
-#define APPLEKEY_6               0x16
-#define APPLEKEY_5               0x17
-#define APPLEKEY_EQUALS          0x18
-#define APPLEKEY_9               0x19
-#define APPLEKEY_7               0x1a
-#define APPLEKEY_MINUS           0x1b
-#define APPLEKEY_8               0x1c
-#define APPLEKEY_0               0x1d
-#define APPLEKEY_CLOSEBRACKET    0x1e
-#define APPLEKEY_o               0x1f
-#define APPLEKEY_u               0x20
-#define APPLEKEY_OPENBRACKET     0x21
-#define APPLEKEY_i               0x22
-#define APPLEKEY_p               0x23
-#define APPLEKEY_RETURN          0x24
-#define APPLEKEY_l               0x25
-#define APPLEKEY_j               0x26
-#define APPLEKEY_QUOTE           0x27
-#define APPLEKEY_k               0x28
-#define APPLEKEY_SEMICOLON       0x29
-#define APPLEKEY_BACKSLASH       0x2a
-#define APPLEKEY_COMMA           0x2b
-#define APPLEKEY_SLASH           0x2c
-#define APPLEKEY_n               0x2d
-#define APPLEKEY_m               0x2e
-#define APPLEKEY_PERIOD          0x2f
-#define APPLEKEY_TAB             0x30
-#define APPLEKEY_SPACE           0x31
-#define APPLEKEY_BACKQUOTE       0x32
-#define APPLEKEY_DELETE          0x33
-#define APPLEKEY_ESC             0x35
-#define APPLEKEY_CTL_LEFT        0x36
-#define APPLEKEY_APPLE_LEFT      0x37
-#define APPLEKEY_SHIFT_LEFT      0x38
-#define APPLEKEY_CAPS_LOCK       0x39
-#define APPLEKEY_OPTION_LEFT     0x3a
-#define APPLEKEY_LEFT_ARROW      0x3b
-#define APPLEKEY_RIGHT_ARROW     0x3c
-#define APPLEKEY_DOWN_ARROW      0x3d
-#define APPLEKEY_UP_ARROW        0x3e
-#define APPLEKEY_KEYPAD_PERIOD   0x41
-#define APPLEKEY_KEYPAD_MULTIPLY 0x43
-#define APPLEKEY_KEYPAD_PLUS     0x45
-#define APPLEKEY_KEYPAD_DIVIDE   0x4b
-#define APPLEKEY_KEYPAD_ENTER    0x4c
-#define APPLEKEY_KEYPAD_MINUS    0x4e
-#define APPLEKEY_KEYPAD_EQUALS   0x51
-#define APPLEKEY_KEYPAD_0        0x52
-#define APPLEKEY_KEYPAD_1        0x53
-#define APPLEKEY_KEYPAD_2        0x54
-#define APPLEKEY_KEYPAD_3        0x55
-#define APPLEKEY_KEYPAD_4        0x56
-#define APPLEKEY_KEYPAD_5        0x57
-#define APPLEKEY_KEYPAD_6        0x58
-#define APPLEKEY_KEYPAD_7        0x59
-#define APPLEKEY_KEYPAD_8        0x5b
-#define APPLEKEY_KEYPAD_9        0x5c
-#define APPLEKEY_HELP            0x72
-#define APPLEKEY_VOLUME_UP       0x73
-#define APPLEKEY_BRIGHTNESS_UP   0x74
-#define APPLEKEY_VOLUME_DOWN     0x77
-#define APPLEKEY_BRIGHTNESS_DOWN 0x79
-#define APPLEKEY_SHIFT_RIGHT     0x7b
-#define APPLEKEY_OPTION_RIGHT    0x7c
-#define APPLEKEY_POWER           0x7f
-
-
-static uint8_t ADB_GetKeyFromScancode(SDL_Scancode sdlscancode)
-{
-	Log_Printf(LOG_ADB_LEVEL, "[ADB] Scancode: %i (%s)\n", sdlscancode, SDL_GetScancodeName(sdlscancode));
-	
-	switch (sdlscancode) {
-		case SDL_SCANCODE_ESCAPE:         return APPLEKEY_ESC;
-		case SDL_SCANCODE_GRAVE:          return APPLEKEY_BACKQUOTE;
-		case SDL_SCANCODE_1:              return APPLEKEY_1;
-		case SDL_SCANCODE_2:              return APPLEKEY_2;
-		case SDL_SCANCODE_3:              return APPLEKEY_3;
-		case SDL_SCANCODE_4:              return APPLEKEY_4;
-		case SDL_SCANCODE_5:              return APPLEKEY_5;
-		case SDL_SCANCODE_6:              return APPLEKEY_6;
-		case SDL_SCANCODE_7:              return APPLEKEY_7;
-		case SDL_SCANCODE_8:              return APPLEKEY_8;
-		case SDL_SCANCODE_9:              return APPLEKEY_9;
-		case SDL_SCANCODE_0:              return APPLEKEY_0;
-		case SDL_SCANCODE_MINUS:          return APPLEKEY_MINUS;
-		case SDL_SCANCODE_EQUALS:         return APPLEKEY_EQUALS;
-		case SDL_SCANCODE_BACKSPACE:      return APPLEKEY_DELETE;
-			
-		case SDL_SCANCODE_TAB:            return APPLEKEY_TAB;
-		case SDL_SCANCODE_Q:              return APPLEKEY_q;
-		case SDL_SCANCODE_W:              return APPLEKEY_w;
-		case SDL_SCANCODE_E:              return APPLEKEY_e;
-		case SDL_SCANCODE_R:              return APPLEKEY_r;
-		case SDL_SCANCODE_T:              return APPLEKEY_t;
-		case SDL_SCANCODE_Y:              return APPLEKEY_y;
-		case SDL_SCANCODE_U:              return APPLEKEY_u;
-		case SDL_SCANCODE_I:              return APPLEKEY_i;
-		case SDL_SCANCODE_O:              return APPLEKEY_o;
-		case SDL_SCANCODE_P:              return APPLEKEY_p;
-		case SDL_SCANCODE_LEFTBRACKET:    return APPLEKEY_OPENBRACKET;
-		case SDL_SCANCODE_RIGHTBRACKET:   return APPLEKEY_CLOSEBRACKET;
-		case SDL_SCANCODE_BACKSLASH:      return APPLEKEY_BACKSLASH;
-			
-		case SDL_SCANCODE_A:              return APPLEKEY_a;
-		case SDL_SCANCODE_S:              return APPLEKEY_s;
-		case SDL_SCANCODE_D:              return APPLEKEY_d;
-		case SDL_SCANCODE_F:              return APPLEKEY_f;
-		case SDL_SCANCODE_G:              return APPLEKEY_g;
-		case SDL_SCANCODE_H:              return APPLEKEY_h;
-		case SDL_SCANCODE_J:              return APPLEKEY_j;
-		case SDL_SCANCODE_K:              return APPLEKEY_k;
-		case SDL_SCANCODE_L:              return APPLEKEY_l;
-		case SDL_SCANCODE_SEMICOLON:      return APPLEKEY_SEMICOLON;
-		case SDL_SCANCODE_APOSTROPHE:     return APPLEKEY_QUOTE;
-		case SDL_SCANCODE_RETURN:         return APPLEKEY_RETURN;
-			
-		case SDL_SCANCODE_NONUSBACKSLASH: return APPLEKEY_LESS;
-		case SDL_SCANCODE_Z:              return APPLEKEY_z;
-		case SDL_SCANCODE_X:              return APPLEKEY_x;
-		case SDL_SCANCODE_C:              return APPLEKEY_c;
-		case SDL_SCANCODE_V:              return APPLEKEY_v;
-		case SDL_SCANCODE_B:              return APPLEKEY_b;
-		case SDL_SCANCODE_N:              return APPLEKEY_n;
-		case SDL_SCANCODE_M:              return APPLEKEY_m;
-		case SDL_SCANCODE_COMMA:          return APPLEKEY_COMMA;
-		case SDL_SCANCODE_PERIOD:         return APPLEKEY_PERIOD;
-		case SDL_SCANCODE_SLASH:          return APPLEKEY_SLASH;
-		case SDL_SCANCODE_SPACE:          return APPLEKEY_SPACE;
-			
-		case SDL_SCANCODE_NUMLOCKCLEAR:   return APPLEKEY_BACKQUOTE;
-		case SDL_SCANCODE_KP_EQUALS:      return APPLEKEY_KEYPAD_EQUALS;
-		case SDL_SCANCODE_KP_DIVIDE:      return APPLEKEY_KEYPAD_DIVIDE;
-		case SDL_SCANCODE_KP_MULTIPLY:    return APPLEKEY_KEYPAD_MULTIPLY;
-		case SDL_SCANCODE_KP_7:           return APPLEKEY_KEYPAD_7;
-		case SDL_SCANCODE_KP_8:           return APPLEKEY_KEYPAD_8;
-		case SDL_SCANCODE_KP_9:           return APPLEKEY_KEYPAD_9;
-		case SDL_SCANCODE_KP_MINUS:       return APPLEKEY_KEYPAD_MINUS;
-		case SDL_SCANCODE_KP_4:           return APPLEKEY_KEYPAD_4;
-		case SDL_SCANCODE_KP_5:           return APPLEKEY_KEYPAD_5;
-		case SDL_SCANCODE_KP_6:           return APPLEKEY_KEYPAD_6;
-		case SDL_SCANCODE_KP_PLUS:        return APPLEKEY_KEYPAD_PLUS;
-		case SDL_SCANCODE_KP_1:           return APPLEKEY_KEYPAD_1;
-		case SDL_SCANCODE_KP_2:           return APPLEKEY_KEYPAD_2;
-		case SDL_SCANCODE_KP_3:           return APPLEKEY_KEYPAD_3;
-		case SDL_SCANCODE_KP_0:           return APPLEKEY_KEYPAD_0;
-		case SDL_SCANCODE_KP_PERIOD:      return APPLEKEY_KEYPAD_PERIOD;
-		case SDL_SCANCODE_KP_ENTER:       return APPLEKEY_KEYPAD_ENTER;
-		
-		case SDL_SCANCODE_LEFT:           return APPLEKEY_LEFT_ARROW;
-		case SDL_SCANCODE_RIGHT:          return APPLEKEY_RIGHT_ARROW;
-		case SDL_SCANCODE_UP:             return APPLEKEY_UP_ARROW;
-		case SDL_SCANCODE_DOWN:           return APPLEKEY_DOWN_ARROW;
-		
-		/* Modifier keys */
-		case SDL_SCANCODE_RSHIFT:
-		case SDL_SCANCODE_LSHIFT:         return APPLEKEY_SHIFT_LEFT;
-		case SDL_SCANCODE_RGUI:
-		case SDL_SCANCODE_LGUI:           return ConfigureParams.Keyboard.bSwapCmdAlt?APPLEKEY_OPTION_LEFT:APPLEKEY_APPLE_LEFT;
-		case SDL_SCANCODE_MENU:
-		case SDL_SCANCODE_RCTRL:          return APPLEKEY_HELP;
-		case SDL_SCANCODE_LCTRL:          return APPLEKEY_CTL_LEFT;
-		case SDL_SCANCODE_RALT:
-		case SDL_SCANCODE_LALT:           return ConfigureParams.Keyboard.bSwapCmdAlt?APPLEKEY_APPLE_LEFT:APPLEKEY_OPTION_LEFT;
-		case SDL_SCANCODE_CAPSLOCK:       return APPLEKEY_CAPS_LOCK;
-		
-		/* Special keys */
-		case SDL_SCANCODE_F10:
-		case SDL_SCANCODE_DELETE:         return APPLEKEY_POWER;
-		case SDL_SCANCODE_F5:
-		case SDL_SCANCODE_END:            return APPLEKEY_VOLUME_DOWN;
-		case SDL_SCANCODE_F6:
-		case SDL_SCANCODE_HOME:           return APPLEKEY_VOLUME_UP;
-		case SDL_SCANCODE_F1:
-		case SDL_SCANCODE_PAGEDOWN:       return APPLEKEY_BRIGHTNESS_DOWN;
-		case SDL_SCANCODE_F2:
-		case SDL_SCANCODE_PAGEUP:         return APPLEKEY_BRIGHTNESS_UP;
-			
-		default:                          return 0xff;
-	}
-}
-
-static uint8_t ADB_GetKeyFromSymbol(SDL_Keycode sdlkey)
-{
-	Log_Printf(LOG_ADB_LEVEL, "[ADB] Symkey: %s\n", SDL_GetKeyName(sdlkey));
-	
-	switch (sdlkey) {
-		case SDLK_BACKSLASH:              return APPLEKEY_BACKSLASH;
-		case SDLK_RIGHTBRACKET:           return APPLEKEY_CLOSEBRACKET;
-		case SDLK_LEFTBRACKET:            return APPLEKEY_OPENBRACKET;
-		case SDLK_LESS:                   return APPLEKEY_LESS;
-		case SDLK_I:                      return APPLEKEY_i;
-		case SDLK_O:                      return APPLEKEY_o;
-		case SDLK_P:                      return APPLEKEY_p;
-		case SDLK_LEFT:                   return APPLEKEY_LEFT_ARROW;
-		case SDLK_KP_0:                   return APPLEKEY_KEYPAD_0;
-		case SDLK_KP_PERIOD:              return APPLEKEY_KEYPAD_PERIOD;
-		case SDLK_KP_ENTER:               return APPLEKEY_KEYPAD_ENTER;
-		case SDLK_DOWN:                   return APPLEKEY_DOWN_ARROW;
-		case SDLK_RIGHT:                  return APPLEKEY_RIGHT_ARROW;
-		case SDLK_KP_1:                   return APPLEKEY_KEYPAD_1;
-		case SDLK_KP_4:                   return APPLEKEY_KEYPAD_4;
-		case SDLK_KP_6:                   return APPLEKEY_KEYPAD_6;
-		case SDLK_KP_3:                   return APPLEKEY_KEYPAD_3;
-		case SDLK_KP_PLUS:                return APPLEKEY_KEYPAD_PLUS;
-		case SDLK_UP:                     return APPLEKEY_UP_ARROW;
-		case SDLK_KP_2:                   return APPLEKEY_KEYPAD_2;
-		case SDLK_KP_5:                   return APPLEKEY_KEYPAD_5;
-		case SDLK_BACKSPACE:              return APPLEKEY_DELETE;
-		case SDLK_EQUALS:                 return APPLEKEY_EQUALS;
-		case SDLK_MINUS:                  return APPLEKEY_MINUS;
-		case SDLK_8:                      return APPLEKEY_8;
-		case SDLK_9:                      return APPLEKEY_9;
-		case SDLK_0:                      return APPLEKEY_0;
-		case SDLK_KP_7:                   return APPLEKEY_KEYPAD_7;
-		case SDLK_KP_8:                   return APPLEKEY_KEYPAD_8;
-		case SDLK_KP_9:                   return APPLEKEY_KEYPAD_9;
-		case SDLK_KP_MINUS:               return APPLEKEY_KEYPAD_MINUS;
-		case SDLK_KP_MULTIPLY:            return APPLEKEY_KEYPAD_MULTIPLY;
-		case SDLK_NUMLOCKCLEAR:           return APPLEKEY_BACKQUOTE;
-		case SDLK_GRAVE:                  return APPLEKEY_BACKQUOTE;
-		case SDLK_KP_EQUALS:              return APPLEKEY_KEYPAD_EQUALS;
-		case SDLK_KP_DIVIDE:              return APPLEKEY_KEYPAD_DIVIDE;
-		case SDLK_RETURN:                 return APPLEKEY_RETURN;
-		case SDLK_APOSTROPHE:             return APPLEKEY_QUOTE;
-		case SDLK_SEMICOLON:              return APPLEKEY_SEMICOLON;
-		case SDLK_L:                      return APPLEKEY_l;
-		case SDLK_COMMA:                  return APPLEKEY_COMMA;
-		case SDLK_PERIOD:                 return APPLEKEY_PERIOD;
-		case SDLK_SLASH:                  return APPLEKEY_SLASH;
-		case SDLK_Z:                      return APPLEKEY_z;
-		case SDLK_X:                      return APPLEKEY_x;
-		case SDLK_C:                      return APPLEKEY_c;
-		case SDLK_V:                      return APPLEKEY_v;
-		case SDLK_B:                      return APPLEKEY_b;
-		case SDLK_M:                      return APPLEKEY_m;
-		case SDLK_N:                      return APPLEKEY_n;
-		case SDLK_SPACE:                  return APPLEKEY_SPACE;
-		case SDLK_A:                      return APPLEKEY_a;
-		case SDLK_S:                      return APPLEKEY_s;
-		case SDLK_D:                      return APPLEKEY_d;
-		case SDLK_F:                      return APPLEKEY_f;
-		case SDLK_G:                      return APPLEKEY_g;
-		case SDLK_K:                      return APPLEKEY_k;
-		case SDLK_J:                      return APPLEKEY_j;
-		case SDLK_H:                      return APPLEKEY_h;
-		case SDLK_TAB:                    return APPLEKEY_TAB;
-		case SDLK_Q:                      return APPLEKEY_q;
-		case SDLK_W:                      return APPLEKEY_w;
-		case SDLK_E:                      return APPLEKEY_e;
-		case SDLK_R:                      return APPLEKEY_r;
-		case SDLK_U:                      return APPLEKEY_u;
-		case SDLK_Y:                      return APPLEKEY_y;
-		case SDLK_T:                      return APPLEKEY_t;
-		case SDLK_ESCAPE:                 return APPLEKEY_ESC;
-		case SDLK_1:                      return APPLEKEY_1;
-		case SDLK_2:                      return APPLEKEY_2;
-		case SDLK_3:                      return APPLEKEY_3;
-		case SDLK_4:                      return APPLEKEY_4;
-		case SDLK_7:                      return APPLEKEY_7;
-		case SDLK_6:                      return APPLEKEY_6;
-		case SDLK_5:                      return APPLEKEY_5;
-			
-		/* Modifier keys */
-		case SDLK_RSHIFT:
-		case SDLK_LSHIFT:                 return APPLEKEY_SHIFT_LEFT;
-		case SDLK_RGUI:
-		case SDLK_LGUI:                   return ConfigureParams.Keyboard.bSwapCmdAlt?APPLEKEY_OPTION_LEFT:APPLEKEY_APPLE_LEFT;
-		case SDLK_MENU:
-		case SDLK_RCTRL:                  return APPLEKEY_HELP;
-		case SDLK_LCTRL:                  return APPLEKEY_CTL_LEFT;
-		case SDLK_RALT:
-		case SDLK_LALT:                   return ConfigureParams.Keyboard.bSwapCmdAlt?APPLEKEY_APPLE_LEFT:APPLEKEY_OPTION_LEFT;
-		case SDLK_CAPSLOCK:               return APPLEKEY_CAPS_LOCK;
-
-		/* Special Keys */
-		case SDLK_F10:
-		case SDLK_DELETE:                 return APPLEKEY_POWER;
-		case SDLK_F5:
-		case SDLK_END:                    return APPLEKEY_VOLUME_DOWN;
-		case SDLK_F6:
-		case SDLK_HOME:                   return APPLEKEY_VOLUME_UP;
-		case SDLK_F1:
-		case SDLK_PAGEDOWN:               return APPLEKEY_BRIGHTNESS_DOWN;
-		case SDLK_F2:
-		case SDLK_PAGEUP:                 return APPLEKEY_BRIGHTNESS_UP;
-			
-		default:                          return 0xff;
-	}
-}
-
-
-void ADB_KeyDown(const SDL_KeyboardEvent *sdlkey)
-{
-	uint8_t adb_key;
-	
-	if (ConfigureParams.Keyboard.nKeymapType == KEYMAP_SYMBOLIC) {
-		adb_key = ADB_GetKeyFromSymbol(sdlkey->key);
-	} else {
-		adb_key = ADB_GetKeyFromScancode(sdlkey->scancode);
-	}
-		
-	Log_Printf(LOG_ADB_LEVEL, "[ADB] Keycode: $%02x", adb_key);
-	
-	adb_keydown(adb_key);
-}
-
-void ADB_KeyUp(const SDL_KeyboardEvent *sdlkey)
-{
-	uint8_t adb_key;
-	
-	if (ConfigureParams.Keyboard.nKeymapType == KEYMAP_SYMBOLIC) {
-		adb_key = ADB_GetKeyFromSymbol(sdlkey->key);
-	} else {
-		adb_key = ADB_GetKeyFromScancode(sdlkey->scancode);
-	}
-		
-	Log_Printf(LOG_ADB_LEVEL, "[ADB] Keycode: $%02x", adb_key);
-	
-	adb_keyup(adb_key);
-}
-
-void ADB_MouseMove(int x, int y) {
-	if (x == 0 && y == 0)
-		return;
-	
-	if      (x < -8) x = -8;
-	else if (x >  8) x =  8;
-	if      (y < -8) y = -8;
-	else if (y >  8) y =  8;
-	
-	adb_mouse_move(x, y);
-}
-
-void ADB_MouseButton(bool left, bool down) {
-	adb_mouse_button(left, down);
 }

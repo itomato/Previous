@@ -25,10 +25,10 @@ extern "C" {
     typedef void (*i860_run_func)(int);
     extern i860_run_func i860_Run;
 
+    extern void        ND_VBL_Handler(void);
+    extern void        ND_Video_VBL_Handler(void);
     extern void        nd_start_interrupts(void);
-    extern void        nd_display_vbl_handler(void);
     extern void        nd_display_repaint(void);
-    extern void        nd_video_vbl_handler(void);
     extern bool        nd_video_enabled(int slot);
     extern uint32_t*   nd_vram_for_slot(int slot);
     extern void        nd_start_debugger(void);
@@ -40,6 +40,7 @@ extern "C" {
 #include "i860.hpp"
 #include "nd_nbic.hpp"
 #include "nd_mem.hpp"
+#include "nd_sdl.hpp"
 #include "ramdac.h"
 
 class NextDimension;

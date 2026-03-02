@@ -1,6 +1,6 @@
 
 
-                                  Previous 4.0
+                                  Previous 4.1
 
 
 
@@ -191,10 +191,8 @@ Issues in Previous:
     compared to real hardware.
   > 68882 transcendental FPU instructions produce results identical to 68040 
     FPSP. The results are slightly different from real 68882 results.
-  > Diagnostic tests for Ethernet fail. Diagnostic tests for SCSI Disk and 
-    Monitor/Sound fail in certain situations due to timing issues. Disable 
-    variable speed mode to reliably pass SCSI Disk diagnostics. Disable sound to 
-    pass Monitor/Sound diagnostics.
+  > Diagnostic tests for Ethernet fail. Diagnostic tests for Monitor/Sound may 
+    fail due to timing issues. Disable sound to pass Monitor/Sound diagnostics.
   > Background DMA Read from DSP test menu of the diagnostics utility fails for 
     an unknown reason. The test program is probably faulty. It sets the DMA 
     channel to the wrong direction.
@@ -460,6 +458,10 @@ Previous v4.0:
   > Improves accuracy of SCSI floppy drive.
   > Improves reliability and error handling of ditool.
   > Fixes bug that could cause a crash when quitting Previous.
+
+Previous v4.1:
+  > Improves behaviour of system timer under special conditions.
+  > Improves efficiency and accuracy of timing system.
 
 
  7) Running Previous

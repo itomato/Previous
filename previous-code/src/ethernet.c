@@ -725,9 +725,7 @@ static void new_enet_io(void) {
     }
 }
 
-void ENET_IO_Handler(void) {
-    CycInt_AcknowledgeInterrupt();
-    
+void Ethernet_IO_Handler(void) {
     if (enet.reset&EN_RESET) {
         Log_Printf(LOG_WARN, "Stopping Ethernet Transmitter/Receiver");
         /* Stop SLIRP/PCAP */
@@ -743,7 +741,7 @@ void ENET_IO_Handler(void) {
         enet_io();
     }
     
-    CycInt_AddRelativeInterruptUs(receiver_state==RECV_STATE_WAITING?ENET_IO_DELAY:ENET_IO_SHORT, 0, INTERRUPT_ENET_IO);
+    CycInt_UpdateTimeEvent(receiver_state==RECV_STATE_WAITING?ENET_IO_DELAY:ENET_IO_SHORT, 0, EVENT_ETHERNET_IO);
 }
 
 void enet_reset(void) {
@@ -754,9 +752,9 @@ void enet_reset(void) {
         if (ConfigureParams.Ethernet.bEthernetConnected) {
             enet_start(enet.mac_addr);
         }
-        if (!CycInt_InterruptActive(INTERRUPT_ENET_IO)) {
+        if (!CycInt_EventPending(EVENT_ETHERNET_IO)) {
             Log_Printf(LOG_WARN, "Starting Ethernet Transmitter/Receiver");
-            CycInt_AddRelativeInterruptUs(ENET_IO_DELAY, 0, INTERRUPT_ENET_IO);
+            CycInt_AddTimeEvent(ENET_IO_DELAY, 0, EVENT_ETHERNET_IO);
         }
     }
 }
@@ -769,7 +767,7 @@ void Ethernet_Reset(bool hard) {
         enet_rx_buffer.size=enet_tx_buffer.size=0;
         enet_rx_buffer.limit=enet_tx_buffer.limit=EN_BUF_MAX;
         enet.tx_status=ConfigureParams.System.bTurbo?0:TXSTAT_READY;
-        CycInt_RemovePendingInterrupt(INTERRUPT_ENET_IO);
+        CycInt_RemovePendingEvent(EVENT_ETHERNET_IO);
     }
     
     if (init_done) {

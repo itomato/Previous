@@ -66,7 +66,7 @@ static void pcap_tick(void)
 
 static int tick_func(void *arg)
 {
-    while(pcap_started)
+    while (pcap_started)
     {
         host_sleep_us(1230);
         pcap_tick();

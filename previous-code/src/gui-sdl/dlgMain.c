@@ -13,6 +13,7 @@ const char DlgMain_fileid[] = "Previous dlgMain.c";
 #include "dialog.h"
 #include "sdlgui.h"
 #include "screen.h"
+#include "sdlscreen.h"
 #include "dimension.hpp"
 
 
@@ -81,7 +82,7 @@ int Dialog_MainDlg(bool *bReset, bool *bLoadedSnapshot)
 	if (SDLGui_SetScreen(sdlscrn))
 		return false;
 
-	bOldMouseVisibility = Main_ShowCursor(true);
+	bOldMouseVisibility = Screen_ShowCursor(true);
 
 	SDLGui_CenterDlg(maindlg);
 
@@ -174,7 +175,7 @@ int Dialog_MainDlg(bool *bReset, bool *bLoadedSnapshot)
 		*bReset = true;
 
 	Screen_UpdateRect(sdlscrn, 0, 0, 0, 0);
-	Main_ShowCursor(bOldMouseVisibility);
+	Screen_ShowCursor(bOldMouseVisibility);
 
 	return (retbut == MAINDLG_OK);
 }

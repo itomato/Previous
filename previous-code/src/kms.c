@@ -18,7 +18,6 @@ const char Kms_fileid[] = "Previous kms.c";
 #include "dma.h"
 #include "rtcnvram.h"
 #include "snd.h"
-#include "host.h"
 
 #define LOG_KMS_REG_LEVEL LOG_DEBUG
 #define LOG_KMS_LEVEL     LOG_DEBUG
@@ -395,7 +394,7 @@ void kms_keydown(uint8_t modkeys, uint8_t keycode) {
     uint8_t  addr = kms.km_addr|KM_MASTER;
     uint16_t data = 0;
 
-    if (keycode==0x58) { /* Power key */
+    if (keycode == NEXTKEY_POWER) { /* Power key */
         rtc_request_power_down();
         return;
     }
@@ -411,7 +410,7 @@ void kms_keyup(uint8_t modkeys, uint8_t keycode) {
     uint8_t  addr = kms.km_addr|KM_MASTER;
     uint16_t data = 0;
 
-    if (keycode==0x58) {
+    if (keycode == NEXTKEY_POWER) {
         rtc_stop_pdown_request();
         return;
     }
@@ -470,11 +469,20 @@ static void kms_mouse_move_step(void) {
 /* Mouse movement handler */
 #define MOUSE_STEP_FREQ 1000
 
-void kms_mouse_move(int x, bool left, int y, bool up) {
-    if (x<0 || y<0) abort();
+void kms_mouse_move(int x, int y) {
+    if (x < 0) {
+        x = -x;
+        m_move_left = true;
+    } else {
+        m_move_left = false;
+    }
+    if (y < 0) {
+        y = -y;
+        m_move_up = true;
+    } else {
+        m_move_up = false;
+    }
     
-    m_move_left = left;
-    m_move_up   = up;
 #if 0
     int xsteps = x / 8; if(xsteps == 0) xsteps = 1;
     int ysteps = y / 8; if(ysteps == 0) ysteps = 1;
@@ -491,15 +499,15 @@ void kms_mouse_move(int x, bool left, int y, bool up) {
     m_move_dx = 1;
     m_move_dy = 1;
 #endif
-    CycInt_AddRelativeInterruptCycles(10, INTERRUPT_MOUSE);
+    if (!CycInt_EventPending(EVENT_KMS_MOUSE_MOTION)) {
+        CycInt_AddTimeEvent(1, 0, EVENT_KMS_MOUSE_MOTION);
+    }
 }
 
-void Mouse_Handler(void) {
-    CycInt_AcknowledgeInterrupt();
-    
+void KMS_Mouse_Motion_Handler(void) {
     if (m_move_x > 0 || m_move_y > 0) {
         kms_mouse_move_step();
-        CycInt_AddRelativeInterruptUs((1000*1000)/MOUSE_STEP_FREQ, 0, INTERRUPT_MOUSE);
+        CycInt_UpdateTimeEvent((1000*1000)/MOUSE_STEP_FREQ, 0, EVENT_KMS_MOUSE_MOTION);
     }
 }
 

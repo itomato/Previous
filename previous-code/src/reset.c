@@ -10,7 +10,7 @@ const char Reset_fileid[] = "Hatari reset.c";
 
 #include "main.h"
 #include "configuration.h"
-#include "host.h"
+#include "timing.h"
 #include "cycInt.h"
 #include "m68000.h"
 #include "reset.h"
@@ -47,7 +47,7 @@ static int Reset_NeXT(bool bCold)
 		if (ret) {
 			return ret;
 		}
-		host_reset();             /* Reset host related timing vars */
+		Timing_Reset();           /* Reset timing system */
 		CycInt_Reset();           /* Reset interrupts */
 		Video_Reset();            /* Reset video */
 		Screen_ModeChanged();     /* Reset screen mode */

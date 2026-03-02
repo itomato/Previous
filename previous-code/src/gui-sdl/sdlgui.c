@@ -8,7 +8,6 @@
 */
 const char SDLGui_fileid[] = "Hatari sdlgui.c";
 
-#include <SDL3/SDL.h>
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
@@ -16,6 +15,7 @@ const char SDLGui_fileid[] = "Hatari sdlgui.c";
 
 #include "main.h"
 #include "screen.h"
+#include "sdlscreen.h"
 #include "sdlgui.h"
 #include "str.h"
 #include "log.h"
@@ -615,11 +615,11 @@ static void SDLGui_EditField(SGOBJ *dlg, int objnum)
 	rect.w = (dlg[objnum].w + 1) * sdlgui_fontwidth - 1;
 	rect.h = dlg[objnum].h * sdlgui_fontheight;
 
-	SDL_SetTextInputArea(sdlWindow, &rect, 0);
-	SDL_StartTextInput(sdlWindow);
-
 	txt = dlg[objnum].txt;
 	cursorPos = strlen(txt);
+
+	SDL_SetTextInputArea(sdlWindow, &rect, cursorPos);
+	SDL_StartTextInput(sdlWindow);
 
 	do
 	{

@@ -352,10 +352,10 @@ void snd_start_output(uint8_t mode) {
         Log_Printf(LOG_SND_LEVEL, "[Sound] Starting output loop.");
         sound_output_active = true;
         Audio_Output_Queue_Clear();
-        CycInt_AddRelativeInterruptCycles(10, INTERRUPT_SND_OUT);
+        CycInt_AddTimeEvent(1, 0, EVENT_SND_OUTPUT);
     } else { /* Even re-enable loop if we are already active. This lowers the delay. */
         Log_Printf(LOG_DEBUG, "[Sound] Restarting output loop.");
-        CycInt_AddRelativeInterruptCycles(10, INTERRUPT_SND_OUT);
+        CycInt_AddTimeEvent(1, 0, EVENT_SND_OUTPUT);
     }
 }
 
@@ -377,10 +377,10 @@ void snd_start_input(uint8_t mode) {
     if (!sound_input_active) {
         Log_Printf(LOG_SND_LEVEL, "[Sound] Starting input loop.");
         sound_input_active = true;
-        CycInt_AddRelativeInterruptCycles(10, INTERRUPT_SND_IN);
+        CycInt_AddTimeEvent(1, 0, EVENT_SND_INPUT);
     } else { /* Even re-enable loop if we are already active. This lowers the delay. */
         Log_Printf(LOG_DEBUG, "[Sound] Restarting input loop.");
-        CycInt_AddRelativeInterruptCycles(10, INTERRUPT_SND_IN);
+        CycInt_AddTimeEvent(1, 0, EVENT_SND_INPUT);
     }
 }
 
@@ -424,15 +424,13 @@ void Sound_Pause(bool pause) {
 #define SND_CHECK_DELAY 8
 
 void SND_Out_Handler(void) {
-    CycInt_AcknowledgeInterrupt();
-    
     if (!sound_output_active) {
         Audio_Output_Queue_Flush();
         return;
     }
     
     if (sndout_inited && Audio_Output_Queue_Size() > SOUND_BUFFER_SAMPLES * 2) {
-        CycInt_AddRelativeInterruptUs(SND_CHECK_DELAY * SOUND_BUFFER_SAMPLES, 0, INTERRUPT_SND_OUT);
+        CycInt_UpdateTimeEvent(SND_CHECK_DELAY * SOUND_BUFFER_SAMPLES, 0, EVENT_SND_OUTPUT);
         return;
     }
     
@@ -441,11 +439,11 @@ void SND_Out_Handler(void) {
     if (snd_buffer_len) {
         snd_buffer_len = snd_send_samples(snd_buffer, snd_buffer_len);
         snd_buffer_len = (snd_buffer_len / 4) + 1;
-        CycInt_AddRelativeInterruptUs(SND_CHECK_DELAY * snd_buffer_len, 0, INTERRUPT_SND_OUT);
+        CycInt_UpdateTimeEvent(SND_CHECK_DELAY * snd_buffer_len, 0, EVENT_SND_OUTPUT);
     } else {
         kms_send_sndout_underrun();
         /* Call do_dma_sndout_intr() a little bit later */
-        CycInt_AddRelativeInterruptUs(100, 0, INTERRUPT_SND_OUT);
+        CycInt_UpdateTimeEvent(100, 0, EVENT_SND_OUTPUT);
     }
 }
 
@@ -458,8 +456,6 @@ void SND_In_Handler(void) {
     int16_t sample;
     uint32_t foursamples = 0;
     int size = 0;
-    
-    CycInt_AcknowledgeInterrupt();
     
     if (!sound_input_active) {
         return;
@@ -496,6 +492,6 @@ void SND_In_Handler(void) {
     }
     
     if (kms_can_receive_codec()) {
-        CycInt_AddRelativeInterruptUs(size*SNDIN_SAMPLE_TIME, 0, INTERRUPT_SND_IN);
+        CycInt_UpdateTimeEvent(size*SNDIN_SAMPLE_TIME, 0, EVENT_SND_INPUT);
     }
 }

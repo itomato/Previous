@@ -84,19 +84,7 @@ static inline void M68000_SetSR(uint16_t v)
  * Add CPU cycles.
  */
 static inline void M68000_AddCycles(int cycles) {
-	nCyclesOver += cycles;
-	
-	if (PendingInterrupt.type == CYC_INT_CPU) {
-		PendingInterrupt.time -= cycles;
-	}
-	if (usCheckCycles < 0) {
-		if(!(CycInt_SetNewInterruptUs())) {
-			usCheckCycles = 100 * ConfigureParams.System.nCpuFreq;
-		}
-	} else {
-		usCheckCycles -= cycles;
-	}
-	nCyclesMainCounter += cycles;
+	CycInt_AddCycles(cycles);
 }
 
 extern void M68000_Init(void);

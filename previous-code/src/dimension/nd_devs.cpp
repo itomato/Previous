@@ -18,7 +18,7 @@
 #include "i860cfg.h"
 #include "nd_sdl.hpp"
 #include "ramdac.h"
-#include "host.h"
+#include "timing.h"
 #include "log.h"
 
 /* --------- NEXTDIMENSION DEVICES ---------- */

@@ -108,7 +108,7 @@ extern void IntRegStatWrite(void);
 extern void IntRegMaskRead(void);
 extern void IntRegMaskWrite(void);
 
-extern void Hardclock_InterruptHandler(void);
+extern void Hardclock_Interrupt_Handler(void);
 extern void HardclockRead0(void);
 extern void HardclockRead1(void);
 

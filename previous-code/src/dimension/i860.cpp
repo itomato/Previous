@@ -24,6 +24,7 @@
 #include "i860.hpp"
 #include "dimension.hpp"
 #include "main.h"
+#include "event.h"
 #include "log.h"
 
 extern "C" {
@@ -78,7 +79,7 @@ i860_cpu_device::i860_cpu_device(NextDimension* nd) : nd(nd) {
 }
 
 int i860_cpu_device::thread(void* data) {
-    SDL_SetCurrentThreadPriority(SDL_THREAD_PRIORITY_LOW);
+    host_thread_priority(0);
     ((i860_cpu_device*)data)->run();
     return 0;
 }

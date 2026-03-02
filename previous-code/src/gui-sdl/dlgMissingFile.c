@@ -8,6 +8,7 @@ const char DlgMissingFile_fileid[] = "Previous dlgMissingFile.c";
 
 #include "main.h"
 #include "configuration.h"
+#include "sdlscreen.h"
 #include "screen.h"
 #include "dialog.h"
 #include "sdlgui.h"
@@ -116,7 +117,7 @@ void DlgMissing_Rom(const char* type, char *imgname, const char *defname, bool *
 	char missingrom_alert[64];
 	
 	bool bOldMouseVisibility;
-	bOldMouseVisibility = Main_ShowCursor(true);
+	bOldMouseVisibility = Screen_ShowCursor(true);
 	
 	SDLGui_CenterDlg(missingromdlg);
 	
@@ -169,7 +170,7 @@ void DlgMissing_Rom(const char* type, char *imgname, const char *defname, bool *
 		   but != SDLGUI_QUIT && but != SDLGUI_ERROR && !bQuitProgram);
 	
 	Screen_UpdateRect(sdlscrn, 0, 0, 0, 0);
-	Main_ShowCursor(bOldMouseVisibility);
+	Screen_ShowCursor(bOldMouseVisibility);
 }
 
 
@@ -186,7 +187,7 @@ void DlgMissing_Disk(const char* type, int num, char *imgname, bool *inserted, b
 	char missingdisk_disk[64];
 	
 	bool bOldMouseVisibility;
-	bOldMouseVisibility = Main_ShowCursor(true);
+	bOldMouseVisibility = Screen_ShowCursor(true);
 
 	SDLGui_CenterDlg(missingdiskdlg);
 	
@@ -233,7 +234,7 @@ void DlgMissing_Disk(const char* type, int num, char *imgname, bool *inserted, b
 		   but != SDLGUI_QUIT && but != SDLGUI_ERROR && !bQuitProgram);
 	
 	Screen_UpdateRect(sdlscrn, 0, 0, 0, 0);
-	Main_ShowCursor(bOldMouseVisibility);
+	Screen_ShowCursor(bOldMouseVisibility);
 }
 
 
@@ -250,7 +251,7 @@ void DlgMissing_Dir(const char* type, char *dirname, const char *defname)
 	char missingdir_dir[64];
 	
 	bool bOldMouseVisibility;
-	bOldMouseVisibility = Main_ShowCursor(true);
+	bOldMouseVisibility = Screen_ShowCursor(true);
 	
 	SDLGui_CenterDlg(missingdirdlg);
 	
@@ -291,5 +292,5 @@ void DlgMissing_Dir(const char* type, char *dirname, const char *defname)
 		   but != SDLGUI_QUIT && but != SDLGUI_ERROR && !bQuitProgram);
 	
 	Screen_UpdateRect(sdlscrn, 0, 0, 0, 0);
-	Main_ShowCursor(bOldMouseVisibility);
+	Screen_ShowCursor(bOldMouseVisibility);
 }

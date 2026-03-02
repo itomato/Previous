@@ -25,7 +25,6 @@
 #include <slirp.h>
 #include <stdlib.h>
 
-#include "host.h"
 #include "rpc.h"
 #include "portmap.h"
 #include "mount.h"

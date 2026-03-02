@@ -905,12 +905,10 @@ bool dma_enet_read_memory(void) {
 uint32_t m2m_buffer[DMA_BURST_SIZE];
 int m2m_buffer_size;
 
-void M2MDMA_IO_Handler(void) {
-    CycInt_AcknowledgeInterrupt();
-    
+void DMA_M2M_IO_Handler(void) {
     if (dma[CHANNEL_R2M].csr&DMA_ENABLE) {
         dma_m2m_write_memory();
-        CycInt_AddRelativeInterruptCycles(4, INTERRUPT_M2M_IO);
+        CycInt_UpdateCyclesEvent(4, EVENT_DMA_M2M_IO);
     }
 }
 
@@ -926,7 +924,7 @@ void dma_m2m(void) {
                    dma[CHANNEL_M2R].limit-dma[CHANNEL_M2R].next,dma[CHANNEL_M2R].next,
                    dma[CHANNEL_R2M].limit-dma[CHANNEL_R2M].next,dma[CHANNEL_R2M].next);
         
-        CycInt_AddRelativeInterruptCycles(4, INTERRUPT_M2M_IO);
+        CycInt_AddCyclesEvent(4, EVENT_DMA_M2M_IO);
     }
 }
 
@@ -1234,5 +1232,5 @@ void DMA_Reset(void) {
         dma[i].csr = 0;
         dma_initialize_buffer(i, 0);
     }
-    CycInt_RemovePendingInterrupt(INTERRUPT_M2M_IO);
+    CycInt_RemovePendingEvent(EVENT_DMA_M2M_IO);
 }

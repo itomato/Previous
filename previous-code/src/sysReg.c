@@ -20,7 +20,7 @@ const char SysReg_fileid[] = "Previous sysReg.c";
 #include "rtcnvram.h"
 #include "bmap.h"
 #include "statusbar.h"
-#include "host.h"
+#include "timing.h"
 
 #define LOG_SCR_LEVEL       LOG_DEBUG
 #define LOG_HARDCLOCK_LEVEL LOG_DEBUG
@@ -102,7 +102,8 @@ static uint8_t scr_have_dsp_memreset = 0;
 static uint8_t col_vid_intr   = 0;
 static uint8_t bright_reg     = 0;
 
-static uint8_t hardclock_csr  = 0;
+static uint8_t  hardclock_csr     = 0;
+static uint16_t hardclock_counter = 0;
 
 static uint8_t scr_local_only = 0;
 
@@ -184,6 +185,7 @@ void SCR_Reset(void) {
     
     scr_local_only = 1;
     hardclock_csr = 0;
+    hardclock_counter = 0xFFFF;
     col_vid_intr = 0;
     bright_reg = 0;
     dsp_intr_at_block_end = 0;
@@ -615,84 +617,85 @@ void IntRegMaskWrite(void) {
 #define HARDCLOCK_LATCH  0x40
 #define HARDCLOCK_ZERO   0x3F
 
-static uint8_t hardclock1=0;
-static uint8_t hardclock0=0;
-static int latch_hardclock=0;
+static uint16_t hardclock_latch;
+static uint64_t hardclock_last_time;
 
-static uint64_t hardClockLastLatch;
-
-void Hardclock_InterruptHandler ( void )
-{
-    CycInt_AcknowledgeInterrupt();
-    if ((hardclock_csr&HARDCLOCK_ENABLE) && (latch_hardclock>0)) {
-        Log_Printf(LOG_DEBUG, "[INT] throwing hardclock %lld", host_time_us());
-        set_interrupt(INT_TIMER,SET_INT);
-        uint64_t now = host_time_us();
-        host_hardclock(latch_hardclock, (int)(now - hardClockLastLatch));
-        hardClockLastLatch = now;
-        CycInt_AddRelativeInterruptUs(latch_hardclock, 0, INTERRUPT_HARDCLOCK);
+void Hardclock_Interrupt_Handler(void) {
+    uint64_t now;
+    set_interrupt(INT_TIMER, SET_INT);
+    now = Timing_GetTime();
+    Log_Printf(LOG_HARDCLOCK_LEVEL, "[Hardclock] Interrupting at %lld us", now);
+    Timing_Hardclock(hardclock_counter, (int)(now - hardclock_last_time));
+    hardclock_counter = hardclock_latch;
+    if (hardclock_counter) {
+        hardclock_last_time = now;
+        CycInt_UpdateTimeEvent(hardclock_counter, 0, EVENT_HARDCLOCK_INTERRUPT);
     }
 }
 
+void HardclockRead0(void) {
+    if ((hardclock_csr & HARDCLOCK_ENABLE) && hardclock_counter) {
+        hardclock_counter -= Timing_GetTime() - hardclock_last_time;
+        Log_Printf(LOG_WARN, "[Hardclock] Active counter read %d", hardclock_counter);
+    }
+    IoMem_WriteByte(IoAccessCurrentAddress, hardclock_counter >> 8);
+    Log_Printf(LOG_HARDCLOCK_LEVEL,"[Hardclock] Read at $%08x val=%02x PC=$%08x", IoAccessCurrentAddress,IoMem_ReadByte(IoAccessCurrentAddress),m68k_getpc());
+}
+void HardclockRead1(void) {
+    IoMem_WriteByte(IoAccessCurrentAddress, hardclock_counter & 0xFF);
+    Log_Printf(LOG_HARDCLOCK_LEVEL,"[Hardclock] Read at $%08x val=%02x PC=$%08x", IoAccessCurrentAddress,IoMem_ReadByte(IoAccessCurrentAddress),m68k_getpc());
+}
 
-void HardclockRead0(void){
-    IoMem_WriteByte(IoAccessCurrentAddress, (latch_hardclock>>8));
-    Log_Printf(LOG_HARDCLOCK_LEVEL,"[hardclock] read at $%08x val=%02x PC=$%08x", IoAccessCurrentAddress,IoMem_ReadByte(IoAccessCurrentAddress),m68k_getpc());
+void HardclockWrite0(void) {
+    Log_Printf(LOG_HARDCLOCK_LEVEL,"[Hardclock] Write at $%08x val=%02x PC=$%08x", IoAccessCurrentAddress,IoMem_ReadByte(IoAccessCurrentAddress),m68k_getpc());
+    hardclock_latch &= 0x00FF;
+    hardclock_latch |= (uint16_t)IoMem_ReadByte(IoAccessCurrentAddress) << 8;
 }
-void HardclockRead1(void){
-    IoMem_WriteByte(IoAccessCurrentAddress, latch_hardclock&0xff);
-    Log_Printf(LOG_HARDCLOCK_LEVEL,"[hardclock] read at $%08x val=%02x PC=$%08x", IoAccessCurrentAddress,IoMem_ReadByte(IoAccessCurrentAddress),m68k_getpc());
-}
-
-void HardclockWrite0(void){
-    Log_Printf(LOG_HARDCLOCK_LEVEL,"[hardclock] write at $%08x val=%02x PC=$%08x", IoAccessCurrentAddress,IoMem_ReadByte(IoAccessCurrentAddress),m68k_getpc());
-    hardclock0 = IoMem_ReadByte(IoAccessCurrentAddress);
-}
-void HardclockWrite1(void){
-    Log_Printf(LOG_HARDCLOCK_LEVEL,"[hardclock] write at $%08x val=%02x PC=$%08x",IoAccessCurrentAddress,IoMem_ReadByte(IoAccessCurrentAddress),m68k_getpc());
-    hardclock1 = IoMem_ReadByte(IoAccessCurrentAddress);
+void HardclockWrite1(void) {
+    Log_Printf(LOG_HARDCLOCK_LEVEL,"[Hardclock] Write at $%08x val=%02x PC=$%08x", IoAccessCurrentAddress,IoMem_ReadByte(IoAccessCurrentAddress),m68k_getpc());
+    hardclock_latch &= 0xFF00;
+    hardclock_latch |= IoMem_ReadByte(IoAccessCurrentAddress);
 }
 
 void HardclockWriteCSR(void) {
-    Log_Printf(LOG_HARDCLOCK_LEVEL,"[hardclock] write at $%08x val=%02x PC=$%08x", IoAccessCurrentAddress,IoMem_ReadByte(IoAccessCurrentAddress),m68k_getpc());
+    uint8_t changed_bits = hardclock_csr;
+    Log_Printf(LOG_HARDCLOCK_LEVEL,"[Hardclock] Write at $%08x val=%02x PC=$%08x", IoAccessCurrentAddress,IoMem_ReadByte(IoAccessCurrentAddress),m68k_getpc());
     hardclock_csr = IoMem_ReadByte(IoAccessCurrentAddress);
-    if (hardclock_csr&HARDCLOCK_LATCH) {
-        hardclock_csr&= ~HARDCLOCK_LATCH;
-        latch_hardclock=(hardclock0<<8)|hardclock1;
-        hardClockLastLatch = host_time_us();
+    changed_bits ^= hardclock_csr;
+    if (hardclock_csr & HARDCLOCK_LATCH) {
+        hardclock_counter = hardclock_latch;
     }
-    if ((hardclock_csr&HARDCLOCK_ENABLE) && (latch_hardclock>0)) {
-        Log_Printf(LOG_HARDCLOCK_LEVEL,"[hardclock] enable periodic interrupt (%i microseconds).", latch_hardclock);
-        CycInt_AddRelativeInterruptUs(latch_hardclock, 0, INTERRUPT_HARDCLOCK);
-    } else {
-        Log_Printf(LOG_HARDCLOCK_LEVEL,"[hardclock] disable periodic interrupt.");
+    if ((hardclock_csr & HARDCLOCK_ENABLE) && ((hardclock_csr & HARDCLOCK_LATCH) || (changed_bits & HARDCLOCK_ENABLE))) {
+        Log_Printf(LOG_HARDCLOCK_LEVEL,"[Hardclock] Enable periodic interrupt (%d microseconds).", hardclock_counter);
+        if (hardclock_counter) {
+            hardclock_last_time = Timing_GetTime();
+            CycInt_AddTimeEvent(hardclock_counter, 0, EVENT_HARDCLOCK_INTERRUPT);
+        }
+    } else if (!(hardclock_csr & HARDCLOCK_ENABLE) && (changed_bits & HARDCLOCK_ENABLE)) {
+        Log_Printf(LOG_HARDCLOCK_LEVEL,"[Hardclock] Disable periodic interrupt.");
+        hardclock_counter -= Timing_GetTime() - hardclock_last_time;
+        CycInt_RemovePendingEvent(EVENT_HARDCLOCK_INTERRUPT);
     }
-    set_interrupt(INT_TIMER,RELEASE_INT);
+    hardclock_csr &= ~HARDCLOCK_LATCH;
+    set_interrupt(INT_TIMER, RELEASE_INT);
 }
 void HardclockReadCSR(void) {
     IoMem_WriteByte(IoAccessCurrentAddress, hardclock_csr);
-    Log_Printf(LOG_DEBUG, "[hardclock] read at $%08x val=%02x PC=$%08x", IoAccessCurrentAddress,IoMem_ReadByte(IoAccessCurrentAddress),m68k_getpc());
-    set_interrupt(INT_TIMER,RELEASE_INT);
+    Log_Printf(LOG_DEBUG, "[Hardclock] Read at $%08x val=%02x PC=$%08x", IoAccessCurrentAddress,IoMem_ReadByte(IoAccessCurrentAddress),m68k_getpc());
+    set_interrupt(INT_TIMER, RELEASE_INT);
 }
 
 
 /* Event counter register */
 
-static uint64_t sysTimerOffset = 0;
-static bool resetTimer;
+static uint64_t eventcounter_offset;
 
 void System_Timer_Read(void) {
-    uint64_t now = host_time_us();
-    if(resetTimer) {
-        sysTimerOffset = now;
-        resetTimer = false;
-    }
-    now -= sysTimerOffset;
-    IoMem_WriteLong(IoAccessCurrentAddress, now & 0xFFFFF);
+    IoMem_WriteLong(IoAccessCurrentAddress, (Timing_GetTime() - eventcounter_offset) & 0xFFFFF);
 }
 
 void System_Timer_Write(void) {
-    resetTimer = true;
+    eventcounter_offset = Timing_GetTime(); /* Reset event counter (undocumented but required by dvt040) */
 }
 
 /* Color Video Interrupt Register */

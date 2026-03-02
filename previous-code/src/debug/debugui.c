@@ -29,7 +29,6 @@ const char DebugUI_fileid[] = "Hatari debugui.c";
 #include "m68000.h"
 #include "reset.h"
 #include "screen.h"
-#include "statusbar.h"
 #include "str.h"
 
 #include "debug_priv.h"
@@ -216,10 +215,13 @@ static bool DebugUI_IsForDsp(const char *cmd)
 }
 
 /**
- * Evaluate everything include within single or double quotes ("" or '')
- * and replace them with the result.
+ * Evaluate string(s) within single quotes, and replace them with the
+ * evaluation result.  Orphan (=last) single quote is left as-is, and
+ * empty pair(s) are collapsed to a single character, so that they
+ * can be included into string arguments.
+ *
  * Caller needs to free the returned string separately.
- * 
+ *
  * Return new string with expressions (potentially) expanded, or
  * NULL when there's an error in the expression.
  */
@@ -243,21 +245,21 @@ static char *DebugUI_EvaluateExpressions(const char *initial)
 	inputlen = strlen(input);
 	start = input;
 
-	while ((count = strcspn(start, "\"'")) && *(start+count))
+	while ((count = strcspn(start, "'")) && *(start+count))
 	{
 		start += count;
+		/* matching pair? */
 		end = strchr(start+1, *start);
+
+		/* no matching pair remains => done */
 		if (!end)
-		{
-			fprintf(stderr, "ERROR: matching '%c' missing from '%s'!\n", *start, start);
-			free(input);
-			return NULL;
-		}
-		
+			break;
+
+		/* no expression inside, '' => ' */
 		if (end == start+1)
 		{
-			/* empty expression */
-			memmove(start, start+2, strlen(start+2)+1);
+			memmove(start, end, strlen(end) + 1);
+			start = end;
 			continue;
 		}
 
@@ -504,9 +506,9 @@ static int DebugUI_Help(int nArgc, char *psArgs[])
 		"a normal decimal, if with '%%', it's a binary decimal. Prefix can\n"
 		"be skipped for numbers in the default number base (currently %d).\n"
 		"\n"
-		"Any expression given in quotes (within \"\"), will be evaluated\n"
-		"before given to the debugger command.  Any register and symbol\n"
-		"names in the expression are replaced by their values.\n"
+		"Expressions given between single quotes (''), will be evaluated\n"
+		"before given to the debugger command.  Register, symbol and\n"
+		"variable names in such expression are replaced by their values.\n"
 		"\n"
 		"Note that address ranges like '$fc0000-$fc0100' should have no\n"
 		"spaces between the range numbers.\n"
@@ -515,6 +517,90 @@ static int DebugUI_Help(int nArgc, char *psArgs[])
 	return DEBUGGER_CMDDONE;
 }
 
+/**
+ * Parse debug command arguments from args[argc] to rest of args.
+ * Arguments are parsed as white-space separated except for double
+ * quoted string arguments.
+ *
+ * Return true if parsing succeeds, false otherwise.
+ */
+static bool DebugUI_ParseArgs(char **argv, int argc, int maxArgc, int *retArgc)
+{
+#define IS_CMD_SEPARATOR(x) ((x) == ' ' || (x) == '\t')
+#define IS_CMD_QUOTE(x)     ((x) == '"')
+	/* parsing states */
+	typedef enum {
+		OUTSIDE_ARG,
+		WITHIN_QUOTE,
+		WITHIN_ARG
+	} parse_state_t;
+
+	parse_state_t state = OUTSIDE_ARG;
+	char quote, *line;
+
+	if (!(line = argv[argc]))
+		return true;
+
+	for (; *line && argc < maxArgc; line++)
+	{
+		switch (state)
+		{
+		case OUTSIDE_ARG:
+			if (IS_CMD_SEPARATOR(*line))
+			{
+				*line = '\0';
+				continue;
+			}
+			if (IS_CMD_QUOTE(*line))
+			{
+				state = WITHIN_QUOTE;
+				argv[argc++] = line+1;
+				quote = *line;
+				*line = '\0';
+				continue;
+			}
+			state = WITHIN_ARG;
+			argv[argc++] = line;
+			continue;
+
+		case WITHIN_QUOTE:
+			if (*line == quote)
+			{
+				char next = *(line+1);
+				if (!next || IS_CMD_SEPARATOR(next))
+				{
+					state = OUTSIDE_ARG;
+					*line = '\0';
+				}
+			}
+			continue;
+
+		case WITHIN_ARG:
+			if (IS_CMD_SEPARATOR(*line))
+			{
+				state = OUTSIDE_ARG;
+				*line = '\0';
+			}
+			continue;
+		}
+	}
+
+	*retArgc = argc;
+	if (*line)
+	{
+		fprintf(stderr, "Error: too many arguments (currently up to %d supported)\n",
+			maxArgc);
+		return false;
+	}
+	if (state == WITHIN_QUOTE)
+	{
+		fprintf(stderr, "Error: command argument starting with a quote does not end with one\n");
+		return false;
+	}
+	return true;
+#undef IS_CMD_SEPARATOR
+#undef IS_CMD_QUOTE
+}
 
 /**
  * Parse debug command and execute it.
@@ -522,10 +608,10 @@ static int DebugUI_Help(int nArgc, char *psArgs[])
 static int DebugUI_ParseCommand(const char *input_orig)
 {
 	char *psArgs[64], *input;
-	const char *delim;
 	static char sLastCmd[80] = { '\0' };
 	int nArgc, cmd = -1;
 	int i, retval;
+	bool ok;
 
 	input = strdup(input_orig);
 	psArgs[0] = strtok(input, " \t");
@@ -562,29 +648,35 @@ static int DebugUI_ParseCommand(const char *input_orig)
 		return DEBUGGER_CMDDONE;
 	}
 
-	if (debugCommand[cmd].bNoParsing)
-		delim = "";
-	else
-		delim = " \t";
+	nArgc = 1;
+	/* argument(s) for the command */
+	psArgs[nArgc] = strtok(NULL, "");
 
-	/* Separate arguments and put the pointers into psArgs */
-	for (nArgc = 1; nArgc < ARRAY_SIZE(psArgs); nArgc++)
+	/* split arguments... */
+	if (debugCommand[cmd].bNoParsing)
 	{
-		psArgs[nArgc] = strtok(NULL, delim);
-		if (psArgs[nArgc] == NULL)
-			break;
-	}
-	if (nArgc >= ARRAY_SIZE(psArgs))
-	{
-		fprintf(stderr, "Error: too many arguments (currently up to %d supported)\n",
-			ARRAY_SIZE(psArgs));
-		retval = DEBUGGER_CMDCONT;
+		ok = true;
+		if (psArgs[nArgc])
+			nArgc++;
 	}
 	else
+	{
+		//fprintf(stderr, "ARGS: %s - %s\n", psArgs[0], psArgs[1]);
+		ok = DebugUI_ParseArgs(psArgs, nArgc, ARRAY_SIZE(psArgs), &nArgc);
+		//fprintf(stderr, "ARGC: %d\n", nArgc);
+		//for (int j = 0; j < nArgc; j++) {
+		//	fprintf(stderr, "- '%s'\n", psArgs[j]);
+		//}
+	}
+
+	if (ok)
 	{
 		/* ... and execute the function */
 		retval = debugCommand[i].pFunction(nArgc, psArgs);
 	}
+	else
+		retval = DEBUGGER_CMDCONT;
+
 	/* Save commando string if it can be repeated */
 	if (retval == DEBUGGER_CMDCONT || retval == DEBUGGER_ENDCONT)
 	{
@@ -595,6 +687,7 @@ static int DebugUI_ParseCommand(const char *input_orig)
 	}
 	else
 		sLastCmd[0] = '\0';
+
 	free(input);
 	return retval;
 }
@@ -1104,7 +1197,7 @@ void DebugUI(debug_reason_t reason)
 	 * this is invoked from.  E.g. returning from fullscreen
 	 * enables grab if that was enabled on windowed mode.
 	 */
-	Main_SetMouseGrab(false);
+	Screen_SetMouseGrab(false);
 
 	DebugUI_Init();
 
@@ -1119,7 +1212,7 @@ void DebugUI(debug_reason_t reason)
 	}
 	DebugCpu_InitSession();
 	DebugDsp_InitSession();
-	Symbols_LoadCurrentProgram(0, 0);
+	Symbols_LoadCurrentProgram(NULL, 0);
 	DebugInfo_ShowSessionInfo();
 
 	/* override paused message so that user knows to look into console

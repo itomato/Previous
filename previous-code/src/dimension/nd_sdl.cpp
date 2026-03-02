@@ -9,8 +9,7 @@
 #include "nd_sdl.hpp"
 #include "configuration.h"
 #include "dimension.hpp"
-#include "screen.h"
-#include "host.h"
+#include "sdlscreen.h"
 #include "cycInt.h"
 
 
@@ -22,7 +21,7 @@ int NDSDL::repainter(void *_this) {
 }
 
 int NDSDL::repainter(void) {
-    SDL_SetCurrentThreadPriority(SDL_THREAD_PRIORITY_NORMAL);
+    host_thread_priority(1);
 
     while (doRepaint) {
         if (bEmulationActive && SDL_GetAtomicInt(&blitNDFB)) {

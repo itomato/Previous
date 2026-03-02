@@ -10,7 +10,7 @@
 const char Rtcnvram_fileid[] = "Previous rtcnvram.c";
 
 #include "main.h"
-#include "host.h"
+#include "timing.h"
 #include "ioMem.h"
 #include "ioMemTables.h"
 #include "log.h"
@@ -119,7 +119,7 @@ static int fromBCDhr(uint8_t bcd) {
 }
 
 static void oldrtc_get_time(void) {
-    struct tm* t = host_unix_tm();
+    struct tm* t = Timing_GetUnixTimeStruct();
     
     rtc.time.sec   = toBCD(t->tm_sec);
     rtc.time.min   = toBCD(t->tm_min);
@@ -141,7 +141,7 @@ static void oldrtc_set_time(void) {
     t.tm_mon  = fromBCD(rtc.time.month) - 1;
     t.tm_year = fromBCD(rtc.time.year);
     
-    host_set_unix_tm(&t);
+    Timing_SetUnixTimeStruct(&t);
 }
 
 static void oldrtc_check_time(void) {
@@ -583,28 +583,28 @@ static void newrtc_put_clock(uint8_t addr, uint8_t val) {
             newrtc.timecntr &= 0x00FFFFFF;
             newrtc.timecntr |= val << 24;
             if (newrtc.control&NRTC_START) {
-                host_set_unix_time(newrtc.timecntr);
+                Timing_SetUnixTime(newrtc.timecntr);
             }
             break;
         case 0x21:
             newrtc.timecntr &= 0xFF00FFFF;
             newrtc.timecntr |= val << 16;
             if (newrtc.control&NRTC_START) {
-                host_set_unix_time(newrtc.timecntr);
+                Timing_SetUnixTime(newrtc.timecntr);
             }
             break;
         case 0x22:
             newrtc.timecntr &= 0xFFFF00FF;
             newrtc.timecntr |= val << 8;
             if (newrtc.control&NRTC_START) {
-                host_set_unix_time(newrtc.timecntr);
+                Timing_SetUnixTime(newrtc.timecntr);
             }
             break;
         case 0x23:
             newrtc.timecntr &= 0xFFFFFF00;
             newrtc.timecntr |= val;
             if (newrtc.control&NRTC_START) {
-                host_set_unix_time(newrtc.timecntr);
+                Timing_SetUnixTime(newrtc.timecntr);
             }
             break;
         case 0x24:
@@ -635,7 +635,7 @@ static void newrtc_put_clock(uint8_t addr, uint8_t val) {
             if (changed&NRTC_START) {
                 if (newrtc.control&RTC_START) {
                     Log_Printf(LOG_WARN, "[RTC] Start clock");
-                    host_set_unix_time(newrtc.timecntr);
+                    Timing_SetUnixTime(newrtc.timecntr);
                 } else {
                     Log_Printf(LOG_WARN, "[RTC] Stop clock");
                 }
@@ -678,11 +678,11 @@ static void newrtc_check_alarm(void) {
 #endif
 
 static void newrtc_check_time(void) {
-    newrtc.timecntr = (uint32_t)host_unix_time();
+    newrtc.timecntr = (uint32_t)Timing_GetUnixTime();
     if (newrtc.timecntr >= NEXT_LIMIT_SEC || newrtc.timecntr < NEXT_MIN_SEC) {
         Log_Printf(LOG_WARN,"[RTC] Time %d beyond valid range. Setting to %d", newrtc.timecntr, NEXT_START_SEC);
         newrtc.timecntr = NEXT_START_SEC;
-        host_set_unix_time(newrtc.timecntr);
+        Timing_SetUnixTime(newrtc.timecntr);
     }
 }
 
@@ -755,7 +755,7 @@ static int newrtc_interface_io(uint8_t rtdatabit) {
 /* Data sheet is wrong about when the time counter latch is loaded. But is this correct? */
 static void newrtc_interface_start(void) {
     if (newrtc.control&NRTC_START) {
-        newrtc.timecntr = (uint32_t)host_unix_time();
+        newrtc.timecntr = (uint32_t)Timing_GetUnixTime();
     }
 }
 
@@ -1059,7 +1059,7 @@ void nvram_init(void) {
         default: break;
     }
 
-	/* Set prefered console slot */
+    /* Set prefered console slot */
     rtc.ram[17] |= USE_CONSOLE_SLOT;
     for (i = 0; i < ND_MAX_BOARDS; i++) {
         if (ConfigureParams.Dimension.bMainDisplay &&
@@ -1070,69 +1070,69 @@ void nvram_init(void) {
         }
     }
 
-	/* Re-calculate checksum */
+    /* Re-calculate checksum */
     nvram_checksum(1);
 }
 
 void nvram_checksum(int force) {
-	int sum,i;
-	sum=0;
-	for (i=0;i<30;i+=2) {
-		sum+=(rtc.ram[i]<<8)|(rtc.ram[i+1]);
-		if (sum>=0x10000) {
-			sum-=0x10000;
-			sum+=1;
-		}
-	}
+    int sum,i;
+    sum=0;
+    for (i=0;i<30;i+=2) {
+        sum+=(rtc.ram[i]<<8)|(rtc.ram[i+1]);
+        if (sum>=0x10000) {
+            sum-=0x10000;
+            sum+=1;
+        }
+    }
     
-	sum=0xFFFF-sum;
+    sum=0xFFFF-sum;
     
-	if (force) {
-		rtc.ram[30]=(sum&0xFF00)>>8;
-		rtc.ram[31]=(sum&0xFF);
-		Log_Printf(LOG_WARN,"Forcing RTC checksum to %x %x",rtc.ram[30],rtc.ram[31]);
-	} else {
-		Log_Printf(LOG_WARN,"Check RTC checksum to %x %x %x %x",
+    if (force) {
+        rtc.ram[30]=(sum&0xFF00)>>8;
+        rtc.ram[31]=(sum&0xFF);
+        Log_Printf(LOG_WARN,"Forcing RTC checksum to %x %x",rtc.ram[30],rtc.ram[31]);
+    } else {
+        Log_Printf(LOG_WARN,"Check RTC checksum to %x %x %x %x",
                    rtc.ram[30],(sum&0xFF00)>>8,
                    rtc.ram[31],(sum&0xFF));
-	}
+    }
 }
 
 
 /* Print parameters stored in NVRAM (for debugger) */
 void NVRAM_Info(FILE *fp, uint32_t dummy) {
-	fprintf(fp, "Parameters stored in NVRAM\n");
-	fprintf(fp, "Reset:             %x\n", (rtc.ram[0]>>4)&0xF);
-	fprintf(fp, "Alternate console: %d\n", (rtc.ram[0]>>3)&0x1);
-	fprintf(fp, "Allow eject:       %d\n", (rtc.ram[0]>>2)&0x1);
-	fprintf(fp, "Enable HW PWD:     %x\n", (rtc.ram[2]>>2)&0xF);
-	fprintf(fp, "Brightness:        %d\n", ((rtc.ram[1]&0xF)<<2)|((rtc.ram[2]>>6)&0x3));
-	fprintf(fp, "Volume right:      %d\n", ((rtc.ram[0]&0x3)<<4)|((rtc.ram[1]>>4)&0xF));
-	fprintf(fp, "Volume left:       %d\n", ((rtc.ram[2]&0x3)<<4)|((rtc.ram[3]>>4)&0xF));
-	fprintf(fp, "Speaker enabled:   %d\n", (rtc.ram[3]>>3)&0x1);
-	fprintf(fp, "Lowpass enabled:   %d\n", (rtc.ram[3]>>2)&0x1);
-	fprintf(fp, "Any boot:          %d\n", (rtc.ram[3]>>1)&0x1);
-	fprintf(fp, "Any command:       %d\n", (rtc.ram[3])&0x1);
-	fprintf(fp, "Ethernet address:  %02x:%02x:%02x:%02x:%02x:%02x\n",
-	        rtc.ram[4], rtc.ram[5], rtc.ram[6], rtc.ram[7], rtc.ram[8], rtc.ram[9]);
-	fprintf(fp, "SIMM config:       %02x%02x\n", rtc.ram[10], rtc.ram[11]);
-	fprintf(fp, "Adobe:             %c%c\n", rtc.ram[12], rtc.ram[13]);
-	fprintf(fp, "Enable POT:        %d\n", (rtc.ram[14])&0x1);
-	fprintf(fp, "Sound test:        %d\n", (rtc.ram[14]>>6)&0x1);
-	fprintf(fp, "Boot diagnostics:  %d\n", (rtc.ram[14]>>5)&0x1);
-	fprintf(fp, "DRAM test:         %d\n", (rtc.ram[14]>>4)&0x1);
-	fprintf(fp, "Verbose test:      %d\n", (rtc.ram[14]>>3)&0x1);
-	fprintf(fp, "Loop test:         %d\n", (rtc.ram[14]>>2)&0x1);
-	fprintf(fp, "SCSI test:         %d\n", (rtc.ram[14]>>1)&0x1);
-	fprintf(fp, "Old POT error:     %X\n", rtc.ram[15]);
-	fprintf(fp, "Recent POT error:  %X\n", rtc.ram[16]);
-	fprintf(fp, "New clock chip:    %d\n", (rtc.ram[17]>>7)&0x1);
-	fprintf(fp, "Auto power-on:     %d\n", (rtc.ram[17]>>6)&0x1);
-	fprintf(fp, "Use console slot:  %d\n", (rtc.ram[17]>>5)&0x1);
-	fprintf(fp, "Console slot:      %d\n", ((rtc.ram[17]>>3)&0x3)<<1);
-	fprintf(fp, "Use parity memory: %d\n", (rtc.ram[17]>>2)&0x1);
-	fprintf(fp, "Boot command:      %c%c%c%c%c%c%c%c%c%c%c%c\n",
-	        rtc.ram[18], rtc.ram[19], rtc.ram[20], rtc.ram[21], rtc.ram[22], rtc.ram[23],
-	        rtc.ram[24], rtc.ram[25], rtc.ram[26], rtc.ram[27], rtc.ram[28], rtc.ram[29]);
-	fprintf(fp, "Checksum:          %02x%02x\n\n", rtc.ram[30], rtc.ram[31]);
+    fprintf(fp, "Parameters stored in NVRAM\n");
+    fprintf(fp, "Reset:             %x\n", (rtc.ram[0]>>4)&0xF);
+    fprintf(fp, "Alternate console: %d\n", (rtc.ram[0]>>3)&0x1);
+    fprintf(fp, "Allow eject:       %d\n", (rtc.ram[0]>>2)&0x1);
+    fprintf(fp, "Enable HW PWD:     %x\n", (rtc.ram[2]>>2)&0xF);
+    fprintf(fp, "Brightness:        %d\n", ((rtc.ram[1]&0xF)<<2)|((rtc.ram[2]>>6)&0x3));
+    fprintf(fp, "Volume right:      %d\n", ((rtc.ram[0]&0x3)<<4)|((rtc.ram[1]>>4)&0xF));
+    fprintf(fp, "Volume left:       %d\n", ((rtc.ram[2]&0x3)<<4)|((rtc.ram[3]>>4)&0xF));
+    fprintf(fp, "Speaker enabled:   %d\n", (rtc.ram[3]>>3)&0x1);
+    fprintf(fp, "Lowpass enabled:   %d\n", (rtc.ram[3]>>2)&0x1);
+    fprintf(fp, "Any boot:          %d\n", (rtc.ram[3]>>1)&0x1);
+    fprintf(fp, "Any command:       %d\n", (rtc.ram[3])&0x1);
+    fprintf(fp, "Ethernet address:  %02x:%02x:%02x:%02x:%02x:%02x\n",
+            rtc.ram[4], rtc.ram[5], rtc.ram[6], rtc.ram[7], rtc.ram[8], rtc.ram[9]);
+    fprintf(fp, "SIMM config:       %02x%02x\n", rtc.ram[10], rtc.ram[11]);
+    fprintf(fp, "Adobe:             %c%c\n", rtc.ram[12], rtc.ram[13]);
+    fprintf(fp, "Enable POT:        %d\n", (rtc.ram[14])&0x1);
+    fprintf(fp, "Sound test:        %d\n", (rtc.ram[14]>>6)&0x1);
+    fprintf(fp, "Boot diagnostics:  %d\n", (rtc.ram[14]>>5)&0x1);
+    fprintf(fp, "DRAM test:         %d\n", (rtc.ram[14]>>4)&0x1);
+    fprintf(fp, "Verbose test:      %d\n", (rtc.ram[14]>>3)&0x1);
+    fprintf(fp, "Loop test:         %d\n", (rtc.ram[14]>>2)&0x1);
+    fprintf(fp, "SCSI test:         %d\n", (rtc.ram[14]>>1)&0x1);
+    fprintf(fp, "Old POT error:     %X\n", rtc.ram[15]);
+    fprintf(fp, "Recent POT error:  %X\n", rtc.ram[16]);
+    fprintf(fp, "New clock chip:    %d\n", (rtc.ram[17]>>7)&0x1);
+    fprintf(fp, "Auto power-on:     %d\n", (rtc.ram[17]>>6)&0x1);
+    fprintf(fp, "Use console slot:  %d\n", (rtc.ram[17]>>5)&0x1);
+    fprintf(fp, "Console slot:      %d\n", ((rtc.ram[17]>>3)&0x3)<<1);
+    fprintf(fp, "Use parity memory: %d\n", (rtc.ram[17]>>2)&0x1);
+    fprintf(fp, "Boot command:      %c%c%c%c%c%c%c%c%c%c%c%c\n",
+            rtc.ram[18], rtc.ram[19], rtc.ram[20], rtc.ram[21], rtc.ram[22], rtc.ram[23],
+            rtc.ram[24], rtc.ram[25], rtc.ram[26], rtc.ram[27], rtc.ram[28], rtc.ram[29]);
+    fprintf(fp, "Checksum:          %02x%02x\n\n", rtc.ram[30], rtc.ram[31]);
 }

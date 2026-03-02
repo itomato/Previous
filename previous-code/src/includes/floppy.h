@@ -24,7 +24,7 @@ extern void FLP_Reserved_Write(void);
 extern void FLP_Status_Read(void);
 extern void FLP_Control_Write(void);
 
-extern void FLP_IO_Handler(void);
+extern void Floppy_IO_Handler(void);
 
 extern void Floppy_Reset(void);
 extern int  Floppy_Insert(int drive);

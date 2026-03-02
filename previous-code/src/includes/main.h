@@ -13,7 +13,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* Name and version for window title: */
-#define PROG_NAME "Previous 4.0"
+#define PROG_NAME "Previous 4.1"
 
 #include "config.h"
 
@@ -61,14 +61,6 @@ extern "C" {
 #define SIZE_WORD  2
 #define SIZE_LONG  4
 
-/* Types for special event */
-enum {
-	MAIN_REPAINT,
-	MAIN_ND_DISPLAY,
-	MAIN_PAUSE,
-	MAIN_UNPAUSE,
-	MAIN_HALT
-};
 
 extern volatile bool bQuitProgram;
 extern volatile bool bEmulationActive;
@@ -76,13 +68,8 @@ extern volatile bool bEmulationActive;
 extern bool Main_PauseEmulation(bool visualize);
 extern bool Main_UnPauseEmulation(void);
 extern void Main_Halt(void);
+extern void Main_HaltDialog(void);
 extern void Main_RequestQuit(bool confirm);
-extern void Main_WarpMouse(int x, int y);
-extern bool Main_ShowCursor(bool show);
-extern void Main_SetMouseGrab(bool grab);
-extern void Main_SendSpecialEvent(int type);
-extern void Main_ResetKeys(void);
-extern void Main_EventHandlerInterrupt(void);
 extern void Main_EventHandler(void);
 extern void Main_ErrorExit(const char *msg1, const char *msg2, int errval);
 extern void Main_SpeedReset(void);

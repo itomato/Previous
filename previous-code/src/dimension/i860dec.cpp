@@ -3937,7 +3937,7 @@ void i860_cpu_device::decode_exec (UINT32 insn) {
     
 #if ENABLE_DEBUGGER
     m_traceback[m_traceback_idx++] = m_pc;
-    if(m_traceback_idx >= (sizeof(m_traceback) / sizeof(m_traceback[0])))
+    if(m_traceback_idx >= (int)(sizeof(m_traceback) / sizeof(m_traceback[0])))
         m_traceback_idx = 0;
 #endif    
 //    (this->*decode_tbl[(insn >> 26) & 0x3f])(insn);
