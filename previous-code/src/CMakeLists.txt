@@ -4,7 +4,7 @@ set(SOURCES
 	esp.c enet_slirp.c enet_pcap.c ethernet.c file.c floppy.c grab.c ioMem.c 
 	ioMemTabNEXT.c ioMemTabTurbo.c kms.c m68000.c main.c mo.c nbic.c ncc.c 
 	paths.c printer.c queue.c ramdac.c reset.c rom.c rs.c rtcnvram.c scandir.c 
-	scc.c scsi.c shortcut.c snd.c str.c sysReg.c timing.c tmc.c video.c zip.c 
+	scc.c scsi.c shortcut.c snd.c str.c sysReg.c timing.c tmc.c video.c 
 	NextBus.cpp)
 
 # When building for macOS, define specific sources for gui and resources
@@ -32,7 +32,6 @@ include_directories(includes debug dsp softfloat dimension slirp
 
 if(ZLIB_FOUND)
 	include_directories(${ZLIB_INCLUDE_DIR})
-	set(SOURCES ${SOURCES} unzip.c)
 endif(ZLIB_FOUND)
 
 if(PNG_FOUND)
