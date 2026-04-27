@@ -135,7 +135,7 @@ static SGOBJ enetmacdlg[] =
 	{ SGEDITFIELD, 0, 0, 35,3, 2,1, mac_input[4] },
 	{ SGEDITFIELD, 0, 0, 40,3, 2,1, mac_input[5] },
 	
-	{ SGBUTTON, 0, 0, 15,6, 11,1, "Customize" },
+	{ SGBUTTON, 0, 0, 15,6, 11,1, "Customise" },
 	{ SGBUTTON, SG_DEFAULT, 0, 31,6, 11,1, "Default" },
 	
 	{ SGSTOP, 0, 0, 0,0, 0,0, NULL }

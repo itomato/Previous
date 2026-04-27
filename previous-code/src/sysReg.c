@@ -8,7 +8,7 @@
 */
 const char SysReg_fileid[] = "Previous sysReg.c";
 
-#include <stdlib.h>
+#include <inttypes.h>
 #include "main.h"
 #include "ioMem.h"
 #include "ioMemTables.h"
@@ -624,7 +624,7 @@ void Hardclock_Interrupt_Handler(void) {
     uint64_t now;
     set_interrupt(INT_TIMER, SET_INT);
     now = Timing_GetTime();
-    Log_Printf(LOG_HARDCLOCK_LEVEL, "[Hardclock] Interrupting at %lld us", now);
+    Log_Printf(LOG_HARDCLOCK_LEVEL, "[Hardclock] Interrupting at %"PRIu64" us", now);
     Timing_Hardclock(hardclock_counter, (int)(now - hardclock_last_time));
     hardclock_counter = hardclock_latch;
     if (hardclock_counter) {
@@ -635,8 +635,9 @@ void Hardclock_Interrupt_Handler(void) {
 
 void HardclockRead0(void) {
     if ((hardclock_csr & HARDCLOCK_ENABLE) && hardclock_counter) {
-        hardclock_counter -= Timing_GetTime() - hardclock_last_time;
-        Log_Printf(LOG_WARN, "[Hardclock] Active counter read %d", hardclock_counter);
+        uint64_t diff = Timing_GetTime() - hardclock_last_time;
+        hardclock_counter = (diff > hardclock_counter) ? 0 : (hardclock_counter - diff);
+        Log_Printf(LOG_WARN, "[Hardclock] Active counter read %u", hardclock_counter);
     }
     IoMem_WriteByte(IoAccessCurrentAddress, hardclock_counter >> 8);
     Log_Printf(LOG_HARDCLOCK_LEVEL,"[Hardclock] Read at $%08x val=%02x PC=$%08x", IoAccessCurrentAddress,IoMem_ReadByte(IoAccessCurrentAddress),m68k_getpc());
@@ -672,8 +673,9 @@ void HardclockWriteCSR(void) {
             CycInt_AddTimeEvent(hardclock_counter, 0, EVENT_HARDCLOCK_INTERRUPT);
         }
     } else if (!(hardclock_csr & HARDCLOCK_ENABLE) && (changed_bits & HARDCLOCK_ENABLE)) {
+        uint64_t diff = Timing_GetTime() - hardclock_last_time;
+        hardclock_counter = (diff > hardclock_counter) ? 0 : (hardclock_counter - diff);
         Log_Printf(LOG_HARDCLOCK_LEVEL,"[Hardclock] Disable periodic interrupt.");
-        hardclock_counter -= Timing_GetTime() - hardclock_last_time;
         CycInt_RemovePendingEvent(EVENT_HARDCLOCK_INTERRUPT);
     }
     hardclock_csr &= ~HARDCLOCK_LATCH;

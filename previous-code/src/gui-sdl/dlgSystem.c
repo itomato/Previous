@@ -19,7 +19,7 @@ const char DlgSystem_fileid[] = "Previous dlgSystem.c";
 #define DLGSYS_SLABTURBO  8
 #define DLGSYS_SLABCOLOR  9
 
-#define DLGSYS_CUSTOMIZE  10
+#define DLGSYS_CUSTOMISE  10
 #define DLGSYS_RESET      11
 
 #define DLGSYS_EXIT       34
@@ -56,7 +56,7 @@ static SGOBJ systemdlg[] =
 	{ SGCHECKBOX, SG_EXIT, 0, 7,12, 7,1, "Turbo" },
 	{ SGCHECKBOX, SG_EXIT, 0, 7,13, 7,1, "Color" },
 	
-	{ SGBUTTON, 0, 0, 5,16, 19,1, "Customize" },
+	{ SGBUTTON, 0, 0, 5,16, 19,1, "Customise" },
 	{ SGBUTTON, 0, 0, 5,18, 19,1, "System defaults" },
 
 	{ SGTEXT, 0, 0, 30,4, 13,1, "System overview:" },
@@ -108,8 +108,8 @@ void print_system_overview(void) {
 		default: break;
 	}
 	
-	if(ConfigureParams.System.bRealtime) snprintf(cpu_clock, sizeof(cpu_clock), "variable");
-	else                                 snprintf(cpu_clock, sizeof(cpu_clock), "%i MHz", ConfigureParams.System.nCpuFreq);
+	if (ConfigureParams.System.bRealtime) snprintf(cpu_clock, sizeof(cpu_clock), "variable");
+	else                                  snprintf(cpu_clock, sizeof(cpu_clock), "%i MHz", ConfigureParams.System.nCpuFreq);
 	
 	snprintf(main_memory, sizeof(main_memory), "%i MB", Configuration_CheckMemory(ConfigureParams.Memory.nMemoryBankSize));
 	
@@ -312,7 +312,7 @@ void Dialog_SystemDlg(void)
 				get_default_values();
 				break;
 								
-			case DLGSYS_CUSTOMIZE:
+			case DLGSYS_CUSTOMISE:
 				Dialog_AdvancedDlg();
 				break;
 				

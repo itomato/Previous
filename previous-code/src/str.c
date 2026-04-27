@@ -220,7 +220,7 @@ void Str_UnEscape(char *s1)
 		switch(*s1)
 		{
 		case 'e':
-			*s2++ = '\e';
+			*s2++ = '\x1b';
 			break;
 		case 'n':
 			*s2++ = '\n';

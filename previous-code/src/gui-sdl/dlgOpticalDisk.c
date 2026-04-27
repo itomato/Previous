@@ -35,10 +35,6 @@ const char DlgOpticalDisk_fileid[] = "Previous dlgOpticalDisk.c";
 #define MODLG_EJECT_WARNING     "WARNING: Don't eject manually if a guest system is running. Risk of data loss. Eject now?"
 #define MODLG_DUALDRV_WARNING   "WARNING: Second drive can cause problems. System may crash or hang due to a kernel bug. Add anyway?"
 
-/* Variable strings */
-char inserteject0[16] = "Insert";
-char inserteject1[16] = "Insert";
-
 
 /* The magneto optical drive dialog: */
 static SGOBJ modlg[] =
@@ -55,7 +51,7 @@ static SGOBJ modlg[] =
 	
 	{ SGBOX, 0, 0, 2,6, 60,6, NULL },
 	{ SGTEXT, 0, 0, 4,7, 14,1, "Optical disk:" },
-	{ SGBUTTON, 0, 0, 20,7, 10,1, inserteject0 },
+	{ SGBUTTON, 0, 0, 20,7, 10,1, NULL },
 	{ SGTEXT, 0, 0, 32,7, 17,1, NULL },
 	{ SGTEXT, 0, 0, 4,9, 56,1, NULL },
 #if DUAL_MO_DRIVE
@@ -64,7 +60,7 @@ static SGOBJ modlg[] =
 	
 	{ SGBOX, 0, 0, 2,16, 60,6, NULL },
 	{ SGTEXT, 0, 0, 4,17, 14,1, "Optical disk:" },
-	{ SGBUTTON, 0, 0, 20,17, 10,1, inserteject1 },
+	{ SGBUTTON, 0, 0, 20,17, 10,1, NULL },
 	{ SGTEXT, 0, 0, 32,17, 17,1, NULL },
 	{ SGTEXT, 0, 0, 4,19, 56,1, NULL },
 	
@@ -97,20 +93,20 @@ void DlgOptical_Main(void)
 	if (ConfigureParams.MO.drive[0].bDriveConnected && ConfigureParams.MO.drive[0].bDiskInserted) {
 		File_ShrinkName(dlgname_mo[0], ConfigureParams.MO.drive[0].szImageName,
 						modlg[MODLG_DISKNAME0].w);
-		snprintf(inserteject0, sizeof(inserteject0), "Eject");
+		modlg[MODLG_INSERT0].txt = "Eject";
 	} else {
 		dlgname_mo[0][0] = '\0';
-		snprintf(inserteject0, sizeof(inserteject0), "Insert");
+		modlg[MODLG_INSERT0].txt = "Insert";
 	}
 	modlg[MODLG_DISKNAME0].txt = dlgname_mo[0];
 #if DUAL_MO_DRIVE
 	if (ConfigureParams.MO.drive[1].bDriveConnected && ConfigureParams.MO.drive[1].bDiskInserted) {
 		File_ShrinkName(dlgname_mo[1], ConfigureParams.MO.drive[1].szImageName,
 						modlg[MODLG_DISKNAME1].w);
-		snprintf(inserteject1, sizeof(inserteject1), "Eject");
+		modlg[MODLG_INSERT1].txt = "Eject";
 	} else {
 		dlgname_mo[1][0] = '\0';
-		snprintf(inserteject1, sizeof(inserteject1), "Insert");
+		modlg[MODLG_INSERT1].txt = "Insert";
 	}
 	modlg[MODLG_DISKNAME1].txt = dlgname_mo[1];
 #endif
@@ -151,7 +147,7 @@ void DlgOptical_Main(void)
 					if (SDLGui_FileConfSelect(dlgname_mo[0], ConfigureParams.MO.drive[0].szImageName,
 										  modlg[MODLG_DISKNAME0].w, &ConfigureParams.MO.drive[0].bWriteProtected, false)) {
 						ConfigureParams.MO.drive[0].bDiskInserted = true;
-						snprintf(inserteject0, sizeof(inserteject0), "Eject");
+						modlg[MODLG_INSERT0].txt = "Eject";
 						if (!ConfigureParams.MO.drive[0].bDriveConnected) {
 							ConfigureParams.MO.drive[0].bDriveConnected = true;
 							modlg[MODLG_CONNECTED0].state |= SG_SELECTED;
@@ -162,7 +158,7 @@ void DlgOptical_Main(void)
 					if (DlgAlert_Query(MODLG_EJECT_WARNING)) {
 						ConfigureParams.MO.drive[0].bDiskInserted = false;
 						ConfigureParams.MO.drive[0].bWriteProtected = false;
-						snprintf(inserteject0, sizeof(inserteject0), "Insert");
+						modlg[MODLG_INSERT0].txt = "Insert";
 						ConfigureParams.MO.drive[0].szImageName[0] = '\0';
 						dlgname_mo[0][0] = '\0';
 						MO_Eject(0);
@@ -173,7 +169,7 @@ void DlgOptical_Main(void)
 				if (ConfigureParams.MO.drive[0].bDriveConnected) {
 					ConfigureParams.MO.drive[0].bDriveConnected = false;
 					ConfigureParams.MO.drive[0].bDiskInserted = false;
-					snprintf(inserteject0, sizeof(inserteject0), "Insert");
+					modlg[MODLG_INSERT0].txt = "Insert";
 					ConfigureParams.MO.drive[0].bWriteProtected = false;
 					ConfigureParams.MO.drive[0].szImageName[0] = '\0';
 					dlgname_mo[0][0] = '\0';
@@ -196,14 +192,14 @@ void DlgOptical_Main(void)
 							modlg[MODLG_CONNECTED1].state |= SG_SELECTED;
 						}
 						ConfigureParams.MO.drive[1].bDiskInserted = true;
-						snprintf(inserteject1, sizeof(inserteject1), "Eject");
+						modlg[MODLG_INSERT1].txt = "Eject";
 						MO_Insert(1);
 					}
 				} else {
 					if (DlgAlert_Query(MODLG_EJECT_WARNING)) {
 						ConfigureParams.MO.drive[1].bDiskInserted = false;
 						ConfigureParams.MO.drive[1].bWriteProtected = false;
-						snprintf(inserteject1, sizeof(inserteject1), "Insert");
+						modlg[MODLG_INSERT1].txt = "Insert";
 						ConfigureParams.MO.drive[1].szImageName[0] = '\0';
 						dlgname_mo[1][0] = '\0';
 						MO_Eject(1);
@@ -214,7 +210,7 @@ void DlgOptical_Main(void)
 				if (ConfigureParams.MO.drive[1].bDriveConnected) {
 					ConfigureParams.MO.drive[1].bDriveConnected = false;
 					ConfigureParams.MO.drive[1].bDiskInserted = false;
-					snprintf(inserteject1, sizeof(inserteject1), "Insert");
+					modlg[MODLG_INSERT1].txt = "Insert";
 					ConfigureParams.MO.drive[1].bWriteProtected = false;
 					ConfigureParams.MO.drive[1].szImageName[0] = '\0';
 					dlgname_mo[1][0] = '\0';

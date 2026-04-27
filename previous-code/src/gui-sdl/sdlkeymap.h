@@ -11,7 +11,7 @@
 #include <SDL3/SDL.h>
 
 extern void Keymap_MouseWheel(const SDL_MouseWheelEvent *sdlwheel);
-extern void Keymap_MouseMove(int dx, int dy);
+extern void Keymap_MouseMove(const SDL_MouseMotionEvent *sdlmotion);
 extern void Keymap_MouseDown(bool left);
 extern void Keymap_MouseUp(bool left);
 

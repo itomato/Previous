@@ -48,9 +48,6 @@ const char DlgAdvanced_fileid[] = "Previous dlgAdvanced.c";
 
 #define DLGADV_EXIT       44
 
-char custom_memory[16] = "Customize";
-
-#define DLG_VAR_Y         16
 #define DLG_MEM_Y         16
 
 static SGOBJ advanceddlg[] =
@@ -60,7 +57,7 @@ static SGOBJ advanceddlg[] =
 
 	{ SGBOX, 0, 0, 2,3, 14,15, NULL },
 	{ SGTEXT, 0, 0, 3,4, 12,1, "CPU clock" },
-	{ SGCHECKBOX, 0, 0, 4,DLG_VAR_Y, 10,1, "Variable" },
+	{ SGCHECKBOX, 0, 0, 4,16, 10,1, "Variable" },
 	{ SGRADIOBUT, 0, 0, 4,6, 8,1, "16 MHz" },
 	{ SGRADIOBUT, 0, 0, 4,8, 8,1, "20 MHz" },
 	{ SGRADIOBUT, 0, 0, 4,10, 8,1, "25 MHz" },
@@ -69,7 +66,7 @@ static SGOBJ advanceddlg[] =
 
 	{ SGBOX, 0, 0, 17,3, 14,15, NULL },
 	{ SGTEXT, 0, 0, 18,4, 12,1, "Memory size" },
-	{ SGRADIOBUT, SG_EXIT, 0, 19,DLG_MEM_Y, 8,1, custom_memory },
+	{ SGRADIOBUT, SG_EXIT, 0, 19,DLG_MEM_Y, 8,1, NULL },
 	{ SGRADIOBUT, SG_EXIT, 0, 19,6, 6,1, "8 MB" },
 	{ SGRADIOBUT, SG_EXIT, 0, 19,8, 7,1, "16 MB" },
 	{ SGRADIOBUT, SG_EXIT, 0, 19,10, 7,1, "32 MB" },
@@ -142,7 +139,7 @@ static void Dialog_AdvancedDlg_MemDraw(void) {
 	int i;
 	int memsum, memsize;
 
-	snprintf(custom_memory, sizeof(custom_memory), "Customize");
+	advanceddlg[DLGADV_CUSTOM].txt = "Customise";
 
 	for (i = DLGADV_CUSTOM; i <= DLGADV_128MB; i++)
 	{
@@ -186,7 +183,7 @@ static void Dialog_AdvancedDlg_MemDraw(void) {
 			break;
 		default:
 			advanceddlg[DLGADV_CUSTOM].state |= SG_SELECTED;
-			snprintf(custom_memory, sizeof(custom_memory), "Custom");
+			advanceddlg[DLGADV_CUSTOM].txt = "Custom";
 			break;
 	}
 
@@ -380,7 +377,7 @@ void Dialog_AdvancedDlg(void) {
 					memcpy(ConfigureParams.Memory.nMemoryBankSize, defmemsize[0],
 						   sizeof(ConfigureParams.Memory.nMemoryBankSize));
 				}
-				snprintf(custom_memory, sizeof(custom_memory), "Customize");
+				advanceddlg[DLGADV_CUSTOM].txt = "Customise";
 				break;
 			case DLGADV_16MB:
 				if (ConfigureParams.System.bColor || ConfigureParams.System.bTurbo) {
@@ -390,7 +387,7 @@ void Dialog_AdvancedDlg(void) {
 					memcpy(ConfigureParams.Memory.nMemoryBankSize, defmemsize[2],
 						   sizeof(ConfigureParams.Memory.nMemoryBankSize));
 				}
-				snprintf(custom_memory, sizeof(custom_memory), "Customize");
+				advanceddlg[DLGADV_CUSTOM].txt = "Customise";
 				break;
 			case DLGADV_32MB:
 				if (ConfigureParams.System.bColor || ConfigureParams.System.bTurbo) {
@@ -400,7 +397,7 @@ void Dialog_AdvancedDlg(void) {
 					memcpy(ConfigureParams.Memory.nMemoryBankSize, defmemsize[4],
 						   sizeof(ConfigureParams.Memory.nMemoryBankSize));
 				}
-				snprintf(custom_memory, sizeof(custom_memory), "Customize");
+				advanceddlg[DLGADV_CUSTOM].txt = "Customise";
 				break;
 			case DLGADV_64MB:
 				if (ConfigureParams.System.bTurbo) {
@@ -410,12 +407,12 @@ void Dialog_AdvancedDlg(void) {
 					memcpy(ConfigureParams.Memory.nMemoryBankSize, defmemsize[6],
 						   sizeof(ConfigureParams.Memory.nMemoryBankSize));
 				}
-				snprintf(custom_memory, sizeof(custom_memory), "Customize");
+				advanceddlg[DLGADV_CUSTOM].txt = "Customise";
 				break;
 			case DLGADV_128MB:
 				memcpy(ConfigureParams.Memory.nMemoryBankSize, defmemsize[8],
 					   sizeof(ConfigureParams.Memory.nMemoryBankSize));
-				snprintf(custom_memory, sizeof(custom_memory), "Customize");
+				advanceddlg[DLGADV_CUSTOM].txt = "Customise";
 				break;
 			case DLGADV_CUSTOM:
 				Dialog_MemAdvancedDlg(ConfigureParams.Memory.nMemoryBankSize);

@@ -19,6 +19,7 @@ const char SDLevent_fileid[] = "Previous sdlevent.c";
 #include "sdlkeymap.h"
 #include "sdlscreen.h"
 #include "sdlstatusbar.h"
+#include "tablet.h"
 #include "dimension.hpp"
 
 
@@ -96,7 +97,7 @@ void GuiEvent_EventQueueHandler(void) {
 	if (GuiEvent_GetEventQueue(&event)) {
 		switch (event.type) {
 			case SDL_EVENT_MOUSE_MOTION:
-				Keymap_MouseMove(event.motion.xrel, event.motion.yrel);
+				Keymap_MouseMove(&event.motion);
 				break;
 			case SDL_EVENT_MOUSE_BUTTON_DOWN:
 				Keymap_MouseDown(event.button.button == SDL_BUTTON_LEFT);
@@ -154,74 +155,68 @@ void GuiEvent_WarpMouse(void) {
  */
 static void GuiEvent_HandleMouseMotion(SDL_Event *pEvent) {
 	static SDL_Event mouse_event[100];
+	static float fSavedFracX = 0.0;
+	static float fSavedFracY = 0.0;
 
 	int i, nEvents;
-
-	static float fSavedDeltaX = 0.0;
-	static float fSavedDeltaY = 0.0;
-
-	float fDeltaX;
-	float fDeltaY;
-	int   nDeltaX;
-	int   nDeltaY;
-
-	float fExp = bGrabMouse ? ConfigureParams.Mouse.fExpSpeedLocked : ConfigureParams.Mouse.fExpSpeedNormal;
-	float fLin = bGrabMouse ? ConfigureParams.Mouse.fLinSpeedLocked : ConfigureParams.Mouse.fLinSpeedNormal;
 
 	if (bIgnoreNextMouseMotion) {
 		bIgnoreNextMouseMotion = false;
 		return;
 	}
 
-	fDeltaX = pEvent->motion.xrel;
-	fDeltaY = pEvent->motion.yrel;
-
 	/* Get all mouse event to clean the queue and sum them */
 	nEvents = SDL_PeepEvents(mouse_event, 100, SDL_GETEVENT, SDL_EVENT_MOUSE_MOTION, SDL_EVENT_MOUSE_MOTION);
 
 	for (i = 0; i < nEvents; i++) {
-		fDeltaX += mouse_event[i].motion.xrel;
-		fDeltaY += mouse_event[i].motion.yrel;
+		pEvent->motion.xrel += mouse_event[i].motion.xrel;
+		pEvent->motion.yrel += mouse_event[i].motion.yrel;
 	}
 
-	if ((fDeltaX != 0.0) || (fDeltaY != 0.0)) {
-		/* Exponential adjustmend */
-		if (fExp != 1.0) {
-			fDeltaX = (fDeltaX < 0.0) ? -pow(-fDeltaX, fExp) : pow(fDeltaX, fExp);
-			fDeltaY = (fDeltaY < 0.0) ? -pow(-fDeltaY, fExp) : pow(fDeltaY, fExp);
-		}
+	if ((pEvent->motion.xrel != 0.0) || (pEvent->motion.yrel != 0.0)) {
+		if (ConfigureParams.Tablet.nTabletType && bTabletEnabled) {
+			/* Get last absolute position */
+			if (nEvents > 0) {
+				pEvent->motion.x = mouse_event[nEvents - 1].motion.x;
+				pEvent->motion.y = mouse_event[nEvents - 1].motion.y;
+			}
 
-		/* Linear adjustment */
-		if (fLin != 1.0) {
-			fDeltaX *= fLin;
-			fDeltaY *= fLin;
-		}
-
-		/* Add residuals */
-		if ((fDeltaX < 0.0) == (fSavedDeltaX < 0.0)) {
-			fSavedDeltaX += fDeltaX;
+			/* Scale values to window coordinates */
+			SDL_RenderCoordinatesFromWindow(SDL_GetRenderer(sdlWindow), 
+			                                pEvent->motion.x, pEvent->motion.y, 
+			                                &pEvent->motion.x, &pEvent->motion.y);
 		} else {
-			fSavedDeltaX  = fDeltaX;
-		}
-		if ((fDeltaY < 0.0) == (fSavedDeltaY < 0.0)) {
-			fSavedDeltaY += fDeltaY;
-		} else {
-			fSavedDeltaY  = fDeltaY;
+			float fExp, fLin, fSum;
+
+			/* Sensitivity of the ADB mouse is 100 CPI, sensitivity of the non-ADB mouse is unknown. */
+			fExp = ConfigureParams.Mouse.fExpScale;
+			fLin = ConfigureParams.Mouse.fLinScale * (ConfigureParams.System.bADB ? 1.0 : 0.75);
+
+			/* Exponential adjustment */
+			if (fExp != 1.0) {
+				fSum = fabsf(pEvent->motion.xrel) + fabsf(pEvent->motion.yrel);
+				fLin *= powf(fSum, fExp) / fSum;
+			}
+
+			/* Linear adjustment */
+			if (fLin != 1.0) {
+				pEvent->motion.xrel *= fLin;
+				pEvent->motion.yrel *= fLin;
+			}
 		}
 
-		/* Convert to integer and save residuals */
-		nDeltaX = (int)fSavedDeltaX;
-		nDeltaY = (int)fSavedDeltaY;
-		fSavedDeltaX -= (float)nDeltaX;
-		fSavedDeltaY -= (float)nDeltaY;
+		/* Add saved fraction */
+		pEvent->motion.xrel += fSavedFracX;
+		pEvent->motion.yrel += fSavedFracY;
+
+		/* Save new fraction */
+		fSavedFracX = pEvent->motion.xrel - (float)(int)pEvent->motion.xrel;
+		fSavedFracY = pEvent->motion.yrel - (float)(int)pEvent->motion.yrel;
 
 		/* Done */
 #ifdef ENABLE_RENDERING_THREAD
-		Keymap_MouseMove(nDeltaX, nDeltaY);
+		Keymap_MouseMove(&pEvent->motion);
 #else
-		pEvent->motion.xrel = nDeltaX;
-		pEvent->motion.yrel = nDeltaY;
-
 		GuiEvent_PutEventQueue(pEvent);
 #endif
 	}

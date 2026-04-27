@@ -56,14 +56,10 @@ set(ENABLE_DSP_EMU 1
 set(ENABLE_TRACING 1
     CACHE BOOL "Enable tracing messages for debugging")
 
-# Run-time checks with GCC / LLVM (Clang) AddressSanitizer:
-# - stack protection
-# - checking of pointer accesses
-#
 # Configure Previous with AddressSanitizer:
 #   cd build; make clean; cmake -D ENABLE_ASAN:BOOL=1 -D ..
 # If everything's fine, CMake output should include:
-#   Performing Test ASAN_AVAILABLE - Success"
+#  - ASAN : Compiler Address Sanitizer enabled
 #
 # After (re-)building Previous, run it as following to see
 # available AddressSanitizer options (and that it works):
@@ -71,11 +67,12 @@ set(ENABLE_TRACING 1
 #
 # For more info:
 #   https://github.com/google/sanitizers/wiki/AddressSanitizer
+#   https://gcc.gnu.org/onlinedocs/gcc/Instrumentation-Options.html
 #
 CHECK_C_COMPILER_FLAG("-fsanitize=address" ASAN_AVAILABLE)
 if(ASAN_AVAILABLE)
 	set(ENABLE_ASAN 0
-	    CACHE BOOL "Enable GCC/LLVM run-time stack/pointer debugging (~2x slowdown)")
+	    CACHE BOOL "Enable GCC/LLVM run-time address debugging (~2x slowdown)")
 endif(ASAN_AVAILABLE)
 
 CHECK_C_COMPILER_FLAG("-fsanitize=undefined" UBSAN_AVAILABLE)
@@ -83,6 +80,18 @@ if(UBSAN_AVAILABLE)
 	set(ENABLE_UBSAN 0
 	    CACHE BOOL "Enable GCC/LLVM run-time undefined behavior debugging")
 endif(UBSAN_AVAILABLE)
+
+CHECK_C_COMPILER_FLAG("-fstack-protector-all -fsanitize=bounds-strict" SSP_AVAILABLE)
+if(SSP_AVAILABLE)
+	set(ENABLE_SSP 0
+	    CACHE BOOL "Enable GCC/LLVM run-time stack protection")
+endif(SSP_AVAILABLE)
+
+CHECK_C_COMPILER_FLAG("-fhardened" HARDENED_AVAILABLE)
+if(HARDENED_AVAILABLE)
+	set(ENABLE_HARDENED 0
+	    CACHE BOOL "Enable GCC/LLVM run-time hardening options (for production / distros not enabling them by default)")
+endif(HARDENED_AVAILABLE)
 
 if(APPLE)
 	set(ENABLE_RENDERING_THREAD 1
@@ -117,12 +126,6 @@ find_package(Readline)
 if(Readline_FOUND)
 	set(HAVE_LIBREADLINE 1)
 endif(Readline_FOUND)
-
-find_package(ZLIB)
-if(ZLIB_FOUND)
-	set(HAVE_LIBZ 1)
-	set(HAVE_ZLIB_H 1)
-endif(ZLIB_FOUND)
 
 find_package(PNG)
 if(PNG_FOUND)
@@ -162,11 +165,8 @@ endif(DETECTED_LFS_CFLAGS)
 
 check_include_files(byteswap.h HAVE_BYTESWAP_H)
 check_include_files(strings.h HAVE_STRINGS_H)
-check_include_files(limits.h HAVE_LIMITS_H)
-check_include_files(sys/syslimits.h HAVE_SYS_SYSLIMITS_H)
-check_include_files(sys/types.h HAVE_SYS_TYPES_H)
+check_include_files(sys/time.h HAVE_SYS_TIME_H)
 check_include_files(sys/xattr.h HAVE_SYS_XATTR_H)
-check_include_files(tchar.h HAVE_TCHAR_H)
 check_include_files(arpa/inet.h HAVE_ARPA_INET_H)
 check_include_files(netinet/in.h HAVE_NETINET_IN_H)
 
@@ -205,12 +205,8 @@ check_struct_has_member("struct dirent" d_type dirent.h HAVE_DIRENT_D_TYPE)
 # Other CFLAGS:
 # #############
 
-# GCC/Clang stack/pointer debugging (~2x slowdown)
+# GCC/Clang address pointer access debugging (~2x slowdown)
 if(ENABLE_ASAN)
-	# better backtraces
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -fno-omit-frame-pointer")
-	# enable stack protection
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fstack-protector-all")
 	# enable AddressSanitizer with global variable tracking
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fno-common")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
@@ -222,6 +218,27 @@ if(ENABLE_UBSAN)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=undefined")
 	add_definitions(-DENABLE_UBSAN=1)
 endif(ENABLE_UBSAN)
+
+# GCC/Clang stack protection options (overlaps with HARDENED)
+if(ENABLE_SSP)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fstack-protector-all -fsanitize=bounds-strict")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fstack-protector-all -fsanitize=bounds-strict")
+endif(ENABLE_SSP)
+
+# GCC/Clang production hardening option (overlaps with SSP)
+if(ENABLE_HARDENED)
+	if(ENABLE_SSP)
+		message(FATAL_ERROR "Enabled either HARDENED or SSP, not both!")
+	endif(ENABLE_SSP)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fhardened")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fhardened")
+endif(ENABLE_HARDENED)
+
+# Debug & protection options require better backtraces
+if(ENABLE_ASAN OR ENABLE_SSP OR ENABLE_UBSAN)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -fno-omit-frame-pointer")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fno-omit-frame-pointer")
+endif(ENABLE_ASAN OR ENABLE_SSP OR ENABLE_UBSAN)
 
 # GCC/Clang specific flags:
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")

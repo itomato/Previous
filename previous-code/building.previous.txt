@@ -89,10 +89,9 @@ replace with these steps:
    source tree. Go inside the application bundle and go to the Contents folder.
    Copy SDL3.framework and png.framework into the "Frameworks" folder.
 
-4. Change internal linking of Previous:
+4. Sign the application binary:
    Using Terminal go to the MacOS directory inside the application bundle and
-   run these commands from the command line:
-      install_name_tool -change /opt/local/lib/libz.1.dylib /usr/lib/libz.1.dylib Previous
+   run this command from the command line:
       codesign --force -s - Previous
 
 5. Make a package for distribution:

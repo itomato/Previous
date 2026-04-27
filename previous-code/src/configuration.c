@@ -21,6 +21,8 @@ const char Configuration_fileid[] = "Previous configuration.c";
 #include "m68000.h"
 #include "paths.h"
 #include "68kDisass.h"
+#include "grab.h"
+#include "dimension.hpp"
 
 
 CNF_PARAMS ConfigureParams;                 /* List of configuration for the emulator */
@@ -88,10 +90,16 @@ static const struct Config_Tag configs_Mouse[] =
 	{ "bEnableAutoGrab", Bool_Tag, &ConfigureParams.Mouse.bEnableAutoGrab },
 	{ "bEnableMapToKey", Bool_Tag, &ConfigureParams.Mouse.bEnableMapToKey },
 	{ "bEnableMacClick", Bool_Tag, &ConfigureParams.Mouse.bEnableMacClick },
-	{ "fLinSpeedNormal", Float_Tag, &ConfigureParams.Mouse.fLinSpeedNormal },
-	{ "fLinSpeedLocked", Float_Tag, &ConfigureParams.Mouse.fLinSpeedLocked },
-	{ "fExpSpeedNormal", Float_Tag, &ConfigureParams.Mouse.fExpSpeedNormal },
-	{ "fExpSpeedLocked", Float_Tag, &ConfigureParams.Mouse.fExpSpeedLocked },
+	{ "bUseRawMotion",   Bool_Tag, &ConfigureParams.Mouse.bUseRawMotion },
+	{ "fLinScale",       Float_Tag, &ConfigureParams.Mouse.fLinScale },
+	{ "fExpScale",       Float_Tag, &ConfigureParams.Mouse.fExpScale },
+	{ NULL , Error_Tag, NULL }
+};
+
+/* Used to load/save tablet options */
+static const struct Config_Tag configs_Tablet[] =
+{
+	{ "nTabletType", Int_Tag, &ConfigureParams.Tablet.nTabletType },
 	{ NULL , Error_Tag, NULL }
 };
 
@@ -458,13 +466,15 @@ void Configuration_SetDefault(void)
 	strcpy(ConfigureParams.Keyboard.szMappingFileName, "");
 
 	/* Set defaults for Mouse */
-	ConfigureParams.Mouse.fLinSpeedNormal = 1.0;
-	ConfigureParams.Mouse.fLinSpeedLocked = 1.0;
-	ConfigureParams.Mouse.fExpSpeedNormal = 1.0;
-	ConfigureParams.Mouse.fExpSpeedLocked = 1.0;
+	ConfigureParams.Mouse.fLinScale = 1.0;
+	ConfigureParams.Mouse.fExpScale = 0.75;
+	ConfigureParams.Mouse.bUseRawMotion = false;
 	ConfigureParams.Mouse.bEnableAutoGrab = true;
 	ConfigureParams.Mouse.bEnableMapToKey = false;
 	ConfigureParams.Mouse.bEnableMacClick = false;
+
+	/* Set defaults for Tablet */
+	ConfigureParams.Tablet.nTabletType = TABLET_NONE;
 
 	/* Set defaults for Shortcuts */
 	Keymap_InitShortcutDefaultKeys();
@@ -565,165 +575,58 @@ static void Configuration_CheckFloatMinMax(float *val, float min, float max)
 		*val=max;
 }
 
-
 /*-----------------------------------------------------------------------*/
 /**
- * Copy details from configuration structure into global variables for system,
- * clean file names, etc...  Called from main.c and dialog.c files.
+ * Helper function for Configuration_Apply, check dimension settings
+ * to be valid.
  */
-void Configuration_Apply(bool bReset)
-{
+static void Configuration_CheckDimensionSettings(void) {
 	int i;
-
-	/* Mouse settings */
-	if (ConfigureParams.Mouse.bEnableMacClick) {
-		ConfigureParams.Mouse.bEnableAutoGrab = false;
-	}
-	Configuration_CheckFloatMinMax(&ConfigureParams.Mouse.fLinSpeedNormal, MOUSE_LIN_MIN, MOUSE_LIN_MAX);
-	Configuration_CheckFloatMinMax(&ConfigureParams.Mouse.fLinSpeedLocked, MOUSE_LIN_MIN, MOUSE_LIN_MAX);
-	Configuration_CheckFloatMinMax(&ConfigureParams.Mouse.fExpSpeedNormal, MOUSE_EXP_MIN, MOUSE_EXP_MAX);
-	Configuration_CheckFloatMinMax(&ConfigureParams.Mouse.fExpSpeedLocked, MOUSE_EXP_MIN, MOUSE_EXP_MAX);
-
-	/* Check/constrain CPU settings and change corresponding
-	 * cpu_model/cpu_compatible/cpu_cycle_exact/... variables
-	 */
-	M68000_CheckCpuSettings();
-
-	/* Check memory size for each bank and change to supported values */
-	Configuration_CheckMemory(ConfigureParams.Memory.nMemoryBankSize);
-
- 	/* Check nextdimension memory size and screen options */
-	for (i = 0; i < ND_MAX_BOARDS; i++) {
-		Configuration_CheckDimensionMemory(ConfigureParams.Dimension.board[i].nMemoryBankSize);
-	}
-	Configuration_CheckDimensionSettings();
-
-	/* Make sure twisted pair ethernet is disabled on 68030 Cube */
-	Configuration_CheckEthernetSettings();
-
-	/* Make sure NBIC is only used on Cubes and ADB only on Turbo */
-	Configuration_CheckPeripheralSettings();
-
-	/* Make sure the overlay drive LED is disabled for Previous */
-	ConfigureParams.Screen.bShowDriveLed = false;
-
-	/* Clean file and directory names */
-	File_MakeAbsoluteName(ConfigureParams.Rom.szRom030FileName);
-	File_MakeAbsoluteName(ConfigureParams.Rom.szRom040FileName);
-	File_MakeAbsoluteName(ConfigureParams.Rom.szRomTurboFileName);
-	File_MakeAbsoluteName(ConfigureParams.Printer.szPrintToFileName);
+	bool enabled = false;
 
 	for (i = 0; i < ND_MAX_BOARDS; i++) {
-		File_MakeAbsoluteName(ConfigureParams.Dimension.board[i].szRomFileName);
-	}
-
-	for (i = 0; i < ESP_MAX_DEVS; i++) {
-		File_MakeAbsoluteName(ConfigureParams.SCSI.target[i].szImageName);
-	}
-
-	for (i = 0; i < MO_MAX_DRIVES; i++) {
-		File_MakeAbsoluteName(ConfigureParams.MO.drive[i].szImageName);
-	}
-
-	for (i = 0; i < FLP_MAX_DRIVES; i++) {
-		File_MakeAbsoluteName(ConfigureParams.Floppy.drive[i].szImageName);
-	}
-
-	/* make sure there are no trailing path separators */
-	for (i = 0; i < EN_MAX_SHARES; i++) {
-		File_CleanFileName(ConfigureParams.Ethernet.nfs[i].szPathName);
-	}
-	File_CleanFileName(ConfigureParams.Printer.szPrintToFileName);
-	
-	/* make path names absolute, but handle special file names */
-	File_MakeAbsoluteSpecialName(ConfigureParams.Log.sLogFileName);
-	File_MakeAbsoluteSpecialName(ConfigureParams.Log.sTraceFileName);
-}
-
-
-/*-----------------------------------------------------------------------*/
-/**
- * Set defaults depending on selected machine type.
- */
-void Configuration_SetSystemDefaults(void) {
-	switch (ConfigureParams.System.nMachineType) {
-		case NEXT_CUBE030:
-			ConfigureParams.System.bTurbo = false;
-			ConfigureParams.System.bColor = false;
-			ConfigureParams.System.nCpuLevel = 3;
-			ConfigureParams.System.nCpuFreq = 25;
-			ConfigureParams.System.n_FPUType = FPU_68882;
-			ConfigureParams.System.nDSPType = DSP_TYPE_EMU;
-			ConfigureParams.System.bDSPMemoryExpansion = false;
-			ConfigureParams.System.nSCSI = NCR53C90;
-			ConfigureParams.System.nRTC = MC68HC68T1;
-			ConfigureParams.System.bNBIC = true;
-			ConfigureParams.System.bADB = false;
-			break;
-
-		case NEXT_CUBE040:
-			ConfigureParams.System.bColor = false;
-			ConfigureParams.System.nCpuLevel = 4;
-			if (ConfigureParams.System.bTurbo) {
-				ConfigureParams.System.nCpuFreq = 33;
-				ConfigureParams.System.nRTC = MCCS1850;
-				ConfigureParams.System.bADB = true;
-			} else {
-				ConfigureParams.System.nCpuFreq = 25;
-				ConfigureParams.System.nRTC = MC68HC68T1;
-				ConfigureParams.System.bADB = false;
-			}
-			ConfigureParams.System.n_FPUType = FPU_CPU;
-			ConfigureParams.System.nDSPType = DSP_TYPE_EMU;
-			ConfigureParams.System.bDSPMemoryExpansion = true;
-			ConfigureParams.System.nSCSI = NCR53C90A;
-			ConfigureParams.System.bNBIC = true;
-			break;
-
-		case NEXT_STATION:
-			ConfigureParams.System.nCpuLevel = 4;
-			if (ConfigureParams.System.bTurbo) {
-				ConfigureParams.System.nCpuFreq = 33;
-				ConfigureParams.System.nRTC = MCCS1850;
-				ConfigureParams.System.bADB = true;
-			} else {
-				ConfigureParams.System.nCpuFreq = 25;
-				ConfigureParams.System.nRTC = MC68HC68T1;
-				ConfigureParams.System.bADB = false;
-			}
-			ConfigureParams.System.n_FPUType = FPU_CPU;
-			ConfigureParams.System.nDSPType = DSP_TYPE_EMU;
-			ConfigureParams.System.bDSPMemoryExpansion = true;
-			ConfigureParams.System.nSCSI = NCR53C90A;
-			ConfigureParams.System.bNBIC = false;
-			break;
-		default:
-			break;
-	}
-
-	if (ConfigureParams.System.bTurbo) {
-		ConfigureParams.Memory.nMemoryBankSize[0] = 32;
-		ConfigureParams.Memory.nMemoryBankSize[1] = 32;
-		ConfigureParams.Memory.nMemoryBankSize[2] = 32;
-		ConfigureParams.Memory.nMemoryBankSize[3] = 32;
-	} else if (ConfigureParams.System.bColor) {
-		ConfigureParams.Memory.nMemoryBankSize[0] = 8;
-		ConfigureParams.Memory.nMemoryBankSize[1] = 8;
-		ConfigureParams.Memory.nMemoryBankSize[2] = 8;
-		ConfigureParams.Memory.nMemoryBankSize[3] = 8;
-	} else {
-		ConfigureParams.Memory.nMemoryBankSize[0] = 16;
-		ConfigureParams.Memory.nMemoryBankSize[1] = 16;
 		if (ConfigureParams.System.nMachineType==NEXT_STATION) {
-			ConfigureParams.Memory.nMemoryBankSize[2] = 0;
-			ConfigureParams.Memory.nMemoryBankSize[3] = 0;
-		} else {
-			ConfigureParams.Memory.nMemoryBankSize[2] = 16;
-			ConfigureParams.Memory.nMemoryBankSize[3] = 16;
+			ConfigureParams.Dimension.board[i].bEnabled = false;
+		}
+		if (ConfigureParams.Dimension.board[i].bEnabled) {
+			enabled = true;
+		} else if (ConfigureParams.Dimension.bMainDisplay) {
+			if (ConfigureParams.Dimension.nMainDisplay == i) {
+				ConfigureParams.Dimension.bMainDisplay = false;
+				ConfigureParams.Screen.nMonitorType = MONITOR_TYPE_CPU;
+			}
 		}
 	}
+	if (enabled) {
+		ConfigureParams.System.bNBIC = true;
+	} else {
+		ConfigureParams.Screen.nMonitorType = MONITOR_TYPE_CPU;
+	}
+	if ((ConfigureParams.Dimension.nMainDisplay >= ND_MAX_BOARDS) ||
+		(ConfigureParams.Dimension.nMainDisplay < 0)) {
+		ConfigureParams.Dimension.nMainDisplay = 0;
+	}
+	if ((ConfigureParams.Screen.nMonitorNum >= ND_MAX_BOARDS) ||
+		(ConfigureParams.Screen.nMonitorNum < 0)) {
+		ConfigureParams.Screen.nMonitorNum = 0;
+	}
+
+	ConfigureParams.Dimension.bI860Thread = host_num_cpus() != 1;
 }
 
+/*-----------------------------------------------------------------------*/
+/**
+ * Helper function for Configuration_Apply, check ethernet settings
+ * to be valid.
+ */
+static void Configuration_CheckEthernetSettings(void) {
+	if (ConfigureParams.System.nMachineType == NEXT_CUBE030) {
+		ConfigureParams.Ethernet.bTwistedPair = false;
+	}
+	if (ConfigureParams.Ethernet.nHostInterface == ENET_PCAP) {
+		ConfigureParams.Ethernet.bNetworkTime = false;
+	}
+}
 
 /*-----------------------------------------------------------------------*/
 /**
@@ -824,55 +727,173 @@ int Configuration_CheckDimensionMemory(int *banksize) {
 	return (banksize[0]+banksize[1]+banksize[2]+banksize[3]);
 }
 
-void Configuration_CheckDimensionSettings(void) {
-	int i;
-	bool enabled = false;
-
-	for (i = 0; i < ND_MAX_BOARDS; i++) {
-		if (ConfigureParams.System.nMachineType==NEXT_STATION) {
-			ConfigureParams.Dimension.board[i].bEnabled = false;
-		}
-		if (ConfigureParams.Dimension.board[i].bEnabled) {
-			enabled = true;
-		} else if (ConfigureParams.Dimension.bMainDisplay) {
-			if (ConfigureParams.Dimension.nMainDisplay == i) {
-				ConfigureParams.Dimension.bMainDisplay = false;
-				ConfigureParams.Screen.nMonitorType = MONITOR_TYPE_CPU;
-			}
-		}
-	}
-	if (enabled) {
-		ConfigureParams.System.bNBIC = true;
-	} else {
-		ConfigureParams.Screen.nMonitorType = MONITOR_TYPE_CPU;
-	}
-	if ((ConfigureParams.Dimension.nMainDisplay >= ND_MAX_BOARDS) ||
-		(ConfigureParams.Dimension.nMainDisplay < 0)) {
-		ConfigureParams.Dimension.nMainDisplay = 0;
-	}
-	if ((ConfigureParams.Screen.nMonitorNum >= ND_MAX_BOARDS) ||
-		(ConfigureParams.Screen.nMonitorNum < 0)) {
-		ConfigureParams.Screen.nMonitorNum = 0;
-	}
-
-	ConfigureParams.Dimension.bI860Thread = host_num_cpus() != 1;
-}
-
-void Configuration_CheckEthernetSettings(void) {
-	if (ConfigureParams.System.nMachineType == NEXT_CUBE030) {
-		ConfigureParams.Ethernet.bTwistedPair = false;
-	}
-	if (ConfigureParams.Ethernet.nHostInterface == ENET_PCAP) {
-		ConfigureParams.Ethernet.bNetworkTime = false;
-	}
-}
-
+/*-----------------------------------------------------------------------*/
+/**
+ * Check selected peripherals for compatibility with the selected system.
+ */
 void Configuration_CheckPeripheralSettings(void) {
 	if (!ConfigureParams.System.bTurbo) {
 		ConfigureParams.System.bADB = false;
 	}
 	if (ConfigureParams.System.nMachineType == NEXT_STATION) {
 		ConfigureParams.System.bNBIC = false;
+	}
+}
+
+
+/*-----------------------------------------------------------------------*/
+/**
+ * Copy details from configuration structure into global variables for system,
+ * clean file names, etc...  Called from main.c and dialog.c files.
+ */
+void Configuration_Apply(bool bReset)
+{
+	int i;
+
+	/* Mouse settings */
+	if (ConfigureParams.Mouse.bEnableMacClick) {
+		ConfigureParams.Mouse.bEnableAutoGrab = false;
+	}
+	Configuration_CheckFloatMinMax(&ConfigureParams.Mouse.fLinScale, MOUSE_LIN_MIN, MOUSE_LIN_MAX);
+	Configuration_CheckFloatMinMax(&ConfigureParams.Mouse.fExpScale, MOUSE_EXP_MIN, MOUSE_EXP_MAX);
+
+	/* Check/constrain CPU settings and change corresponding
+	 * cpu_model/cpu_compatible/cpu_cycle_exact/... variables
+	 */
+	M68000_CheckCpuSettings();
+
+	/* Check memory size for each bank and change to supported values */
+	Configuration_CheckMemory(ConfigureParams.Memory.nMemoryBankSize);
+
+	/* Check nextdimension memory size and screen options */
+	for (i = 0; i < ND_MAX_BOARDS; i++) {
+		Configuration_CheckDimensionMemory(ConfigureParams.Dimension.board[i].nMemoryBankSize);
+	}
+	Configuration_CheckDimensionSettings();
+
+	/* Make sure twisted pair ethernet is disabled on 68030 Cube */
+	Configuration_CheckEthernetSettings();
+
+	/* Make sure NBIC is only used on Cubes and ADB only on Turbo */
+	Configuration_CheckPeripheralSettings();
+
+	/* Make sure the overlay drive LED is disabled for Previous */
+	ConfigureParams.Screen.bShowDriveLed = false;
+
+	/* Clean file and directory names */
+	File_MakeAbsoluteName(ConfigureParams.Rom.szRom030FileName);
+	File_MakeAbsoluteName(ConfigureParams.Rom.szRom040FileName);
+	File_MakeAbsoluteName(ConfigureParams.Rom.szRomTurboFileName);
+	File_MakeAbsoluteName(ConfigureParams.Printer.szPrintToFileName);
+
+	for (i = 0; i < ND_MAX_BOARDS; i++) {
+		File_MakeAbsoluteName(ConfigureParams.Dimension.board[i].szRomFileName);
+	}
+
+	for (i = 0; i < ESP_MAX_DEVS; i++) {
+		File_MakeAbsoluteName(ConfigureParams.SCSI.target[i].szImageName);
+	}
+
+	for (i = 0; i < MO_MAX_DRIVES; i++) {
+		File_MakeAbsoluteName(ConfigureParams.MO.drive[i].szImageName);
+	}
+
+	for (i = 0; i < FLP_MAX_DRIVES; i++) {
+		File_MakeAbsoluteName(ConfigureParams.Floppy.drive[i].szImageName);
+	}
+
+	/* make sure there are no trailing path separators */
+	for (i = 0; i < EN_MAX_SHARES; i++) {
+		File_CleanFileName(ConfigureParams.Ethernet.nfs[i].szPathName);
+	}
+	File_CleanFileName(ConfigureParams.Printer.szPrintToFileName);
+
+	/* make path names absolute, but handle special file names */
+	File_MakeAbsoluteSpecialName(ConfigureParams.Log.sLogFileName);
+	File_MakeAbsoluteSpecialName(ConfigureParams.Log.sTraceFileName);
+}
+
+
+/*-----------------------------------------------------------------------*/
+/**
+ * Set defaults depending on selected machine type.
+ */
+void Configuration_SetSystemDefaults(void) {
+	switch (ConfigureParams.System.nMachineType) {
+		case NEXT_CUBE030:
+			ConfigureParams.System.bTurbo = false;
+			ConfigureParams.System.bColor = false;
+			ConfigureParams.System.nCpuLevel = 3;
+			ConfigureParams.System.nCpuFreq = 25;
+			ConfigureParams.System.n_FPUType = FPU_68882;
+			ConfigureParams.System.nDSPType = DSP_TYPE_EMU;
+			ConfigureParams.System.bDSPMemoryExpansion = false;
+			ConfigureParams.System.nSCSI = NCR53C90;
+			ConfigureParams.System.nRTC = MC68HC68T1;
+			ConfigureParams.System.bNBIC = true;
+			ConfigureParams.System.bADB = false;
+			break;
+
+		case NEXT_CUBE040:
+			ConfigureParams.System.bColor = false;
+			ConfigureParams.System.nCpuLevel = 4;
+			if (ConfigureParams.System.bTurbo) {
+				ConfigureParams.System.nCpuFreq = 33;
+				ConfigureParams.System.nRTC = MCCS1850;
+				ConfigureParams.System.bADB = true;
+			} else {
+				ConfigureParams.System.nCpuFreq = 25;
+				ConfigureParams.System.nRTC = MC68HC68T1;
+				ConfigureParams.System.bADB = false;
+			}
+			ConfigureParams.System.n_FPUType = FPU_CPU;
+			ConfigureParams.System.nDSPType = DSP_TYPE_EMU;
+			ConfigureParams.System.bDSPMemoryExpansion = true;
+			ConfigureParams.System.nSCSI = NCR53C90A;
+			ConfigureParams.System.bNBIC = true;
+			break;
+
+		case NEXT_STATION:
+			ConfigureParams.System.nCpuLevel = 4;
+			if (ConfigureParams.System.bTurbo) {
+				ConfigureParams.System.nCpuFreq = 33;
+				ConfigureParams.System.nRTC = MCCS1850;
+				ConfigureParams.System.bADB = true;
+			} else {
+				ConfigureParams.System.nCpuFreq = 25;
+				ConfigureParams.System.nRTC = MC68HC68T1;
+				ConfigureParams.System.bADB = false;
+			}
+			ConfigureParams.System.n_FPUType = FPU_CPU;
+			ConfigureParams.System.nDSPType = DSP_TYPE_EMU;
+			ConfigureParams.System.bDSPMemoryExpansion = true;
+			ConfigureParams.System.nSCSI = NCR53C90A;
+			ConfigureParams.System.bNBIC = false;
+			break;
+		default:
+			break;
+	}
+
+	if (ConfigureParams.System.bTurbo) {
+		ConfigureParams.Memory.nMemoryBankSize[0] = 32;
+		ConfigureParams.Memory.nMemoryBankSize[1] = 32;
+		ConfigureParams.Memory.nMemoryBankSize[2] = 32;
+		ConfigureParams.Memory.nMemoryBankSize[3] = 32;
+	} else if (ConfigureParams.System.bColor) {
+		ConfigureParams.Memory.nMemoryBankSize[0] = 8;
+		ConfigureParams.Memory.nMemoryBankSize[1] = 8;
+		ConfigureParams.Memory.nMemoryBankSize[2] = 8;
+		ConfigureParams.Memory.nMemoryBankSize[3] = 8;
+	} else {
+		ConfigureParams.Memory.nMemoryBankSize[0] = 16;
+		ConfigureParams.Memory.nMemoryBankSize[1] = 16;
+		if (ConfigureParams.System.nMachineType==NEXT_STATION) {
+			ConfigureParams.Memory.nMemoryBankSize[2] = 0;
+			ConfigureParams.Memory.nMemoryBankSize[3] = 0;
+		} else {
+			ConfigureParams.Memory.nMemoryBankSize[2] = 16;
+			ConfigureParams.Memory.nMemoryBankSize[3] = 16;
+		}
 	}
 }
 
@@ -919,6 +940,7 @@ void Configuration_Load(const char *psFileName)
 	Configuration_LoadSection(psFileName, configs_ShortCutWithMod, "[ShortcutsWithModifiers]");
 	Configuration_LoadSection(psFileName, configs_ShortCutWithoutMod, "[ShortcutsWithoutModifiers]");
 	Configuration_LoadSection(psFileName, configs_Mouse, "[Mouse]");
+	Configuration_LoadSection(psFileName, configs_Tablet, "[Tablet]");
 	Configuration_LoadSection(psFileName, configs_Sound, "[Sound]");
 	Configuration_LoadSection(psFileName, configs_Memory, "[Memory]");
 	Configuration_LoadSection(psFileName, configs_Boot, "[Boot]");
@@ -969,6 +991,7 @@ void Configuration_Save(void)
 	Configuration_SaveSection(sConfigFileName, configs_ShortCutWithMod, "[ShortcutsWithModifiers]");
 	Configuration_SaveSection(sConfigFileName, configs_ShortCutWithoutMod, "[ShortcutsWithoutModifiers]");
 	Configuration_SaveSection(sConfigFileName, configs_Mouse, "[Mouse]");
+	Configuration_SaveSection(sConfigFileName, configs_Tablet, "[Tablet]");
 	Configuration_SaveSection(sConfigFileName, configs_Sound, "[Sound]");
 	Configuration_SaveSection(sConfigFileName, configs_Memory, "[Memory]");
 	Configuration_SaveSection(sConfigFileName, configs_Boot, "[Boot]");
@@ -980,4 +1003,103 @@ void Configuration_Save(void)
 	Configuration_SaveSection(sConfigFileName, configs_Printer, "[Printer]");
 	Configuration_SaveSection(sConfigFileName, configs_System, "[System]");
 	Configuration_SaveSection(sConfigFileName, configs_Dimension, "[Dimension]");
+}
+
+/*-----------------------------------------------------------------------*/
+/**
+ * Write given 'more' string to 'buffer' and return new end of 'buffer'
+ */
+static char *Configuration_AddInfo(char *buffer, const char *more)
+{
+	if (!more)
+		return buffer;
+	while (*more)
+		*buffer++ = *more++;
+	return buffer;
+}
+
+/**
+ * Write Previous configuration info string to provided buffer,
+ * used by statusbar.
+ * Returns number of written chars.
+ */
+int Configuration_SetInfoString(char *buffer, int len)
+{
+	int size;
+	char *end;
+
+	/* Output needs to fit into statusbar, so max this
+	 * currently writes is about 50 chars
+	 */
+	assert(len >= 60);
+	end = buffer;
+
+	if (bRecordingAiff)
+	{
+		/* Recording in progress */
+		end = Configuration_AddInfo(end, "Recording sound");
+	} 
+	else if (ConfigureParams.Screen.nMonitorType==MONITOR_TYPE_DIMENSION)
+	{
+		/* Message for NeXTdimension */
+		size = Configuration_CheckDimensionMemory(ConfigureParams.Dimension.board[ConfigureParams.Screen.nMonitorNum].nMemoryBankSize);
+		end = Configuration_AddInfo(end, "33MHz/i860XR/");
+		end += snprintf(end, len - (end - buffer), "%dMB/", size);
+		end = Configuration_AddInfo(end, "NeXTdimension/");
+		end += snprintf(end, len - (end - buffer), "Slot%d", ND_SLOT(ConfigureParams.Screen.nMonitorNum));
+	} 
+	else /* Default message */
+	{
+		/* CPU MHz */
+		end = Configuration_AddInfo(end, Main_SpeedMsg());
+
+		/* CPU type */
+		if (ConfigureParams.System.nCpuLevel > 0)
+		{
+			*end++ = '6';
+			*end++ = '8';
+			*end++ = '0';
+			if (ConfigureParams.System.nCpuLevel == 5) /* Special case: 68060 has nCpuLevel=5 */
+				*end++ = '0' + 6;
+			else
+				*end++ = '0' + ConfigureParams.System.nCpuLevel % 10;
+			*end++ = '0';
+			*end++ = '/';
+		}
+
+		/* amount of memory in MB */
+		size = Configuration_CheckMemory(ConfigureParams.Memory.nMemoryBankSize);
+		end += snprintf(end, len - (end - buffer), "%dMB/", size);
+
+		/* machine type */
+		switch (ConfigureParams.System.nMachineType)
+		{
+			case NEXT_CUBE030:
+				end = Configuration_AddInfo(end, "NeXT Computer");
+				break;
+			case NEXT_CUBE040:
+				end = Configuration_AddInfo(end, "NeXTcube");
+				break;
+			case NEXT_STATION:
+				end = Configuration_AddInfo(end, "NeXTstation");
+				break;
+				
+			default:
+				break;
+		}
+		if (ConfigureParams.System.bTurbo)
+		{
+			end = Configuration_AddInfo(end, (ConfigureParams.System.nCpuFreq == 40) ? " Nitro" : " Turbo");
+		}
+		if (ConfigureParams.System.bColor)
+		{
+			end = Configuration_AddInfo(end, " Color");
+		}
+	}
+
+	*end++ = '\0';
+
+	assert((end -buffer) < len);
+
+	return end - buffer;
 }

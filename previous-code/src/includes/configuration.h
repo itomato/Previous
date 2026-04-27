@@ -114,7 +114,7 @@ typedef struct
 
 
 /* Dialog Mouse */
-#define MOUSE_LIN_MIN   0.1
+#define MOUSE_LIN_MIN   0.01
 #define MOUSE_LIN_MAX   10.0
 #define MOUSE_EXP_MIN   0.5
 #define MOUSE_EXP_MAX   1.0
@@ -123,12 +123,30 @@ typedef struct
   bool bEnableAutoGrab;
   bool bEnableMapToKey;
   bool bEnableMacClick;
-  float fLinSpeedNormal;
-  float fLinSpeedLocked;
-  float fExpSpeedNormal;
-  float fExpSpeedLocked;
+  bool bUseRawMotion;
+  float fLinScale;
+  float fExpScale;
 } CNF_MOUSE;
 
+
+/* Tablet configuration */
+
+typedef enum
+{
+  TABLET_NONE,
+  TABLET_MM961,
+  TABLET_MM1201,
+  TABLET_SD210L,
+  TABLET_SD310E,
+  TABLET_SD320E,
+  TABLET_SD420E,
+  TABLET_SD510C
+} TABLET_TYPE;
+
+typedef struct
+{
+  TABLET_TYPE nTabletType;
+} CNF_TABLET;
 
 /* Memory configuration */
 
@@ -378,6 +396,7 @@ typedef struct
   CNF_KEYBOARD  Keyboard;
   CNF_SHORTCUT  Shortcut;
   CNF_MOUSE     Mouse;
+  CNF_TABLET    Tablet;
   CNF_SOUND     Sound;
   CNF_MEMORY    Memory;
   CNF_BOOT      Boot;
@@ -400,12 +419,10 @@ extern void Configuration_SetSystemDefaults(void);
 extern void Configuration_Apply(bool bReset);
 extern int  Configuration_CheckMemory(int *banksize);
 extern int  Configuration_CheckDimensionMemory(int *banksize);
-extern void Configuration_CheckDimensionSettings(void);
-extern void Configuration_CheckEthernetSettings(void);
 extern void Configuration_CheckPeripheralSettings(void);
 extern void Configuration_Load(const char *psFileName);
 extern void Configuration_Save(void);
-extern void Configuration_MemorySnapShot_Capture(bool bSave);
+extern int  Configuration_SetInfoString(char *buffer, int len);
 
 #ifdef __cplusplus
 }

@@ -35,10 +35,6 @@ const char DlgFloppy_fileid[] = "Previous dlgFloppy.c";
 #define FLPDLG_EJECT_WARNING     "WARNING: Don't eject manually if a guest system is running. Risk of data loss. Eject now?"
 #define FLPDLG_BADSIZE_ERROR     "ERROR: Can't insert floppy disk. Bad disk size. Must be 720K, 1440K or 2880K."
 
-/* Variable strings */
-char insrtejct0[16] = "Insert";
-char insrtejct1[16] = "Insert";
-
 
 /* The floppy drive dialog: */
 static SGOBJ flpdlg[] =
@@ -55,7 +51,7 @@ static SGOBJ flpdlg[] =
 	
 	{ SGBOX, 0, 0, 2,6, 60,6, NULL },
 	{ SGTEXT, 0, 0, 4,7, 14,1, "Floppy disk:" },
-	{ SGBUTTON, 0, 0, 20,7, 10,1, insrtejct0 },
+	{ SGBUTTON, 0, 0, 20,7, 10,1, NULL },
 	{ SGTEXT, 0, 0, 32,7, 17,1, NULL },
 	{ SGTEXT, 0, 0, 4,9, 56,1, NULL },
 #if DUAL_FLOPPY_DRIVE
@@ -64,7 +60,7 @@ static SGOBJ flpdlg[] =
 	
 	{ SGBOX, 0, 0, 2,16, 60,6, NULL },
 	{ SGTEXT, 0, 0, 4,17, 14,1, "Floppy disk:" },
-	{ SGBUTTON, 0, 0, 20,17, 10,1, insrtejct1 },
+	{ SGBUTTON, 0, 0, 20,17, 10,1, NULL },
 	{ SGTEXT, 0, 0, 32,17, 17,1, NULL },
 	{ SGTEXT, 0, 0, 4,19, 56,1, NULL },
 	
@@ -97,20 +93,20 @@ void DlgFloppy_Main(void)
 	if (ConfigureParams.Floppy.drive[0].bDriveConnected && ConfigureParams.Floppy.drive[0].bDiskInserted) {
 		File_ShrinkName(dlgname_flp[0], ConfigureParams.Floppy.drive[0].szImageName,
 						flpdlg[FLPDLG_DISKNAME0].w);
-		snprintf(insrtejct0, sizeof(insrtejct0), "Eject");
+		flpdlg[FLPDLG_INSERT0].txt = "Eject";
 	} else {
 		dlgname_flp[0][0] = '\0';
-		snprintf(insrtejct0, sizeof(insrtejct0), "Insert");
+		flpdlg[FLPDLG_INSERT0].txt = "Insert";
 	}
 	flpdlg[FLPDLG_DISKNAME0].txt = dlgname_flp[0];
 #if DUAL_FLOPPY_DRIVE
 	if (ConfigureParams.Floppy.drive[1].bDriveConnected && ConfigureParams.Floppy.drive[1].bDiskInserted) {
 		File_ShrinkName(dlgname_flp[1], ConfigureParams.Floppy.drive[1].szImageName,
 						flpdlg[FLPDLG_DISKNAME1].w);
-		snprintf(insrtejct1, sizeof(insrtejct1), "Eject");
+		flpdlg[FLPDLG_INSERT1].txt = "Eject";
 	} else {
 		dlgname_flp[1][0] = '\0';
-		snprintf(insrtejct1, sizeof(insrtejct1), "Insert");
+		flpdlg[FLPDLG_INSERT1].txt = "Insert";
 	}
 	flpdlg[FLPDLG_DISKNAME1].txt = dlgname_flp[1];
 #endif
@@ -158,7 +154,7 @@ void DlgFloppy_Main(void)
 							break;
 						}
 						ConfigureParams.Floppy.drive[0].bDiskInserted = true;
-						snprintf(insrtejct0, sizeof(insrtejct0), "Eject");
+						flpdlg[FLPDLG_INSERT0].txt = "Eject";
 						if (!ConfigureParams.Floppy.drive[0].bDriveConnected) {
 							ConfigureParams.Floppy.drive[0].bDriveConnected = true;
 							flpdlg[FLPDLG_CONNECTED0].state |= SG_SELECTED;
@@ -168,7 +164,7 @@ void DlgFloppy_Main(void)
 					if (DlgAlert_Query(FLPDLG_EJECT_WARNING)) {
 						ConfigureParams.Floppy.drive[0].bDiskInserted = false;
 						ConfigureParams.Floppy.drive[0].bWriteProtected = false;
-						snprintf(insrtejct0, sizeof(insrtejct0), "Insert");
+						flpdlg[FLPDLG_INSERT0].txt = "Insert";
 						ConfigureParams.Floppy.drive[0].szImageName[0] = '\0';
 						dlgname_flp[0][0] = '\0';
 						Floppy_Eject(0);
@@ -179,7 +175,7 @@ void DlgFloppy_Main(void)
 				if (ConfigureParams.Floppy.drive[0].bDriveConnected) {
 					ConfigureParams.Floppy.drive[0].bDriveConnected = false;
 					ConfigureParams.Floppy.drive[0].bDiskInserted = false;
-					snprintf(insrtejct0, sizeof(insrtejct0), "Insert");
+					flpdlg[FLPDLG_INSERT0].txt = "Insert";
 					ConfigureParams.Floppy.drive[0].bWriteProtected = false;
 					ConfigureParams.Floppy.drive[0].szImageName[0] = '\0';
 					dlgname_flp[0][0] = '\0';
@@ -200,7 +196,7 @@ void DlgFloppy_Main(void)
 							break;
 						}
 						ConfigureParams.Floppy.drive[1].bDiskInserted = true;
-						snprintf(insrtejct1, sizeof(insrtejct1), "Eject");
+						flpdlg[FLPDLG_INSERT1].txt = "Eject";
 						if (!ConfigureParams.Floppy.drive[1].bDriveConnected) {
 							ConfigureParams.Floppy.drive[1].bDriveConnected = true;
 							flpdlg[FLPDLG_CONNECTED1].state |= SG_SELECTED;
@@ -210,7 +206,7 @@ void DlgFloppy_Main(void)
 					if (DlgAlert_Query(FLPDLG_EJECT_WARNING)) {
 						ConfigureParams.Floppy.drive[1].bDiskInserted = false;
 						ConfigureParams.Floppy.drive[1].bWriteProtected = false;
-						snprintf(insrtejct1, sizeof(insrtejct1), "Insert");
+						flpdlg[FLPDLG_INSERT1].txt = "Insert";
 						ConfigureParams.Floppy.drive[1].szImageName[0] = '\0';
 						dlgname_flp[1][0] = '\0';
 						Floppy_Eject(1);
@@ -221,7 +217,7 @@ void DlgFloppy_Main(void)
 				if (ConfigureParams.Floppy.drive[1].bDriveConnected) {
 					ConfigureParams.Floppy.drive[1].bDriveConnected = false;
 					ConfigureParams.Floppy.drive[1].bDiskInserted = false;
-					snprintf(insrtejct1, sizeof(insrtejct1), "Insert");
+					flpdlg[FLPDLG_INSERT1].txt = "Insert";
 					ConfigureParams.Floppy.drive[1].bWriteProtected = false;
 					ConfigureParams.Floppy.drive[1].szImageName[0] = '\0';
 					dlgname_flp[1][0] = '\0';

@@ -162,10 +162,10 @@ void adb_mouse_move(int x, int y) {
 	if (x == 0 && y == 0)
 		return;
 	
-	if      (x < -8) x = -8;
-	else if (x >  8) x =  8;
-	if      (y < -8) y = -8;
-	else if (y >  8) y =  8;
+	if      (x < -63) x = -63;
+	else if (x >  63) x =  63;
+	if      (y < -63) y = -63;
+	else if (y >  63) y =  63;
 	
 	adb_mouse.x = x;
 	adb_mouse.y = y;

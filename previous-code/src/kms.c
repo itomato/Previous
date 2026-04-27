@@ -380,15 +380,9 @@ static void km_version(uint8_t addr) {
 }
 
 
-/* Mouse states */
-bool m_button_right = false;
-bool m_button_left  = false;
-bool m_move_left    = false;
-bool m_move_up      = false;
-int  m_move_x       = 0;
-int  m_move_y       = 0;
-int  m_move_dx      = 0;
-int  m_move_dy      = 0;
+/* Mouse button states */
+static bool m_button_right;
+static bool m_button_left;
 
 void kms_keydown(uint8_t modkeys, uint8_t keycode) {
     uint8_t  addr = kms.km_addr|KM_MASTER;
@@ -440,20 +434,37 @@ void kms_mouse_button(bool left, bool down) {
     km_internal_poll(addr);
 }
 
-static void kms_mouse_move_step(void) {
+void kms_mouse_move(int x, int y) {
+    bool move_right, move_down;
     uint8_t  addr = kms.km_addr|KM_MOUSE;
     uint16_t data = 0;
-
-    int x = m_move_x > m_move_dx ? m_move_dx : m_move_x;
-    int y = m_move_y > m_move_dy ? m_move_dy : m_move_y;
-
-    m_move_x -= x;
-    m_move_y -= y;
     
-    if (!m_move_left && x>0)  /* right */
-        x=(0x40-x)|0x40;
-    if (!m_move_up && y>0)    /* down */
-        y=(0x40-y)|0x40;
+    if (x < 0) {
+        x = -x;
+        move_right = false;
+    } else {
+        move_right = true;
+    }
+    if (y < 0) {
+        y = -y;
+        move_down = false;
+    } else {
+        move_down = true;
+    }
+    
+    if (x > 0x3F) {
+        x = 0x3F;
+    }
+    if (y > 0x3F) {
+        y = 0x3F;
+    }
+    
+    if (move_right && x > 0) {
+        x = (0x40 - x) | 0x40;
+    }
+    if (move_down && y > 0) {
+        y = (0x40 - y) | 0x40;
+    }
     
     data |= (x<<1)&MOUSE_X;
     data |= (y<<9)&MOUSE_Y;
@@ -462,60 +473,12 @@ static void kms_mouse_move_step(void) {
     data |= m_button_right?0:MOUSE_RIGHT_UP;
     
     kms.km_data[addr&KM_ADDR_MASK] = data;
-
+    
     km_internal_poll(addr);
-}
-
-/* Mouse movement handler */
-#define MOUSE_STEP_FREQ 1000
-
-void kms_mouse_move(int x, int y) {
-    if (x < 0) {
-        x = -x;
-        m_move_left = true;
-    } else {
-        m_move_left = false;
-    }
-    if (y < 0) {
-        y = -y;
-        m_move_up = true;
-    } else {
-        m_move_up = false;
-    }
-    
-#if 0
-    int xsteps = x / 8; if(xsteps == 0) xsteps = 1;
-    int ysteps = y / 8; if(ysteps == 0) ysteps = 1;
-    
-    m_move_x  = x;
-    m_move_dx = x / xsteps;
-    
-    m_move_y  = y;
-    m_move_dy = y / ysteps;
-#else
-    m_move_x = x;
-    m_move_y = y;
-    
-    m_move_dx = 1;
-    m_move_dy = 1;
-#endif
-    if (!CycInt_EventPending(EVENT_KMS_MOUSE_MOTION)) {
-        CycInt_AddTimeEvent(1, 0, EVENT_KMS_MOUSE_MOTION);
-    }
-}
-
-void KMS_Mouse_Motion_Handler(void) {
-    if (m_move_x > 0 || m_move_y > 0) {
-        kms_mouse_move_step();
-        CycInt_UpdateTimeEvent((1000*1000)/MOUSE_STEP_FREQ, 0, EVENT_KMS_MOUSE_MOTION);
-    }
 }
 
 static void km_reset(void) {
     int i;
-    
-    m_move_x = 0;
-    m_move_y = 0;
     
     kms.km_addr = 0;
     kms.km_mask = 0;

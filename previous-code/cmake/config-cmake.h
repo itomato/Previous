@@ -9,29 +9,14 @@
 /* Define if you have a readline compatible library */
 #cmakedefine HAVE_LIBREADLINE 1
 
-/* Define to 1 if you have the `z' library (-lz). */
-#cmakedefine HAVE_LIBZ 1
-
-/* Define to 1 if you have the <zlib.h> header file. */
-#cmakedefine HAVE_ZLIB_H 1
-
 /* Define to 1 if you have the <strings.h> header file. */
 #cmakedefine HAVE_STRINGS_H 1
 
-/* Define to 1 if you have the <limits.h> header file. */
-#cmakedefine HAVE_LIMITS_H 1
-
-/* Define to 1 if you have the <sys/syslimits.h> header file. */
-#cmakedefine HAVE_SYS_SYSLIMITS_H 1
-
-/* Define to 1 if you have the <sys/types.h> header file. */
-#cmakedefine HAVE_SYS_TYPES_H 1
+/* Define to 1 if you have the <sys/time.h> header file. */
+#cmakedefine HAVE_SYS_TIME_H 1
 
 /* Define to 1 if you have the <sys/xattr.h> header file. */
 #cmakedefine HAVE_SYS_XATTR_H 1
-
-/* Define to 1 if you have the <tchar.h> header file. */
-#cmakedefine HAVE_TCHAR_H 1
 
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #cmakedefine HAVE_ARPA_INET_H 1

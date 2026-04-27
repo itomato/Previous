@@ -23,4 +23,6 @@ extern void SCC_Reset(void);
 
 extern void SCC_IO_Handler(void);
 
+extern void scc_receive(int ch, uint8_t val);
+
 #endif /* PREV_SCC_H */

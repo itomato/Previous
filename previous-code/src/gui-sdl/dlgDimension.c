@@ -13,7 +13,7 @@ const char DlgDimension_fileid[] = "Previous dlgDimension.c";
 #include "file.h"
 
 
-#define DLGND_CUSTOMIZE     5
+#define DLGND_CUSTOMISE     5
 #define DLGND_MEMSIZE       12
 #define DLGND_BROWSE        16
 #define DLGND_NAME          17
@@ -31,7 +31,7 @@ static SGOBJ dimensiondlg[] =
 	{ SGBOX,      0, 0, 2,  3, 54, 8, NULL },
 	{ SGTEXT,     0, 0, 3,  4, 28, 1, "NeXTdimension board at slot " },
 	{ SGTEXT,     0, 0, 31, 4, 2,  1, dimension_slot },
-	{ SGBUTTON,   0, 0, 35, 4, 11, 1, "Customize" },
+	{ SGBUTTON,   0, 0, 35, 4, 11, 1, "Customise" },
 
 	{ SGTEXT, 0, 0, 4 ,6, 13,1, "CPU type:" },
 	{ SGTEXT, 0, 0, 18,6, 13,1, "i860XR" },
@@ -103,7 +103,7 @@ void Dialog_DimensionDlg(int n)
 									  NULL, false);
 				break;
 				
-			case DLGND_CUSTOMIZE:
+			case DLGND_CUSTOMISE:
 				Dialog_NDMemDlg(ConfigureParams.Dimension.board[n].nMemoryBankSize);
 				print_nd_overview(n);
 				break;

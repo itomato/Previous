@@ -151,7 +151,7 @@ void DlgMissing_Rom(const char* type, char *imgname, const char *defname, bool *
 									  NULL, false);
 				break;
 			case DLGMISROM_DEFAULT:
-				snprintf(imgname, FILENAME_MAX, "%s",defname);
+				snprintf(imgname, FILENAME_MAX, "%s", defname);
 				File_ShrinkName(dlgname_missingrom, imgname, missingromdlg[DLGMISROM_NAME].w);
 				break;
 			case DLGMISROM_REMOVE:
@@ -277,7 +277,7 @@ void DlgMissing_Dir(const char* type, char *dirname, const char *defname)
 				SDLGui_DirConfSelect(dlgname_missingdir, dirname, missingdirdlg[DLGMISDIR_NAME].w);
 				break;
 			case DLGMISDIR_DEFAULT:
-				snprintf(dirname, FILENAME_MAX, "%s",defname);
+				snprintf(dirname, FILENAME_MAX, "%s", defname);
 				File_ShrinkName(dlgname_missingdir, dirname, missingdirdlg[DLGMISDIR_NAME].w);
 				break;
 			case DLGMISDIR_QUIT:

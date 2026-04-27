@@ -15,6 +15,7 @@ const char Reset_fileid[] = "Hatari reset.c";
 #include "m68000.h"
 #include "reset.h"
 #include "scc.h"
+#include "tablet.h"
 #include "screen.h"
 #include "tmc.h"
 #include "ncc.h"
@@ -34,6 +35,7 @@ const char Reset_fileid[] = "Hatari reset.c";
 #include "printer.h"
 #include "dsp.h"
 #include "kms.h"
+#include "keymap.h"
 #include "NextBus.hpp"
 
 /*-----------------------------------------------------------------------*/
@@ -47,6 +49,7 @@ static int Reset_NeXT(bool bCold)
 		if (ret) {
 			return ret;
 		}
+		Keymap_Init();            /* Reset keymap */
 		Timing_Reset();           /* Reset timing system */
 		CycInt_Reset();           /* Reset interrupts */
 		Video_Reset();            /* Reset video */
@@ -68,6 +71,7 @@ static int Reset_NeXT(bool bCold)
 	MO_Reset();                   /* Reset MO disks */
 	Floppy_Reset();               /* Reset Floppy disks */
 	SCC_Reset();                  /* Reset SCC */
+	Tablet_Reset();               /* Reset Tablet */
 	Ethernet_Reset(true);         /* Reset Ethernet */
 	KMS_Reset();                  /* Reset KMS */
 	Sound_Reset();                /* Reset Sound */

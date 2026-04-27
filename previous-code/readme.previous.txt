@@ -1,6 +1,6 @@
 
 
-                                  Previous 4.1
+                                  Previous 4.2
 
 
 
@@ -437,7 +437,7 @@ Previous v3.8:
   > Adds support for multiple internal NFS servers.
   > Adds missing MOUNT procedures to make showmount work as expected.
   > Adds LISTREG procedure to the internal NetInfo server.
-  > Fixes bug that could cause memory leaks when stopping SLIRP thread.
+  > Fixes bug that could cause memory leaks when stopping SLiRP thread.
   > Fixes bug in internal network time server that caused bad reference time. 
 
 Previous v3.9:
@@ -462,6 +462,14 @@ Previous v4.0:
 Previous v4.1:
   > Improves behaviour of system timer under special conditions.
   > Improves efficiency and accuracy of timing system.
+
+Previous v4.2:
+  > Adds support for tablet input via the host's mouse.
+  > Adds option to enable raw mouse input.
+  > Improves mouse dialog to be more user friendly.
+  > Improves mouse movement handling once again.
+  > Fixes bug that could cause system timer underflow.
+  > Fixes bug that caused the statusbar to fail after a certain period of time.
 
 
  7) Running Previous
@@ -506,6 +514,23 @@ S: Disables sound output and re-enables it when pressed again.
 Q: Requests to quit Previous. All unsaved changes will be lost.
 
 Shortcuts can be changed from the keyboard preferences dialog.
+
+Mouse motion is normally derived from scaled host mouse motion values which is
+not ideal for the simulated mouse. You might want use the mouse preferences to 
+compensate for host mouse acceleration curves. Under custom mouse settings you 
+can choose to use raw mouse motion values which might make it easier to obtain 
+good results. Divide 100 by the CPI of your physical mouse to obtain the value 
+to be used for linear adjustment and set exponential adjustment to 1.
+Note that raw mouse input is only available while the cursor is locked to the 
+window or in fullscreen mode. Raw mouse input is unavailable on some hosts.
+
+You can select to use simulated tablet input to get different cursor movement
+behaviour. If you select the corresponding option in the mouse options dialog
+tablet input will be enabled automatically after installing the tablet driver
+using InstallTablet.app (you find it in the NextAdmin directory). Use absolute
+mode for synced mouse movement in window mode without NeXTdimension screens.
+Note that tablet input is only available under NeXTstep 2.0 and later and the 
+driver needs to be re-installed after every boot of the guest system.
 
 Previous comes with some empty disk images of different types and sizes. The 
 suffix of the respective file name indicates the image type:

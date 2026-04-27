@@ -76,8 +76,6 @@ static char dlgfilenames[SGFS_NUMENTRIES][DLGFILENAMES_SIZE+1];  /* Visible file
 #define TITLE_OFFSET 0
 #define TITLE_MAXLEN 64
 
-static char dlgreadonly[16];    	/* Read-only string */
-
 /* The dialog data: */
 static SGOBJ fsdlg[] =
 {
@@ -113,9 +111,9 @@ static SGOBJ fsdlg[] =
 	{ SGBUTTON, SG_TOUCHEXIT|SG_REPEAT, 0, 62, 7,1,1, "\x01", SG_SHORTCUT_UP },
 	{ SGBUTTON, SG_TOUCHEXIT|SG_REPEAT, 0, 62,22,1,1, "\x02", SG_SHORTCUT_DOWN },
 	{ SGCHECKBOX, SG_EXIT, 0, 2,24, 18,1, "Show hidden files" },
-	{ SGBUTTON, SG_DEFAULT, 0, 32,24, 8,1, "Okay" },
+	{ SGBUTTON, SG_DEFAULT, 0, 32,24, 8,1, "OK" },
 	{ SGBUTTON, SG_CANCEL, 0, 50,24, 8,1, "Cancel" },
-	{ SGCHECKBOX, SG_EXIT, 0, 46,3, 17,1, dlgreadonly },
+	{ SGCHECKBOX, SG_EXIT, 0, 46,3, 17,1, NULL },
 #if WIN32
 	/* Drive selection */
 	{ SGBUTTON,   0, 0, 44,5, 1,1, "\x04", SG_SHORTCUT_LEFT },
@@ -727,7 +725,7 @@ char* SDLGui_FileSelect(const char *title, const char *path_and_name, char **zip
 	if (pReadOnly)
 	{
 		fsdlg[SGFSDLG_READONLY].type = SGCHECKBOX;
-		snprintf(dlgreadonly, sizeof(dlgreadonly), "Write protected");
+		fsdlg[SGFSDLG_READONLY].txt = "Write protected";
 		if (*pReadOnly)
 			fsdlg[SGFSDLG_READONLY].state |= SG_SELECTED;
 		else
@@ -736,7 +734,7 @@ char* SDLGui_FileSelect(const char *title, const char *path_and_name, char **zip
 	else
 	{
 		fsdlg[SGFSDLG_READONLY].type = SGTEXT;
-		snprintf(dlgreadonly, sizeof(dlgreadonly), " ");
+		fsdlg[SGFSDLG_READONLY].txt = "";
 	}
 
 	/* Prepare the path and filename variables */

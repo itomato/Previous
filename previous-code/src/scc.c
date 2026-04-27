@@ -16,6 +16,7 @@ const char Scc_fileid[] = "Previous scc.c";
 #include "scc.h"
 #include "sysReg.h"
 #include "dma.h"
+#include "tablet.h"
 
 #define LOG_SCC_LEVEL     LOG_DEBUG
 #define LOG_SCC_IO_LEVEL  LOG_DEBUG
@@ -317,7 +318,7 @@ static void scc_hard_reset(void) {
 
 
 /* Receive and send data */
-static void scc_receive(int ch, uint8_t val) {
+void scc_receive(int ch, uint8_t val) {
     Log_Printf(LOG_SCC_IO_LEVEL,"[SCC] Channel %c: Receiving %02X\n", ch?'B':'A', val);
 
     scc[ch].data = val;
@@ -334,7 +335,11 @@ static void scc_send(int ch, uint8_t val) {
     if (scc[ch].wreg[W_MISC]&WR14_LOOPBACK) {
         scc_receive(ch, val);
     } else {
-        /* send to real world */
+        if (ch && ConfigureParams.Tablet.nTabletType) {
+            tablet_receive(val);
+        } else {
+            /* send to real world */
+        }
     }
     
     if (scc[ch].wreg[W_MODE]&WR1_TXIE) {
