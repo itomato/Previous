@@ -364,11 +364,11 @@ static void DlgFileSelect_ManageScrollbar(void)
 	scrollbar_Ypos += scrollMove;
 	oldMouseY = y;
 
-	/* Verifiy if scrollbar is in correct inferior boundary */
+	/* Verify if scrollbar is in correct inferior boundary */
 	if (scrollbar_Ypos < 0)
 		scrollbar_Ypos = 0.0;
 
-	/* Verifiy if scrollbar is in correct superior boundary */
+	/* Verify if scrollbar is in correct superior boundary */
 	b = (int) (scrollbar_Ypos * ((float)entries/(float)(SGFS_NUMENTRIES-2)) + 0.5);
 	if (b+SGFS_NUMENTRIES >= entries) {
 		ypos = entries - SGFS_NUMENTRIES;

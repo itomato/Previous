@@ -53,7 +53,7 @@ static int Reset_NeXT(bool bCold)
 		Timing_Reset();           /* Reset timing system */
 		CycInt_Reset();           /* Reset interrupts */
 		Video_Reset();            /* Reset video */
-		Screen_ModeChanged();     /* Reset screen mode */
+		Screen_Reset();           /* Reset screen */
 		DebugCpu_SetDebugging();  /* Reset debugging flag if needed */
 		DebugDsp_SetDebugging();  /* Reset debugging flag if needed */
 		Main_SpeedReset();        /* Reset speed reporting system */

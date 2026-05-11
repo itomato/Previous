@@ -1,6 +1,6 @@
 
 
-                                  Previous 4.2
+                                  Previous 4.3
 
 
 
@@ -471,6 +471,12 @@ Previous v4.2:
   > Fixes bug that could cause system timer underflow.
   > Fixes bug that caused the statusbar to fail after a certain period of time.
 
+Previous v4.3:
+  > Adds support for drawing multiple screens to a single window.
+  > Improves behaviour when creating large windows on small screens.
+  > Fixes bug that could cause artifacts on the screen until a dialog is shown.
+  > Fixes bug that could cause a late crash while quitting.
+
 
  7) Running Previous
  -------------------
@@ -528,7 +534,9 @@ You can select to use simulated tablet input to get different cursor movement
 behaviour. If you select the corresponding option in the mouse options dialog
 tablet input will be enabled automatically after installing the tablet driver
 using InstallTablet.app (you find it in the NextAdmin directory). Use absolute
-mode for synced mouse movement in window mode without NeXTdimension screens.
+mode for mouse movement synced with the host cursor. If using multiple screens
+switch to grouped screen view and match the screen arrangement with the guest
+system's settings.
 Note that tablet input is only available under NeXTstep 2.0 and later and the 
 driver needs to be re-installed after every boot of the guest system.
 

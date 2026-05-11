@@ -13,6 +13,7 @@ const char Tablet_fileid[] = "Previous tablet.c";
 #include "main.h"
 #include "configuration.h"
 #include "m68000.h"
+#include "screen.h"
 #include "statusbar.h"
 #include "scc.h"
 #include "tablet.h"
@@ -62,9 +63,6 @@ static struct tablet_device {
 	int32_t xdelta;
 	int32_t ydelta;
 	uint8_t flags;
-	
-	int32_t xscreen;
-	int32_t yscreen;
 	
 	/* Functions */
 	void (*reset)(void);
@@ -530,12 +528,12 @@ static void summa_pen_move(int xrel, int yrel, int x, int y) {
 	} else {
 		x++;
 		y++;
-		if (x > tablet.xscreen) x = tablet.xscreen;
-		else if (x < 0)         x = 0;
-		if (y > tablet.yscreen) y = tablet.yscreen;
-		else if (y < 0)         y = 0;
-		tablet.xpos = (x * tablet.xmax) / tablet.xscreen;
-		tablet.ypos = (y * tablet.ymax) / tablet.yscreen;
+		if (x > screen_w) x = screen_w;
+		else if (x < 0)   x = 0;
+		if (y > screen_h) y = screen_h;
+		else if (y < 0)   y = 0;
+		tablet.xpos = (x * tablet.xmax) / screen_w;
+		tablet.ypos = (y * tablet.ymax) / screen_h;
 		if (tablet.origin == SUMMA_ORIG_LOWER) {
 			tablet.ypos = tablet.ymax - tablet.ypos;
 		}
@@ -775,12 +773,12 @@ static void wacom_pen_move(int xrel, int yrel, int x, int y) {
 	} else {
 		x++;
 		y++;
-		if (x > tablet.xscreen) x = tablet.xscreen;
-		else if (x < 0)         x = 0;
-		if (y > tablet.yscreen) y = tablet.yscreen;
-		else if (y < 0)         y = 0;
-		tablet.xpos = (x * tablet.xmax) / tablet.xscreen;
-		tablet.ypos = (y * tablet.ymax) / tablet.yscreen;
+		if (x > screen_w) x = screen_w;
+		else if (x < 0)   x = 0;
+		if (y > screen_h) y = screen_h;
+		else if (y < 0)   y = 0;
+		tablet.xpos = (x * tablet.xmax) / screen_w;
+		tablet.ypos = (y * tablet.ymax) / screen_h;
 	}
 	if (tablet.xpos > INT16_MAX) {
 		tablet.xpos = INT16_MAX;
@@ -854,15 +852,11 @@ void Tablet_Reset(void) {
 			tablet.pen_button = wacom_pen_button;
 			break;
 	}
-
+	
 	/* Reset tablet */
 	if (tablet.reset) {
 		tablet.reset();
 	}
-	
-	/* Reset common variables */
-	tablet.xscreen = 1120;
-	tablet.yscreen = 832;
 	
 	/* Uninit tablet */
 	bTabletEnabled = false;

@@ -59,7 +59,7 @@ typedef struct {
 
 static uint64_t lastRT;
 static uint64_t lastCycles;
-static double   speedFactor;
+static double   speedFactor = 1.0;
 static char     speedMsg[32];
 
 static void Main_Speed(uint64_t realTime, uint64_t hostTime) {
@@ -81,16 +81,12 @@ void Main_SpeedReset(void) {
 }
 
 const char* Main_SpeedMsg(void) {
-	speedMsg[0] = 0;
-	if(speedFactor > 0) {
-		if(ConfigureParams.System.bRealtime) {
-			snprintf(speedMsg, sizeof(speedMsg), "%dMHz/", (int)(ConfigureParams.System.nCpuFreq * speedFactor + 0.5));
-		} else {
-			if ((speedFactor < 0.9) || (speedFactor > 1.1))
-				snprintf(speedMsg, sizeof(speedMsg), "%.1fx%dMHz/", speedFactor, ConfigureParams.System.nCpuFreq);
-			else
-				snprintf(speedMsg, sizeof(speedMsg), "%dMHz/",                   ConfigureParams.System.nCpuFreq);
-		}
+	if (ConfigureParams.System.bRealtime) {
+		snprintf(speedMsg, sizeof(speedMsg), "%dMHz/", (int)(ConfigureParams.System.nCpuFreq * speedFactor + 0.5));
+	} else if (speedFactor < 0.9 || speedFactor > 1.1) {
+		snprintf(speedMsg, sizeof(speedMsg), "%.1fx%dMHz/", speedFactor, ConfigureParams.System.nCpuFreq);
+	} else {
+		snprintf(speedMsg, sizeof(speedMsg), "%dMHz/", ConfigureParams.System.nCpuFreq);
 	}
 	return speedMsg;
 }
@@ -379,6 +375,9 @@ static void Main_UnInit(void) {
 	Log_UnInit();
 
 	Paths_UnInit();
+
+	/* Quit UI API as late as possible */
+	UI_Quit();
 }
 
 

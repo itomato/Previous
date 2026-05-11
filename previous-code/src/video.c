@@ -77,7 +77,7 @@ void Video_VBL_Handler(void) {
 	Timing_BlankCount(MAIN_DISPLAY, bBlankToggle);
 	if (bBlankToggle) {
 		Video_Interrupt();
-	} else if (ConfigureParams.Screen.nMonitorType != MONITOR_TYPE_DIMENSION) {
+	} else if (!Configuration_SingleColorScreen()) {
 		GuiEvent_SendSpecialEvent(SPECIAL_EVENT_REPAINT);
 	}
 	bBlankToggle = !bBlankToggle;

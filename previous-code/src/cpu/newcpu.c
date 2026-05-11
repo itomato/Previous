@@ -1483,7 +1483,7 @@ static void set_x_funcs (void)
 
 	icache_fetch = phys_get_long;
 	icache_fetch_word = NULL;
-	if (currprefs.cpu_cycle_exact) {
+	if (currprefs.cpu_memory_cycle_exact) {
 		icache_fetch = mem_access_delay_longi_read_ce020;
 	}
 	if (currprefs.cpu_model >= 68040 && currprefs.cpu_memory_cycle_exact) {
@@ -2528,8 +2528,9 @@ static void activate_trace(void)
 void checkint(void)
 {
 	doint();
-	if (!m68k_accurate_ipl && !currprefs.cachesize && !(regs.spcflags & SPCFLAG_INT) && (regs.spcflags & SPCFLAG_DOINT))
+	if (!m68k_accurate_ipl && !currprefs.cachesize && !(regs.spcflags & SPCFLAG_INT) && (regs.spcflags & SPCFLAG_DOINT)) {
 		set_special(SPCFLAG_INT);
+	}
 }
 
 void REGPARAM2 MakeSR(void)
@@ -5071,7 +5072,7 @@ void doint(void)
 	if (m68k_interrupt_delay) {
 //fprintf ( stderr , "doint2 %d ipl=%x ipl_pin=%x intmask=%x spcflags=%x\n" , m68k_interrupt_delay,regs.ipl, regs.ipl_pin , regs.intmask, regs.spcflags );
 		if (!m68k_accurate_ipl && regs.ipl_pin > regs.intmask) {
-			set_special(SPCFLAG_INT);
+			set_special(SPCFLAG_DOINT);
 		}
 		return;
 	}
@@ -5159,7 +5160,7 @@ static int do_specialties (int cycles)
 			do_trace();
 
 //fprintf ( stderr , "dospec1 %d %d spcflags=%x ipl=%x ipl_pin=%x intmask=%x\n" , m68k_interrupt_delay,time_for_interrupt() , spcflags , regs.ipl , regs.ipl_pin, regs.intmask );
-		if (m68k_interrupt_delay) {
+		if (m68k_interrupt_delay && m68k_accurate_ipl) {
 			int ipl = time_for_interrupt();
 			if (ipl) {
 				unset_special(SPCFLAG_INT);
@@ -5168,7 +5169,7 @@ static int do_specialties (int cycles)
 		} else {
 			if (spcflags & SPCFLAG_INT) {
 				int intr = intlev();
-				unset_special (SPCFLAG_INT | SPCFLAG_DOINT);
+				unset_special(SPCFLAG_INT | SPCFLAG_DOINT);
 				if (intr > regs.intmask || (intr == 7 && intr > regs.lastipl)) {
 					do_interrupt(intr);
 				}
@@ -7431,6 +7432,12 @@ void m68k_go (int may_quit)
 
 			hsync_counter = 0;
 			vsync_counter = 0;
+#ifndef WINUAE_FOR_HATARI
+			if (quit_program) {
+				set_cycles(start_cycles);
+				clear_events();
+			}
+#endif
 			quit_program = 0;
 
 #ifdef SAVESTATE
@@ -7804,8 +7811,10 @@ void m68k_dumpstate(uaecptr *nextpc, uaecptr prevpc)
 		}
 	}
 	m68k_disasm (pc, nextpc, pc, 1);
-	if (nextpc)
+	if (nextpc) {
 		console_out_f (_T("Next PC: %08x\n"), *nextpc);
+		*nextpc = pc;
+	}
 }
 #ifdef WINUAE_FOR_HATARI
 void m68k_dumpstate_file (FILE *f, uaecptr *nextpc, uaecptr prevpc)
@@ -7820,6 +7829,9 @@ void m68k_dumpcache (bool dc)
 	if (!currprefs.cpu_compatible)
 		return;
 	if (currprefs.cpu_model == 68020) {
+		if (dc) {
+			return;
+		}
 		for (int i = 0; i < CACHELINES020; i += 4) {
 			for (int j = 0; j < 4; j++) {
 				int s = i + j;

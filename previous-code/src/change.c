@@ -219,8 +219,7 @@ bool Change_DoNeedReset(CNF_PARAMS *current, CNF_PARAMS *changed)
 		}
 	}
 	if (current->Dimension.bI860Thread != changed->Dimension.bI860Thread ||
-		current->Dimension.bMainDisplay != changed->Dimension.bMainDisplay ||
-		current->Dimension.nMainDisplay != changed->Dimension.nMainDisplay) {
+		current->Dimension.nConsoleSlot != changed->Dimension.nConsoleSlot) {
 		printf("dimension display reset\n");
 		return true;
 	}
@@ -284,10 +283,14 @@ void Change_CopyChangedParamsToConfiguration(CNF_PARAMS *current, CNF_PARAMS *ch
 		}
 
 		/* Do we need to change Screen configuration? */
-		if (current->Screen.nMonitorType != changed->Screen.nMonitorType &&
-			(current->Screen.nMonitorType == MONITOR_TYPE_DUAL ||
-			 changed->Screen.nMonitorType == MONITOR_TYPE_DUAL)) {
+		if (current->Screen.nMode != changed->Screen.nMode) {
 			bScreenModeChange = true;
+		} else if (current->Screen.nMode == SCREEN_GROUP) {
+			for (i = 0; i < NUM_MONITORS; i++) {
+				if (current->Screen.nGroupModePos[i] != changed->Screen.nGroupModePos[i]) {
+					bScreenModeChange = true;
+				}
+			}
 		}
 	}
 
@@ -330,7 +333,7 @@ void Change_CopyChangedParamsToConfiguration(CNF_PARAMS *current, CNF_PARAMS *ch
 	if (bScreenModeChange)
 	{
 		Dprintf("- Screen\n");
-		Screen_ModeChanged();
+		Screen_Reset();
 	}
 
 	/* Do we need to perform reset? */

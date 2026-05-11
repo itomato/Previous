@@ -13,7 +13,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* Name and version for window title: */
-#define PROG_NAME "Previous 4.2"
+#define PROG_NAME "Previous 4.3"
 
 #include "config.h"
 

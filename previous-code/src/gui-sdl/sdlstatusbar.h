@@ -9,12 +9,10 @@
 
 #include <SDL3/SDL.h>
 
-extern int Statusbar_SetHeight(int ScreenWidth, int ScreenHeight, bool force);
+extern int Statusbar_SetHeight(int ScreenWidth, int ScreenHeight);
 extern int Statusbar_GetHeight(void);
 
 extern void Statusbar_Init(SDL_Surface *screen);
-extern void Statusbar_OverlayBackup(SDL_Surface *screen);
 extern void Statusbar_Update(SDL_Surface *screen);
-extern void Statusbar_OverlayRestore(SDL_Surface *screen);
 
 #endif /* PREV_SDLSTATUSBAR_H */

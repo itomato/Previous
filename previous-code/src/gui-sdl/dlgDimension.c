@@ -11,6 +11,7 @@ const char DlgDimension_fileid[] = "Previous dlgDimension.c";
 #include "dialog.h"
 #include "sdlgui.h"
 #include "file.h"
+#include "dimension.hpp"
 
 
 #define DLGND_CUSTOMISE     5
@@ -81,7 +82,7 @@ void Dialog_DimensionDlg(int n)
  
 	/* Set up dialog from actual values: */
 	
-	snprintf(dimension_slot, sizeof(dimension_slot), "%i:", n*2+2);
+	snprintf(dimension_slot, sizeof(dimension_slot), "%d:", ND_SLOT(n));
 
 	File_ShrinkName(dlgname_ndrom, ConfigureParams.Dimension.board[n].szRomFileName,
 						dimensiondlg[DLGND_NAME].w);
@@ -117,6 +118,7 @@ void Dialog_DimensionDlg(int n)
 
 	ConfigureParams.Dimension.board[n].bEnabled = true;
 	ConfigureParams.System.bNBIC = true;
+	Configuration_SetDefaultScreen(ND_SLOT(n));
 }
 
 

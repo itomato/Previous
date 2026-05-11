@@ -13,19 +13,10 @@
     Statusbar_GetHeight() can be used to retrieve the statusbar size
   - After screen surface is (re-)created, call Statusbar_Init()
     to re-initialize / re-draw the statusbar
-  - Call Statusbar_SetFloppyLed() to set floppy drive led ON/OFF,
-    or call Statusbar_EnableHDLed() to enabled HD led for a while
+  - Call Statusbar_Set{System,Dsp,Nd}Led() to set corresponding led ON/OFF,
+    or call Statusbar_BlinkLed() to enabled device led for a while
   - Whenever screen is redrawn, call Statusbar_Update() to update
-    statusbar contents and find out whether and what screen area
-    needs to be updated (outside of screen locking)
-  - If screen redraws can be partial, Statusbar_OverlayRestore()
-    needs to be called before locking the screen for drawing and
-    Statusbar_OverlayBackup() needs to be called after screen unlocking,
-    but before calling Statusbar_Update().  These are needed for
-    hiding the overlay drive led (= restoring the area that was below
-    them before LED was shown) when drive leds are turned OFF.
-  - If other information shown by Statusbar (TOS version etc) changes,
-    call Statusbar_UpdateInfo()
+    statusbar contents
 */
 const char SDLstatusbar_fileid[] = "Previous sdlstatusbar.c";
 
@@ -60,18 +51,6 @@ static struct {
 
 /* drive leds size & y-pos */
 static SDL_Rect LedRect;
-
-/* overlay led size & pos */
-static SDL_Rect OverlayLedRect;
-
-/* screen contents left under overlay led */
-static SDL_Surface *OverlayUnderside;
-
-static enum {
-	OVERLAY_NONE,
-	OVERLAY_DRAWN,
-	OVERLAY_RESTORED
-} nOverlayState;
 
 static SDL_Rect SystemLedRect;
 static bool bSystemLed, bOldSystemLed;
@@ -113,13 +92,13 @@ static int StatusbarHeight;
 /**
  * Return statusbar height for given width and height
  */
-static int Statusbar_GetHeightForSize(int width, int height, bool force)
+static int Statusbar_GetHeightForSize(int width, int height)
 {
 	int h = 0;
 	/* Must arrive at same conclusion about font size as SDLGui_SetScreen(),
 	 * and max size returned by this must correspond to STATUSBAR_MAX_HEIGHT
 	 */
-	if (ConfigureParams.Screen.bShowStatusbar || force)
+	if (ConfigureParams.Screen.bShowStatusbar)
 	{
 		/* smaller SDL GUI font height = 8, larger = 16 */
 		h = 8;
@@ -141,7 +120,7 @@ static int Statusbar_GetHeightForSize(int width, int height, bool force)
  * height when screen is (re-)created, or zero if statusbar will
  * not be shown
  */
-int Statusbar_SetHeight(int width, int height, bool force)
+int Statusbar_SetHeight(int width, int height)
 {
 #if DEBUG
 	/* find out from where the set height is called */
@@ -150,7 +129,7 @@ int Statusbar_SetHeight(int width, int height, bool force)
 	backtrace_symbols_fd(addr, count, fileno(stderr));
 #endif
 	ScreenHeight = height;
-	StatusbarHeight = Statusbar_GetHeightForSize(width, height, force);
+	StatusbarHeight = Statusbar_GetHeightForSize(width, height);
 	DEBUGPRINT(("Statusbar_SetHeight(%d, %d) -> %d\n", width, height, StatusbarHeight));
 	return StatusbarHeight;
 }
@@ -176,7 +155,6 @@ void Statusbar_BlinkLed(drive_index_t drive)
 	Led[drive].state = LED_STATE_ON;
 }
 
-
 /*-----------------------------------------------------------------------*/
 /**
  * Set system, DSP, CPU and NeXTdimension led state, anything enabling led with
@@ -192,32 +170,6 @@ void Statusbar_SetDspLed(bool state) {
 
 void Statusbar_SetNdLed(int state) {
 	nNdLed = state;
-}
-
-/*-----------------------------------------------------------------------*/
-/**
- * Set overlay led size/pos on given screen to internal Rect
- * and free previous resources.
- */
-static void Statusbar_OverlayInit(const SDL_Surface *surf)
-{
-	int h;
-	/* led size/pos needs to be re-calculated in case screen changed */
-	h = surf->h / 50;
-	OverlayLedRect.w = 2*h;
-	OverlayLedRect.h = h;
-	OverlayLedRect.x = surf->w - 5*h/2;
-	OverlayLedRect.y = h/2;
-	/* free previous restore surface if it's incompatible */
-	if (OverlayUnderside && (
-	    OverlayUnderside->w != OverlayLedRect.w ||
-	    OverlayUnderside->h != OverlayLedRect.h ||
-	    OverlayUnderside->format != surf->format))
-	{
-		SDL_DestroySurface(OverlayUnderside);
-		OverlayUnderside = NULL;
-	}
-	nOverlayState = OVERLAY_NONE;
 }
 
 /*-----------------------------------------------------------------------*/
@@ -256,7 +208,6 @@ void Statusbar_Init(SDL_Surface *surf)
 		Led[i].state = Led[i].oldstate = LED_STATE_OFF;
 		Led[i].expire = 0;
 	}
-	Statusbar_OverlayInit(surf);
 	
 	/* disable statusbar if it doesn't fit to video mode */
 	if (surf->h < ScreenHeight + StatusbarHeight)
@@ -322,7 +273,11 @@ void Statusbar_Init(SDL_Surface *surf)
 		Led[i].offset = xoffset;
 		xoffset += LedRect.w + fontw;
 	}
-	MessageRect.x = xoffset + fontw;
+	MessageRect.x = (FullRect.w - MAX_MESSAGE_LEN*fontw) / 2;
+	/* on narrow windows compensate for asymmetric led arrangement */
+	if (FullRect.w < 1600) {
+		MessageRect.x += 2*fontw;
+	}
 	MessageRect.w = MAX_MESSAGE_LEN * fontw;
 	MessageRect.h = fonth;
 	for (item = MessageList; item; item = item->next) {
@@ -331,30 +286,30 @@ void Statusbar_Init(SDL_Surface *surf)
 
 	/* draw i860 led box */
 	NdLedRect = LedRect;
-	NdLedRect.x = surf->w - 15*fontw - NdLedRect.w;
+	NdLedRect.x = FullRect.w - 15*fontw - NdLedRect.w;
 	ledbox.x = NdLedRect.x - 1;
 	SDLGui_Text(ledbox.x - 3*fontw - fontw/2, MessageRect.y, "ND:");
 	SDL_FillSurfaceRect(surf, &ledbox, LedColorBg);
 	SDL_FillSurfaceRect(surf, &NdLedRect, NdColorOff);
-	nNdLed = 0;
+	nOldNdLed = 0;
 
 	/* draw dsp led box */
 	DspLedRect = LedRect;
-	DspLedRect.x = surf->w - 8*fontw - DspLedRect.w;
+	DspLedRect.x = FullRect.w - 8*fontw - DspLedRect.w;
 	ledbox.x = DspLedRect.x - 1;
 	SDLGui_Text(ledbox.x - 4*fontw - fontw/2, MessageRect.y, "DSP:");
 	SDL_FillSurfaceRect(surf, &ledbox, LedColorBg);
 	SDL_FillSurfaceRect(surf, &DspLedRect, DspColorOff);
-	bDspLed = false;
+	bOldDspLed = false;
 
 	/* draw system led box */
 	SystemLedRect = LedRect;
-	SystemLedRect.x = surf->w - fontw - SystemLedRect.w;
+	SystemLedRect.x = FullRect.w - fontw - SystemLedRect.w;
 	ledbox.x = SystemLedRect.x - 1;
 	SDLGui_Text(ledbox.x - 4*fontw - fontw/2, MessageRect.y, "LED:");
 	SDL_FillSurfaceRect(surf, &ledbox, LedColorBg);
 	SDL_FillSurfaceRect(surf, &SystemLedRect, SysColorOff);
-	bSystemLed = false;
+	bOldSystemLed = false;
 
 	/* and blit statusbar on screen */
 	Screen_UpdateRects(surf, 1, &FullRect);
@@ -472,120 +427,6 @@ static SDL_Rect* Statusbar_ShowMessage(SDL_Surface *surf, uint64_t ticks)
 
 /*-----------------------------------------------------------------------*/
 /**
- * Save the area that will be left under overlay led
- */
-void Statusbar_OverlayBackup(SDL_Surface *surf)
-{
-	if ((StatusbarHeight && ConfigureParams.Screen.bShowStatusbar)
-	    || !ConfigureParams.Screen.bShowDriveLed)
-	{
-		/* overlay not used with statusbar */
-		return;
-	}
-	assert(surf);
-	if (!OverlayUnderside)
-	{
-		SDL_Surface *bak;
-		bak = SDL_CreateSurface(OverlayLedRect.w, OverlayLedRect.h, surf->format);
-		assert(bak);
-		OverlayUnderside = bak;
-	}
-	SDL_BlitSurface(surf, &OverlayLedRect, OverlayUnderside, NULL);
-}
-
-/*-----------------------------------------------------------------------*/
-/**
- * Restore the area left under overlay led
- * 
- * State machine for overlay led handling will return from
- * Statusbar_Update() call the area that is restored (if any)
- */
-void Statusbar_OverlayRestore(SDL_Surface *surf)
-{
-	if ((StatusbarHeight && ConfigureParams.Screen.bShowStatusbar)
-	    || !ConfigureParams.Screen.bShowDriveLed)
-	{
-		/* overlay not used with statusbar */
-		return;
-	}
-	if (nOverlayState == OVERLAY_DRAWN && OverlayUnderside)
-	{
-		assert(surf);
-		SDL_BlitSurface(OverlayUnderside, NULL, surf, &OverlayLedRect);
-		/* this will make the draw function to update this the screen */
-		nOverlayState = OVERLAY_RESTORED;
-	}
-}
-
-/*-----------------------------------------------------------------------*/
-/**
- * Draw overlay led
- */
-static void Statusbar_OverlayDrawLed(SDL_Surface *surf, uint32_t color)
-{
-	SDL_Rect rect;
-	if (nOverlayState == OVERLAY_DRAWN)
-	{
-		/* some led already drawn */
-		return;
-	}
-	nOverlayState = OVERLAY_DRAWN;
-
-	/* enabled led with border */
-	rect = OverlayLedRect;
-	rect.x += 1;
-	rect.y += 1;
-	rect.w -= 2;
-	rect.h -= 2;
-	SDL_FillSurfaceRect(surf, &OverlayLedRect, LedColorBg);
-	SDL_FillSurfaceRect(surf, &rect, color);
-}
-
-/*-----------------------------------------------------------------------*/
-/**
- * Draw overlay led onto screen surface if any drives are enabled.
- * 
- * Return updated area, or NULL if nothing drawn
- */
-static SDL_Rect* Statusbar_OverlayDraw(SDL_Surface *surf)
-{
-	uint64_t currentticks = SDL_GetTicks();
-	int i;
-
-	for (i = 0; i < NUM_DEVICE_LEDS; i++)
-	{
-		if (Led[i].state)
-		{
-			if (Led[i].expire && Led[i].expire < currentticks)
-			{
-				Led[i].state = LED_STATE_OFF;
-				continue;
-			}
-			Statusbar_OverlayDrawLed(surf, LedColor[ Led[i].state ]);
-			break;
-		}
-	}
-	/* possible state transitions:
-	 *   NONE -> DRAWN -> RESTORED -> DRAWN -> RESTORED -> NONE
-	 * Other than NONE state needs to be updated on screen
-	 */
-	switch (nOverlayState)
-	{
-	case OVERLAY_RESTORED:
-		nOverlayState = OVERLAY_NONE;
-		/* fall through */
-	case OVERLAY_DRAWN:
-		DEBUGPRINT(("Overlay LED = %s\n", nOverlayState==OVERLAY_DRAWN?"ON":"OFF"));
-		return &OverlayLedRect;
-	case OVERLAY_NONE:
-		break;
-	}
-	return NULL;
-}
-
-
-/*-----------------------------------------------------------------------*/
-/**
  * Update statusbar information (leds etc) if/when needed.
  * 
  * May not be called when screen is locked (SDL limitation).
@@ -603,17 +444,6 @@ void Statusbar_Update(SDL_Surface *surf)
 	assert(surf);
 	if (!(StatusbarHeight && ConfigureParams.Screen.bShowStatusbar))
 	{
-		last_rect = NULL;
-		/* not enabled (anymore), show overlay led instead? */
-		if (ConfigureParams.Screen.bShowDriveLed)
-		{
-			last_rect = Statusbar_OverlayDraw(surf);
-			if (last_rect)
-			{
-				Screen_UpdateRects(surf, 1, last_rect);
-				last_rect = NULL;
-			}
-		}
 		return;
 	}
 
@@ -692,7 +522,6 @@ void Statusbar_Update(SDL_Surface *surf)
 		nOldNdLed = nNdLed;
 		switch(nNdLed)
 		{
-			case 0:  color = NdColorOff; break;
 			case 1:  color = NdColorCS8; break;
 			case 2:  color = NdColorOn;  break;
 			default: color = NdColorOff; break;

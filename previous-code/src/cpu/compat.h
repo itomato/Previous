@@ -30,7 +30,7 @@ static inline void to_lower (TCHAR *s, int len) {
 	if (len < 0 )
 		len = uaetcslen(s);
 	for (i = 0; i < len; i++) {
-		s[i] = tolower(s[i]);
+		s[i] = tolower((unsigned char)s[i]);
 	}
 }
 
@@ -40,7 +40,7 @@ static inline void to_upper (TCHAR *s, int len) {
 	if (len < 0 )
 		len = uaetcslen(s);
 	for (i = 0; i < len; i++) {
-		s[i] = toupper(s[i]);
+		s[i] = toupper((unsigned char)s[i]);
 	}
 }
 

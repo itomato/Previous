@@ -32,6 +32,7 @@ extern void GuiEvent_EventQueueHandler(void);
 
 extern void UI_Init(void);
 extern void UI_UnInit(void);
+extern void UI_Quit(void);
 
 #ifdef __cplusplus
 }

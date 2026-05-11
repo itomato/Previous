@@ -1137,7 +1137,7 @@ bool DebugUI_DoQuitQuery(const char *info)
 	char input[8];
 	fprintf(stderr, "--- q to exit %s, enter to continue --- ", info);
 	if (fgets(input, sizeof(input), stdin) == NULL ||
-	    toupper(input[0]) == 'Q') {
+	    toupper((unsigned char)input[0]) == 'Q') {
 		return true;
 	}
 	return false;

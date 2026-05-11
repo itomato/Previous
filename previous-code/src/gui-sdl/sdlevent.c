@@ -307,7 +307,6 @@ void GuiEvent_EventHandler(void) {
 
 			case SDL_EVENT_MOUSE_MOTION:               /* Read/Update internal mouse position */
 				GuiEvent_HandleMouseMotion(&event);
-				bContinueProcessing = false;
 				break;
 
 			case SDL_EVENT_MOUSE_BUTTON_DOWN:
@@ -461,7 +460,9 @@ void UI_Init(void) {
 void UI_UnInit(void) {
 	SDLGui_UnInit();
 	Screen_UnInit();
+}
 
-	/* SDL uninit: */
+void UI_Quit(void) {
+	/* All rendering has to be stopped before calling this */
 	SDL_Quit();
 }

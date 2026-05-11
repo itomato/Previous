@@ -17,14 +17,12 @@ const char Grab_fileid[] = "Previous grab.c";
 #include "statusbar.h"
 #include "m68000.h"
 #include "host.h"
+#include "screen.h"
 #include "grab.h"
 
 
 #if HAVE_LIBPNG
 #include <png.h>
-
-#define NEXT_SCREEN_HEIGHT 832
-#define NEXT_SCREEN_WIDTH  1120
 
 #if ND_STEP
 #define ND_OFFSET 0
@@ -36,51 +34,73 @@ const char Grab_fileid[] = "Previous grab.c";
  * Convert framebuffer data to RGBA and fill buffer.
  */
 static bool Grab_FillBuffer(uint8_t* buf) {
-	uint8_t* fb;
-	int i, j;
+	uint8_t* src;
+	uint8_t* dst;
 	
-	if (ConfigureParams.Screen.nMonitorType==MONITOR_TYPE_DIMENSION) {
-		fb = (uint8_t*)(nd_vram_for_slot(ND_SLOT(ConfigureParams.Screen.nMonitorNum)));
-		if (fb) {
-			for (i = 0, j = ND_OFFSET; i < (NEXT_SCREEN_WIDTH*NEXT_SCREEN_HEIGHT*4); i+=4, j+=4) {		
-				if (i && (i%(NEXT_SCREEN_WIDTH*4))==0)
-					j+=32*4;
-
-				buf[i+0] = fb[j+2]; /* r */
-				buf[i+1] = fb[j+1]; /* g */
-				buf[i+2] = fb[j+0]; /* b */
-				buf[i+3] = 0xff;    /* a */
+	int slot, xoff, yoff;
+	int m, x, y;
+	
+	for (m = 0; m < NUM_MONITORS; m++) {
+		slot = m * 2;
+		if (ConfigureParams.Screen.nMode == SCREEN_GROUP) {
+			if (ConfigureParams.Screen.nGroupModePos[m] < 0) {
+				continue;
 			}
-			return true;
+			xoff = (ConfigureParams.Screen.nGroupModePos[m] % NUM_MONITORS) * NeXT_SCRN_W;
+			yoff = (ConfigureParams.Screen.nGroupModePos[m] / NUM_MONITORS) * NeXT_SCRN_H;
+		} else if (m == 0) {
+			if (ConfigureParams.Screen.nMode == SCREEN_SINGLE) {
+				slot = ConfigureParams.Screen.nSingleModeSlot;
+			}
+			xoff = 0;
+			yoff = 0;
+		} else {
+			break;
 		}
-	} else {
-		if (NEXTVideo) {
-			fb = NEXTVideo;
-			if (ConfigureParams.System.bColor) {
-				for (i = 0, j = 0; i < (NEXT_SCREEN_WIDTH*NEXT_SCREEN_HEIGHT*4); i+=4, j+=2) {
-					if (!ConfigureParams.System.bTurbo && i && (i%(NEXT_SCREEN_WIDTH*4))==0)
-						j+=32*2;
-					
-					buf[i+0] = (fb[j+0]&0xf0) | ((fb[j+0]&0xf0)>>4); /* r */
-					buf[i+1] = (fb[j+0]&0x0f) | ((fb[j+0]&0x0f)<<4); /* g */
-					buf[i+2] = (fb[j+1]&0xf0) | ((fb[j+1]&0xf0)>>4); /* b */
-					buf[i+3] = 0xff;                                 /* a */
+		
+		if ((xoff + NeXT_SCRN_W) > screen_w || (yoff + NeXT_SCRN_H) > screen_h) {
+			return false;
+		}
+		
+		dst = buf + screen_w * yoff * 4;
+		src = (slot > 0) ? (uint8_t*)(nd_vram_for_slot(slot)) : NEXTVideo;
+		if (!src) {
+			return false;
+		}
+		
+		src += (slot > 0) ? ND_OFFSET : 0;
+		
+		for (y = 0; y < NeXT_SCRN_H; y++) {
+			dst += xoff * 4;
+			if (slot > 0) {
+				for (x = 0; x < NeXT_SCRN_W; x++, src += 4, dst += 4) {
+					dst[0] = src[2]; /* r */
+					dst[1] = src[1]; /* g */
+					dst[2] = src[0]; /* b */
+					dst[3] = 0xff;   /* a */
 				}
+				src += 32 * 4;
+			} else if (ConfigureParams.System.bColor) {
+				for (x = 0; x < NeXT_SCRN_W; x++, src += 2, dst += 4) {
+					dst[0] = ((src[0] & 0xf0) >> 4) * 0x11; /* r */
+					dst[1] = ((src[0] & 0x0f) >> 0) * 0x11; /* g */
+					dst[2] = ((src[1] & 0xf0) >> 4) * 0x11; /* b */
+					dst[3] = 0xff;                          /* a */
+				}
+				src += ConfigureParams.System.bTurbo ? 0 : (32 * 2);
 			} else {
-				for (i = 0, j = 0; i < (NEXT_SCREEN_WIDTH*NEXT_SCREEN_HEIGHT*4); i+=16, j++) {
-					if (!ConfigureParams.System.bTurbo && i && (i%(NEXT_SCREEN_WIDTH*4))==0)
-						j+=32/4;
-					
-					buf[i+ 0] = buf[i+ 1] = buf[i+ 2] = (~(fb[j] >> 6) & 3) * 0x55; buf[i+ 3] = 0xff; /* rgba */
-					buf[i+ 4] = buf[i+ 5] = buf[i+ 6] = (~(fb[j] >> 4) & 3) * 0x55; buf[i+ 7] = 0xff; /* rgba */
-					buf[i+ 8] = buf[i+ 9] = buf[i+10] = (~(fb[j] >> 2) & 3) * 0x55; buf[i+11] = 0xff; /* rgba */
-					buf[i+12] = buf[i+13] = buf[i+14] = (~(fb[j] >> 0) & 3) * 0x55; buf[i+15] = 0xff; /* rgba */
+				for (x = 0; x < NeXT_SCRN_W; x += 4, src++, dst += 4 * 4) {
+					dst[0]  = dst[1]  = dst[2]  = (~(*src >> 6) & 3) * 0x55; dst[3]  = 0xff; /* rgba */
+					dst[4]  = dst[5]  = dst[6]  = (~(*src >> 4) & 3) * 0x55; dst[7]  = 0xff; /* rgba */
+					dst[8]  = dst[9]  = dst[10] = (~(*src >> 2) & 3) * 0x55; dst[11] = 0xff; /* rgba */
+					dst[12] = dst[13] = dst[14] = (~(*src >> 0) & 3) * 0x55; dst[15] = 0xff; /* rgba */
 				}
+				src += ConfigureParams.System.bTurbo ? 0 : (32 / 4);
 			}
-			return true;
+			dst += (screen_w - (xoff + NeXT_SCRN_W)) * 4;
 		}
 	}
-	return false;
+	return true;
 }
 
 /**
@@ -98,7 +118,7 @@ static bool Grab_MakePNG(FILE* fp) {
 	bool        result   = false;
 	
 	uint8_t*    src_ptr  = NULL;
-	uint8_t*    buf      = malloc(NEXT_SCREEN_WIDTH*NEXT_SCREEN_HEIGHT*4);
+	uint8_t*    buf      = calloc(1, screen_w * screen_h * 4);
 	
 	if (buf) {
 		if (Grab_FillBuffer(buf)) {
@@ -116,9 +136,9 @@ static bool Grab_MakePNG(FILE* fp) {
 						png_init_io(png_ptr, fp);
 						
 						/* image data properties */
-						png_set_IHDR(png_ptr, info_ptr, NEXT_SCREEN_WIDTH, NEXT_SCREEN_HEIGHT, 8, PNG_COLOR_TYPE_RGB_ALPHA,
-									 PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
-									 PNG_FILTER_TYPE_DEFAULT);
+						png_set_IHDR(png_ptr, info_ptr, screen_w, screen_h, 8, 
+						             PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE, 
+						             PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 						
 						/* image info */
 						pngtext.key = key;
@@ -132,9 +152,9 @@ static bool Grab_MakePNG(FILE* fp) {
 						/* write the file header information */
 						png_write_info(png_ptr, info_ptr);
 						
-						for (y = 0; y < NEXT_SCREEN_HEIGHT; y++)
+						for (y = 0; y < screen_h; y++)
 						{		
-							src_ptr = buf + y * NEXT_SCREEN_WIDTH * 4;
+							src_ptr = buf + y * screen_w * 4;
 							
 							png_write_row(png_ptr, src_ptr);
 						}

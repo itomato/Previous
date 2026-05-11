@@ -321,15 +321,10 @@ extern "C" {
         
 #ifndef ENABLE_RENDERING_THREAD
         if (!bBlankToggle) {
-            switch (ConfigureParams.Screen.nMonitorType) {
-                case MONITOR_TYPE_DUAL:
-                    GuiEvent_SendSpecialEvent(SPECIAL_EVENT_ND_DISPLAY);
-                    break;
-                case MONITOR_TYPE_DIMENSION:
-                    GuiEvent_SendSpecialEvent(SPECIAL_EVENT_REPAINT);
-                    break;
-                default:
-                    break;
+            if (ConfigureParams.Screen.nMode == SCREEN_ALL) {
+                GuiEvent_SendSpecialEvent(SPECIAL_EVENT_ND_DISPLAY);
+            } else if (Configuration_SingleColorScreen()) {
+                GuiEvent_SendSpecialEvent(SPECIAL_EVENT_REPAINT);
             }
         }
 #endif
@@ -366,13 +361,13 @@ extern "C" {
     }
 
     void nd_start_interrupts(void) {
-	    CycInt_AddTimeEvent(1000, 0, EVENT_ND_VBL);
-	    CycInt_AddTimeEvent(1000, 0, EVENT_ND_VIDEO_VBL);
+        CycInt_AddTimeEvent(1000, 0, EVENT_ND_VBL);
+        CycInt_AddTimeEvent(1000, 0, EVENT_ND_VIDEO_VBL);
     }
 
 #ifndef ENABLE_RENDERING_THREAD
     void nd_display_repaint(void) {
-	    nd_sdl_repaint();
+        nd_sdl_repaint();
     }
 #endif
 

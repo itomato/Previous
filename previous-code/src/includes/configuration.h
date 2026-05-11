@@ -270,22 +270,23 @@ typedef struct {
   EN_NFS nfs[EN_MAX_SHARES];
 } CNF_ENET;
 
+/* Screen configuration */
+#define NUM_MONITORS 4
 typedef enum
 {
-  MONITOR_TYPE_DUAL,
-  MONITOR_TYPE_CPU,
-  MONITOR_TYPE_DIMENSION,
-} MONITORTYPE;
+  SCREEN_SINGLE,
+  SCREEN_ALL,
+  SCREEN_GROUP
+} SCREENMODE;
 
-/* Screen configuration */
 typedef struct
 {
-  MONITORTYPE nMonitorType;
-  int nMonitorNum;
+  SCREENMODE nMode;
+  int nGroupModePos[NUM_MONITORS];
+  int nSingleModeSlot;
   bool bFullScreen;
   bool bShowStatusbar;
   bool bShowTitlebar;
-  bool bShowDriveLed;
 } CNF_SCREEN;
 
 
@@ -379,8 +380,7 @@ typedef struct
 
 typedef struct {
   bool bI860Thread;
-  bool bMainDisplay;
-  int nMainDisplay;
+  int nConsoleSlot;
   NDBOARD board[ND_MAX_BOARDS];
 } CNF_ND;
 
@@ -416,6 +416,9 @@ extern char sConfigFileName[FILENAME_MAX];
 
 extern void Configuration_SetDefault(void);
 extern void Configuration_SetSystemDefaults(void);
+extern void Configuration_SetDefaultScreen(int slot);
+extern int  Configuration_GetScreenFromPos(int pos);
+extern int  Configuration_SingleColorScreen(void);
 extern void Configuration_Apply(bool bReset);
 extern int  Configuration_CheckMemory(int *banksize);
 extern int  Configuration_CheckDimensionMemory(int *banksize);

@@ -539,7 +539,7 @@ int DebugCpu_MemDump(int nArgc, char *psArgs[])
 	uint32_t memdump_upper = 0;
 
 	if (nArgc > 1)
-		mode = tolower(psArgs[arg][0]);
+		mode = tolower((unsigned char)psArgs[arg][0]);
 
 	if (!mode || isdigit((unsigned char)psArgs[arg][0]) || psArgs[arg][1])
 	{
@@ -683,7 +683,7 @@ static int DebugCpu_Struct(int nArgc, char *psArgs[])
 		if (maxlen < str - arg)
 			maxlen = str - arg;
 
-		type = tolower(*++str);
+		type = tolower((unsigned char)*++str);
 		size = get_type_width(type);
 		if (!size && type == 's')
 		    size = 1;
@@ -694,7 +694,7 @@ static int DebugCpu_Struct(int nArgc, char *psArgs[])
 		}
 
 		/* type followed by base? */
-		if (get_type_base(tolower(*++str)))
+		if (get_type_base(tolower((unsigned char)*++str)))
 			str++;
 
 		/* done? */
@@ -758,9 +758,9 @@ static int DebugCpu_Struct(int nArgc, char *psArgs[])
 		str = strchr(name, ':');
 		*str = '\0';
 
-		type = tolower(*++str);
+		type = tolower((unsigned char)*++str);
 		size = get_type_width(type);
-		base = get_type_base(tolower(*++str));
+		base = get_type_base(tolower((unsigned char)*++str));
 		if (!base)
 			base = 16;
 		else
@@ -837,7 +837,7 @@ static int DebugCpu_MemWrite(int nArgc, char *psArgs[])
 	}
 
 	arg = 1;
-	mode = tolower(psArgs[arg][0]);
+	mode = tolower((unsigned char)psArgs[arg][0]);
 	max_values = ARRAY_SIZE(store.bytes);
 
 	if (!mode || isdigit((unsigned char)psArgs[arg][0]) || psArgs[arg][1])
@@ -976,7 +976,7 @@ static int DebugCpu_MemFind(int nArgc, char *psArgs[])
 	}
 
 	arg = 1;
-	mode = tolower(psArgs[arg][0]);
+	mode = tolower((unsigned char)psArgs[arg][0]);
 	max_values = ARRAY_SIZE(store.bytes);
 
 	if (!mode || isdigit((unsigned char)psArgs[arg][0]) || psArgs[arg][1])

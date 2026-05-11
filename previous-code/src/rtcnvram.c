@@ -1062,8 +1062,7 @@ void nvram_init(void) {
     /* Set prefered console slot */
     rtc.ram[17] |= USE_CONSOLE_SLOT;
     for (i = 0; i < ND_MAX_BOARDS; i++) {
-        if (ConfigureParams.Dimension.bMainDisplay &&
-            (ConfigureParams.Dimension.nMainDisplay == i) &&
+        if ((ConfigureParams.Dimension.nConsoleSlot == ND_SLOT(i)) &&
             ConfigureParams.Dimension.board[i].bEnabled) {
             rtc.ram[17] |= (ND_SLOT(i)>>1)<<3;
             break;

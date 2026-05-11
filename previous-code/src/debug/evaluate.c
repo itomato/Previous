@@ -800,7 +800,7 @@ static int get_width(const char *str, char *width)
 	if (str[0] != '.')
 		return 0;
 
-	char lower = tolower(str[1]);
+	char lower = tolower((unsigned char)str[1]);
 	if (lower != 'b' && lower != 'w' && lower != 'l') {
 		id.error = CLAC_WDT_ERR;
 		return 1;

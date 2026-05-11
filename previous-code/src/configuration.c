@@ -66,12 +66,15 @@ static const struct Config_Tag configs_Debugger[] =
 /* Used to load/save screen options */
 static const struct Config_Tag configs_Screen[] =
 {
-	{ "nMonitorType", Int_Tag, &ConfigureParams.Screen.nMonitorType },
-	{ "nMonitorNum", Int_Tag, &ConfigureParams.Screen.nMonitorNum },
+	{ "nMode", Int_Tag, &ConfigureParams.Screen.nMode },
+	{ "nGroupModePos0", Int_Tag, &ConfigureParams.Screen.nGroupModePos[0] },
+	{ "nGroupModePos1", Int_Tag, &ConfigureParams.Screen.nGroupModePos[1] },
+	{ "nGroupModePos2", Int_Tag, &ConfigureParams.Screen.nGroupModePos[2] },
+	{ "nGroupModePos3", Int_Tag, &ConfigureParams.Screen.nGroupModePos[3] },
+	{ "nSingleModeSlot", Int_Tag, &ConfigureParams.Screen.nSingleModeSlot },
 	{ "bFullScreen", Bool_Tag, &ConfigureParams.Screen.bFullScreen },
 	{ "bShowStatusbar", Bool_Tag, &ConfigureParams.Screen.bShowStatusbar },
 	{ "bShowTitlebar", Bool_Tag, &ConfigureParams.Screen.bShowTitlebar },
-	{ "bShowDriveLed", Bool_Tag, &ConfigureParams.Screen.bShowDriveLed },
 	{ NULL , Error_Tag, NULL }
 };
 
@@ -342,8 +345,7 @@ static const struct Config_Tag configs_System[] =
 static const struct Config_Tag configs_Dimension[] =
 {
 	{ "bI860Thread",       Bool_Tag, &ConfigureParams.Dimension.bI860Thread },
-	{ "bMainDisplay",      Bool_Tag, &ConfigureParams.Dimension.bMainDisplay },
-	{ "nMainDisplay",      Int_Tag,  &ConfigureParams.Dimension.nMainDisplay },
+	{ "nConsoleSlot",      Int_Tag,  &ConfigureParams.Dimension.nConsoleSlot },
 
 	{ "bEnabled0",         Bool_Tag, &ConfigureParams.Dimension.board[0].bEnabled },
 	{ "nMemoryBankSize00", Int_Tag,  &ConfigureParams.Dimension.board[0].nMemoryBankSize[0] },
@@ -492,12 +494,15 @@ void Configuration_SetDefault(void)
 	                 Paths_GetUserHome(), "", NULL);
 
 	/* Set defaults for Screen */
+	ConfigureParams.Screen.nMode = SCREEN_SINGLE;
+	ConfigureParams.Screen.nGroupModePos[0] = 0;
+	for (i = 1; i < NUM_MONITORS; i++) {
+		ConfigureParams.Screen.nGroupModePos[i] = -1;
+	}
+	ConfigureParams.Screen.nSingleModeSlot = 0;
 	ConfigureParams.Screen.bFullScreen = false;
-	ConfigureParams.Screen.nMonitorType = MONITOR_TYPE_CPU;
-	ConfigureParams.Screen.nMonitorNum = 0;
 	ConfigureParams.Screen.bShowStatusbar = true;
 	ConfigureParams.Screen.bShowTitlebar = true;
-	ConfigureParams.Screen.bShowDriveLed = false;
 
 	/* Set defaults for Sound */
 	ConfigureParams.Sound.bEnableMicrophone = true;
@@ -540,8 +545,7 @@ void Configuration_SetDefault(void)
 
 	/* Set defaults for Dimension */
 	ConfigureParams.Dimension.bI860Thread  = host_num_cpus() != 1;
-	ConfigureParams.Dimension.bMainDisplay = false;
-	ConfigureParams.Dimension.nMainDisplay = 0;
+	ConfigureParams.Dimension.nConsoleSlot = 0;
 	for (i = 0; i < ND_MAX_BOARDS; i++) {
 		ConfigureParams.Dimension.board[i].bEnabled           = false;
 		ConfigureParams.Dimension.board[i].nMemoryBankSize[0] = 4;
@@ -582,36 +586,66 @@ static void Configuration_CheckFloatMinMax(float *val, float min, float max)
  */
 static void Configuration_CheckDimensionSettings(void) {
 	int i;
-	bool enabled = false;
+
+	ConfigureParams.Dimension.nConsoleSlot &= 6;
+	ConfigureParams.Screen.nSingleModeSlot &= 6;
 
 	for (i = 0; i < ND_MAX_BOARDS; i++) {
 		if (ConfigureParams.System.nMachineType==NEXT_STATION) {
 			ConfigureParams.Dimension.board[i].bEnabled = false;
 		}
 		if (ConfigureParams.Dimension.board[i].bEnabled) {
-			enabled = true;
-		} else if (ConfigureParams.Dimension.bMainDisplay) {
-			if (ConfigureParams.Dimension.nMainDisplay == i) {
-				ConfigureParams.Dimension.bMainDisplay = false;
-				ConfigureParams.Screen.nMonitorType = MONITOR_TYPE_CPU;
-			}
+			Configuration_CheckDimensionMemory(ConfigureParams.Dimension.board[i].nMemoryBankSize);
+			ConfigureParams.System.bNBIC = true;
+		} else if (ConfigureParams.Dimension.nConsoleSlot == ND_SLOT(i)) {
+			ConfigureParams.Screen.nSingleModeSlot = 0;
 		}
-	}
-	if (enabled) {
-		ConfigureParams.System.bNBIC = true;
-	} else {
-		ConfigureParams.Screen.nMonitorType = MONITOR_TYPE_CPU;
-	}
-	if ((ConfigureParams.Dimension.nMainDisplay >= ND_MAX_BOARDS) ||
-		(ConfigureParams.Dimension.nMainDisplay < 0)) {
-		ConfigureParams.Dimension.nMainDisplay = 0;
-	}
-	if ((ConfigureParams.Screen.nMonitorNum >= ND_MAX_BOARDS) ||
-		(ConfigureParams.Screen.nMonitorNum < 0)) {
-		ConfigureParams.Screen.nMonitorNum = 0;
 	}
 
 	ConfigureParams.Dimension.bI860Thread = host_num_cpus() != 1;
+}
+
+/*-----------------------------------------------------------------------*/
+/**
+ * Helper function for Configuration_Apply, check screen settings
+ * to be valid. Check for duplicates and screens without board.
+ */
+static void Configuration_Check_ScreenSettings(void) {
+	int i, j, n, s;
+	if (ConfigureParams.Screen.nMode == SCREEN_GROUP) {
+		for (i = 0, n = 0, s = 0; i < NUM_MONITORS; i++) {
+			if (ConfigureParams.Screen.nGroupModePos[i] >= 0) {
+				for (j = i + 1; j < NUM_MONITORS; j++) {
+					if (ConfigureParams.Screen.nGroupModePos[j] >= 0) {
+						if (ConfigureParams.Screen.nGroupModePos[j] == ConfigureParams.Screen.nGroupModePos[i]) {
+							ConfigureParams.Screen.nGroupModePos[j] = -1;
+						}
+					}
+				}
+				if (ConfigureParams.Screen.nGroupModePos[i] >= (NUM_MONITORS * NUM_MONITORS)) {
+					ConfigureParams.Screen.nGroupModePos[i] = -1;
+				}
+				if (i && !ConfigureParams.Dimension.board[ND_NUM(2 * i)].bEnabled) {
+					ConfigureParams.Screen.nGroupModePos[i] = -1;
+				}
+				if (ConfigureParams.Screen.nGroupModePos[i] >= 0) {
+					s = 2 * i;
+					n++;
+				}
+			}
+		}
+		if (n < 2) {
+			ConfigureParams.Screen.nMode = SCREEN_SINGLE;
+			ConfigureParams.Screen.nSingleModeSlot = s;
+		}
+	}
+	if (ConfigureParams.Screen.nMode == SCREEN_SINGLE) {
+		if (ConfigureParams.Screen.nSingleModeSlot > 0) {
+			if (!ConfigureParams.Dimension.board[ND_NUM(ConfigureParams.Screen.nSingleModeSlot)].bEnabled) {
+				ConfigureParams.Screen.nSingleModeSlot = 0;
+			}
+		}
+	}
 }
 
 /*-----------------------------------------------------------------------*/
@@ -766,19 +800,16 @@ void Configuration_Apply(bool bReset)
 	Configuration_CheckMemory(ConfigureParams.Memory.nMemoryBankSize);
 
 	/* Check nextdimension memory size and screen options */
-	for (i = 0; i < ND_MAX_BOARDS; i++) {
-		Configuration_CheckDimensionMemory(ConfigureParams.Dimension.board[i].nMemoryBankSize);
-	}
 	Configuration_CheckDimensionSettings();
+
+	/* Check screen settings */
+	Configuration_Check_ScreenSettings();
 
 	/* Make sure twisted pair ethernet is disabled on 68030 Cube */
 	Configuration_CheckEthernetSettings();
 
 	/* Make sure NBIC is only used on Cubes and ADB only on Turbo */
 	Configuration_CheckPeripheralSettings();
-
-	/* Make sure the overlay drive LED is disabled for Previous */
-	ConfigureParams.Screen.bShowDriveLed = false;
 
 	/* Clean file and directory names */
 	File_MakeAbsoluteName(ConfigureParams.Rom.szRom030FileName);
@@ -895,6 +926,57 @@ void Configuration_SetSystemDefaults(void) {
 			ConfigureParams.Memory.nMemoryBankSize[3] = 16;
 		}
 	}
+}
+
+/*-----------------------------------------------------------------------*/
+/**
+ * Set default screen position for given slot. Skip if screen already
+ * has a position set. Use next free screen if default position is 
+ * already occupied by another board.
+ */
+void Configuration_SetDefaultScreen(int slot) {
+	int i, n;
+	n = slot / 2;
+	if (n < 0 || n >= NUM_MONITORS) {
+		return;
+	}
+	if (ConfigureParams.Screen.nGroupModePos[n] < 0) {
+		if (Configuration_GetScreenFromPos(n) < 0) {
+			ConfigureParams.Screen.nGroupModePos[n] = n;
+		} else {
+			for (i = 0; i < NUM_MONITORS; i++) {
+				if (Configuration_GetScreenFromPos(i) < 0) {
+					ConfigureParams.Screen.nGroupModePos[n] = i;
+					break;
+				}
+			}
+		}
+	}
+}
+
+/*-----------------------------------------------------------------------*/
+/**
+ * Get screen number from position in monitor grid.
+ */
+int Configuration_GetScreenFromPos(int pos) {
+	int i;
+	for (i = 0; i < NUM_MONITORS; i++) {
+		if (ConfigureParams.Screen.nGroupModePos[i] == pos) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+/*-----------------------------------------------------------------------*/
+/**
+ * Return true if set to show color screen on single window.
+ */
+int Configuration_SingleColorScreen(void) {
+	if (ConfigureParams.Screen.nMode == SCREEN_SINGLE) {
+		return (ConfigureParams.Screen.nSingleModeSlot > 0);
+	}
+	return 0;
 }
 
 
@@ -1025,7 +1107,7 @@ static char *Configuration_AddInfo(char *buffer, const char *more)
  */
 int Configuration_SetInfoString(char *buffer, int len)
 {
-	int size;
+	int size, num;
 	char *end;
 
 	/* Output needs to fit into statusbar, so max this
@@ -1039,14 +1121,15 @@ int Configuration_SetInfoString(char *buffer, int len)
 		/* Recording in progress */
 		end = Configuration_AddInfo(end, "Recording sound");
 	} 
-	else if (ConfigureParams.Screen.nMonitorType==MONITOR_TYPE_DIMENSION)
+	else if (Configuration_SingleColorScreen())
 	{
 		/* Message for NeXTdimension */
-		size = Configuration_CheckDimensionMemory(ConfigureParams.Dimension.board[ConfigureParams.Screen.nMonitorNum].nMemoryBankSize);
+		num = ND_NUM(ConfigureParams.Screen.nSingleModeSlot);
+		size = Configuration_CheckDimensionMemory(ConfigureParams.Dimension.board[num].nMemoryBankSize);
 		end = Configuration_AddInfo(end, "33MHz/i860XR/");
 		end += snprintf(end, len - (end - buffer), "%dMB/", size);
 		end = Configuration_AddInfo(end, "NeXTdimension/");
-		end += snprintf(end, len - (end - buffer), "Slot%d", ND_SLOT(ConfigureParams.Screen.nMonitorNum));
+		end += snprintf(end, len - (end - buffer), "Slot%d", ConfigureParams.Screen.nSingleModeSlot);
 	} 
 	else /* Default message */
 	{

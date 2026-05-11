@@ -108,24 +108,18 @@ static void ShortCut_Pause(void)
  */
 static void ShortCut_Dimension(void)
 {
-	if (ConfigureParams.System.nMachineType==NEXT_STATION ||
-		ConfigureParams.Screen.nMonitorType==MONITOR_TYPE_DUAL) {
+	if (ConfigureParams.System.nMachineType == NEXT_STATION ||
+		ConfigureParams.Screen.nMode != SCREEN_SINGLE) {
 		return;
 	}
 
-	while (ConfigureParams.Screen.nMonitorNum < ND_MAX_BOARDS) {
-		if (ConfigureParams.Screen.nMonitorType==MONITOR_TYPE_CPU) {
-			ConfigureParams.Screen.nMonitorType = MONITOR_TYPE_DIMENSION;
-			ConfigureParams.Screen.nMonitorNum = 0;
-		} else {
-			ConfigureParams.Screen.nMonitorNum++;
-		}
-		if (ConfigureParams.Screen.nMonitorNum==ND_MAX_BOARDS) {
-			ConfigureParams.Screen.nMonitorType = MONITOR_TYPE_CPU;
-			ConfigureParams.Screen.nMonitorNum = 0;
+	for (;;) {
+		ConfigureParams.Screen.nSingleModeSlot += 2;
+		ConfigureParams.Screen.nSingleModeSlot &= 6;
+		if (ConfigureParams.Screen.nSingleModeSlot == 0) {
 			break;
 		}
-		if (ConfigureParams.Dimension.board[ConfigureParams.Screen.nMonitorNum].bEnabled) {
+		if (ConfigureParams.Dimension.board[ND_NUM(ConfigureParams.Screen.nSingleModeSlot)].bEnabled) {
 			break;
 		}
 	}
@@ -139,7 +133,7 @@ static void ShortCut_Dimension(void)
 static void ShortCut_StatusBar(void)
 {
 	ConfigureParams.Screen.bShowStatusbar = !ConfigureParams.Screen.bShowStatusbar;
-	Screen_StatusbarChanged();
+	Screen_Reset();
 }
 
 /**

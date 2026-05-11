@@ -141,7 +141,7 @@ static SGOBJ enetmacdlg[] =
 	{ SGSTOP, 0, 0, 0,0, 0,0, NULL }
 };
 
-bool DlgEthernetAdvanced_GetRomMAC(Uint8 *mac)
+static bool DlgEthernetAdvanced_GetRomMAC(Uint8 *mac)
 {
 	FILE* rom;
 	

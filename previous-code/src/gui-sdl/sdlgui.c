@@ -894,7 +894,7 @@ static void SDLGui_SetShortcuts(SGOBJ *dlg)
 			if (*str++ == UNDERLINE_INDICATOR)
 			{
 				/* TODO: conversion */
-				chr = toupper(*str);
+				chr = toupper((unsigned char)*str);
 				dlg[i].shortcut = chr;
 				if (used[chr])
 				{

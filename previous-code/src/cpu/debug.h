@@ -342,6 +342,7 @@ extern struct dma_rec *record_dma_next_cycle(int hpos, int vpos, int vvpos);
 #define TRACE_RANGE_PC 4
 #define TRACE_SKIP_LINE 5
 #define TRACE_RAM_PC 6
+#define TRACE_IMMEDIATE 7
 #define TRACE_CHECKONLY 10
 
 #else
