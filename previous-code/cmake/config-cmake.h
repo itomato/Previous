@@ -63,6 +63,15 @@
 /* Define to 1 if you have the 'strdup' function */
 #cmakedefine HAVE_STRDUP 1
 
+/* Define to 1 if you have the 'posix_memalign' function */
+#cmakedefine HAVE_POSIX_MEMALIGN 1
+
+/* Define to 1 if you have the 'aligned_alloc' function */
+#cmakedefine HAVE_ALIGNED_ALLOC 1
+
+/* Define to 1 if you have the '_aligned_alloc' function */
+#cmakedefine HAVE__ALIGNED_ALLOC 1
+
 /* Define to 1 if you have the 'lsetxattr' and 'lgetxattr' functions */
 #cmakedefine HAVE_LXETXATTR 1
 
@@ -86,12 +95,3 @@
 
 /* Define to 1 to enable rendering threads for higher efficiency */
 #cmakedefine ENABLE_RENDERING_THREAD 1
-
-/* Define to 1 if you have the 'posix_memalign' function */
-#cmakedefine HAVE_POSIX_MEMALIGN 1
-
-/* Define to 1 if you have the 'aligned_alloc' function */
-#cmakedefine HAVE_ALIGNED_ALLOC 1
-
-/* Define to 1 if you have the '_aligned_alloc' function */
-#cmakedefine HAVE__ALIGNED_ALLOC 1

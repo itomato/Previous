@@ -63,23 +63,18 @@ static SDL_Thread*   repaintThread;
 #endif
 
 
-static uint32_t BW2RGB[0x400];
+static uint32_t BW2RGB[0x100][4];
 static uint32_t COL2RGB[0x10000];
 
 static uint32_t bw2rgb(SDL_Surface* surf, int bw) {
-	switch(bw & 3) {
-		case 3:  return SDL_MapSurfaceRGB(surf, 0,   0,   0);
-		case 2:  return SDL_MapSurfaceRGB(surf, 85,  85,  85);
-		case 1:  return SDL_MapSurfaceRGB(surf, 170, 170, 170);
-		case 0:  return SDL_MapSurfaceRGB(surf, 255, 255, 255);
-		default: return 0;
-	}
+	int c = (~bw & 3) * 0x55;
+	return SDL_MapSurfaceRGB(surf, c, c, c);
 }
 
 static uint32_t col2rgb(SDL_Surface* surf, int col) {
-	int r = col & 0xF000; r >>= 12; r |= r << 4;
-	int g = col & 0x0F00; g >>= 8;  g |= g << 4;
-	int b = col & 0x00F0; b >>= 4;  b |= b << 4;
+	int r = ((col >> 12) & 0x0F) * 0x11;
+	int g = ((col >>  8) & 0x0F) * 0x11;
+	int b = ((col >>  4) & 0x0F) * 0x11;
 	return SDL_MapSurfaceRGB(surf, r, g, b);
 }
 
@@ -88,21 +83,22 @@ static uint32_t col2rgb(SDL_Surface* surf, int col) {
  */
 static void blitBW(SDL_Texture* tex) {
 	void* pixels;
-	uint32_t* dst;
-	int src, idx, src_pitch, dst_pitch, x, y;
+	uint8_t* src;
+	uint8_t* dst;
+	int pitch, src_padding, dst_padding, x, y;
 
-	src_pitch = (NeXT_SCRN_W + (ConfigureParams.System.bTurbo ? 0 : 32)) / 4;
-	SDL_LockTexture(tex, NULL, &pixels, &dst_pitch);
+	SDL_LockTexture(tex, NULL, &pixels, &pitch);
+	src = NEXTVideo;
+	dst = (uint8_t*)pixels;
+	src_padding = ConfigureParams.System.bTurbo ? 0 : (32 / 4);
+	dst_padding = pitch - NeXT_SCRN_W * 4;
 	for (y = 0; y < NeXT_SCRN_H; y++) {
-		src = y * src_pitch;
-		dst = (uint32_t*)((uint8_t*)pixels + (y * dst_pitch));
 		for (x = 0; x < NeXT_SCRN_W / 4; x++) {
-			idx = NEXTVideo[src++] * 4;
-			*dst++ = BW2RGB[idx+0];
-			*dst++ = BW2RGB[idx+1];
-			*dst++ = BW2RGB[idx+2];
-			*dst++ = BW2RGB[idx+3];
+			memcpy(dst, BW2RGB[*src++], 16);
+			dst += 16;
 		}
+		src += src_padding;
+		dst += dst_padding;
 	}
 	SDL_UnlockTexture(tex);
 }
@@ -114,16 +110,19 @@ static void blitColor(SDL_Texture* tex) {
 	void* pixels;
 	uint16_t* src;
 	uint32_t* dst;
-	int src_pitch, dst_pitch, x, y;
+	int pitch, src_padding, dst_padding, x, y;
 
-	src_pitch = NeXT_SCRN_W + (ConfigureParams.System.bTurbo ? 0 : 32);
-	SDL_LockTexture(tex, NULL, &pixels, &dst_pitch);
+	SDL_LockTexture(tex, NULL, &pixels, &pitch);
+	src = (uint16_t*)NEXTVideo;
+	dst = (uint32_t*)pixels;
+	src_padding = ConfigureParams.System.bTurbo ? 0 : 32;
+	dst_padding = pitch / 4 - NeXT_SCRN_W;
 	for (y = 0; y < NeXT_SCRN_H; y++) {
-		src = (uint16_t*)NEXTVideo + (y * src_pitch);
-		dst = (uint32_t*)((uint8_t*)pixels + (y * dst_pitch));
 		for (x = 0; x < NeXT_SCRN_W; x++) {
 			*dst++ = COL2RGB[*src++];
 		}
+		src += src_padding;
+		dst += dst_padding;
 	}
 	SDL_UnlockTexture(tex);
 }
@@ -612,13 +611,13 @@ void Screen_Init(void) {
 
 	/* Setup lookup tables */
 	for (i = 0; i < 0x100; i++) {
-		BW2RGB[i*4+0] = bw2rgb(sdlscrn, i>>6);
-		BW2RGB[i*4+1] = bw2rgb(sdlscrn, i>>4);
-		BW2RGB[i*4+2] = bw2rgb(sdlscrn, i>>2);
-		BW2RGB[i*4+3] = bw2rgb(sdlscrn, i>>0);
+		BW2RGB[i][0] = bw2rgb(sdlscrn, i>>6);
+		BW2RGB[i][1] = bw2rgb(sdlscrn, i>>4);
+		BW2RGB[i][2] = bw2rgb(sdlscrn, i>>2);
+		BW2RGB[i][3] = bw2rgb(sdlscrn, i>>0);
 	}
 	for (i = 0; i < 0x10000; i++) {
-		COL2RGB[SDL_BYTEORDER == SDL_BIG_ENDIAN ? i : SDL_Swap16(i)] = col2rgb(sdlscrn, i);
+		COL2RGB[SDL_Swap16BE(i)] = col2rgb(sdlscrn, i);
 	}
 
 	/* Set title, cursor visibility and mouse grab */

@@ -299,10 +299,17 @@ typedef enum
   PAPER_LEGAL
 } PAPER_SIZE;
 
+typedef enum
+{
+  FORMAT_PNG,
+  FORMAT_TIFF
+} PRINT_FORMAT;
+
 typedef struct
 {
   bool bPrinterConnected;
   PAPER_SIZE nPaperSize;
+  PRINT_FORMAT nFileFormat;
   char szPrintToFileName[FILENAME_MAX];
 } CNF_PRINTER;
 

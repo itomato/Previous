@@ -601,7 +601,7 @@ static uint32_t const p_rom[0x20] = {
 	/* P_1C */ 0x0502ba, /* MOVEC #2,OMR          */
 	/* P_1D */ 0x0000b9, /* ANDI  #0,CCR          */
 	/* P_1E */ 0x0c0000, /* JMP   $0              */
-	/* P_1F */ 0x000000, /*                       */
+	/* P_1F */ 0x000000  /*                       */
 };
 
 
@@ -852,6 +852,10 @@ void dsp_core_ssi_Receive_SC0(void)
 
 	LOG_TRACE(TRACE_DSP_HOST_SSI, "Dsp SSI received value from crossbar: 0x%06x\n", value);
 
+	/* FIXME: Two quick hacks added for Previous: */
+	dsp_core.ssi.waitFrameRX = 0; /* So that we receive the frame */
+	dsp_core.periph[DSP_SPACE_X][DSP_SSI_SR] |= (1<<DSP_SSI_SR_TDE); /* required for 24-bit input */
+
 	if (dsp_core.ssi.crb_re && dsp_core.ssi.waitFrameRX == 0) {
 		/* Send value to DSP receive */
 		dsp_core.ssi.RX = value;
@@ -1020,6 +1024,7 @@ void dsp_core_ssi_configure(uint32_t address, uint32_t value)
 
 			LOG_TRACE(TRACE_DSP_HOST_SSI, "Dsp SSI CRB write: 0x%06x\n", value);
 
+			DSP_InitSSI(value); /* Added for Previous */
 			break;
 	}
 }

@@ -314,6 +314,7 @@ static const struct Config_Tag configs_Printer[] =
 {
 	{ "bPrinterConnected", Bool_Tag, &ConfigureParams.Printer.bPrinterConnected },
 	{ "nPaperSize", Int_Tag, &ConfigureParams.Printer.nPaperSize },
+	{ "nFileFormat", Int_Tag, &ConfigureParams.Printer.nFileFormat },
 	{ "szPrintToFileName", String_Tag, ConfigureParams.Printer.szPrintToFileName },
 	{ NULL , Error_Tag, NULL }
 };
@@ -489,6 +490,7 @@ void Configuration_SetDefault(void)
 	/* Set defaults for Printer */
 	ConfigureParams.Printer.bPrinterConnected = false;
 	ConfigureParams.Printer.nPaperSize = PAPER_A4;
+	ConfigureParams.Printer.nFileFormat = FORMAT_PNG;
 	File_MakePathBuf(ConfigureParams.Printer.szPrintToFileName,
 	                 sizeof(ConfigureParams.Printer.szPrintToFileName),
 	                 Paths_GetUserHome(), "", NULL);

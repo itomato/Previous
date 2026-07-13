@@ -30,6 +30,7 @@
 #include "m68000.h"
 #include "sysReg.h"
 #include "dma.h"
+#include "snd.h"
 #include "statusbar.h"
 
 #if ENABLE_DSP_EMU
@@ -169,6 +170,20 @@ static void DSP_HandleDMA(void)
 }
 #endif
 
+
+/**
+ * SSI DSP interface: Start or stop I/O.
+ */
+#if ENABLE_DSP_EMU
+void DSP_InitSSI(uint32_t value)
+{
+	if (value) {
+		snd_dsp_start();
+	} else {
+		snd_dsp_stop();
+	}
+}
+#endif
 
 /**
  * Initialize the DSP emulation

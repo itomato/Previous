@@ -9,6 +9,7 @@
 #define PREV_GRAB_H
 
 extern void Grab_Screen(void);
+extern void Grab_Print(uint8_t* data, int width, int height, int dpi);
 
 extern void Grab_Sound(uint8_t* samples, int len);
 extern void Grab_SoundToggle(void);

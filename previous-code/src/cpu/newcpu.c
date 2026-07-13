@@ -61,6 +61,11 @@ bool check_prefs_changed_comp (bool checkonly) { return false; }
 //#endif
 #endif
 
+#if defined(JIT_HAS_BUS_ERROR_RECOVERY)
+jmp_buf jit_bus_error_jmpbuf;
+volatile bool jit_in_compiled_code = false;
+#endif
+
 /* Opcode of faulting instruction */
 static uae_u32 last_op_for_exception_3;
 /* PC at fault time */
@@ -4817,6 +4822,10 @@ static bool haltloop_do(int vsynctimeline, frame_time_t rpt_end, int lines)
 			ppc_interrupt(intlev());
 			uae_ppc_execute_check();
 #endif
+			if (regs.spcflags & SPCFLAG_CALLBACK) {
+				unset_special(SPCFLAG_CALLBACK);
+				device_call_main_thread_callbacks();
+			}
 			if (regs.spcflags & (SPCFLAG_BRK | SPCFLAG_MODE_CHANGE)) {
 				if (regs.spcflags & SPCFLAG_BRK) {
 					unset_special(SPCFLAG_BRK);
@@ -4836,6 +4845,11 @@ static bool haltloop_do(int vsynctimeline, frame_time_t rpt_end, int lines)
 			ppc_interrupt(intlev());
 			uae_ppc_execute_check();
 #endif
+			if (regs.spcflags & SPCFLAG_CALLBACK) {
+				unset_special(SPCFLAG_CALLBACK);
+				device_call_main_thread_callbacks();
+			}
+
 			if (event_wait)
 				break;
 			frame_time_t d = read_processor_time() - rpt_end;
@@ -5687,10 +5701,15 @@ static void init_cpu_thread(void)
 
 extern addrbank *thread_mem_banks[MEMORY_BANKS];
 
+static bool is_cpu_thread(void)
+{
+	return cpu_thread_tid == uae_thread_get_id();
+}
+
 uae_u32 process_cpu_indirect_memory_read(uae_u32 addr, int size)
 {
 	// Do direct access if call is from filesystem etc thread 
-	if (cpu_thread_tid != uae_thread_get_id()) {
+	if (!is_cpu_thread()) {
 		uae_u32 data = 0;
 		addrbank *ab = thread_mem_banks[bankindex(addr)];
 		switch (size)
@@ -5719,7 +5738,7 @@ uae_u32 process_cpu_indirect_memory_read(uae_u32 addr, int size)
 
 void process_cpu_indirect_memory_write(uae_u32 addr, uae_u32 data, int size)
 {
-	if (cpu_thread_tid != uae_thread_get_id()) {
+	if (!is_cpu_thread()) {
 		addrbank *ab = thread_mem_banks[bankindex(addr)];
 		switch (size)
 		{
@@ -5883,7 +5902,7 @@ static void run_cpu_thread(void (*f)(void *))
 static void custom_reset_cpu(bool hardreset, bool keyboardreset)
 {
 #ifdef WITH_THREADED_CPU
-	if (cpu_thread_tid != uae_thread_get_id()) {
+	if (!is_cpu_thread()) {
 		custom_reset(hardreset, keyboardreset);
 		return;
 	}
@@ -5897,6 +5916,17 @@ static void custom_reset_cpu(bool hardreset, bool keyboardreset)
 #endif
 
 #ifdef JIT  /* Completely different run_2 replacement */
+
+#ifdef CPU_AARCH64
+void execute_exception(uae_u32 cycles)
+{
+	countdown -= cycles;
+	Exception_cpu(regs.jit_exception);
+	regs.jit_exception = 0;
+	cpu_cycles = adjust_cycles(4 * CYCLE_UNIT / 2);
+	do_cycles(cpu_cycles);
+}
+#endif
 
 void do_nothing (void)
 {
@@ -5973,6 +6003,14 @@ void execute_normal(void)
 		/* Take note: This is the do-it-normal loop */
 		r->opcode = get_jit_opcode();
 
+#if defined(JIT) && defined(CPU_x86_64)
+		/* High x86-64 natmem uses jit_n_addr_unsafe for pointer-clean
+		 * codegen decisions. Keep pc_hist.specmem reserved for real
+		 * special-bank flags. */
+		if (jit_n_addr_unsafe && !jit_n_addr_bank_unsafe) {
+			special_mem = 0;
+		} else
+#endif
 		special_mem = special_mem_default;
 		pc_hist[blocklen].location = (uae_u16*)r->pc_p;
 
@@ -6018,12 +6056,29 @@ static void cpu_thread_run_jit(void *v)
 #endif
 	{
 		for (;;) {
+#if defined(JIT_HAS_BUS_ERROR_RECOVERY)
+			{
+				int bus_error_exc = setjmp(jit_bus_error_jmpbuf);
+				if (bus_error_exc != 0) {
+					jit_in_compiled_code = false;
+					Exception(bus_error_exc);
+					continue;
+				}
+			}
+			jit_in_compiled_code = true;
+#endif
 			((compiled_handler*)(pushall_call_handler))();
 			/* Whenever we return from that, we should check spcflags */
 			if (regs.spcflags || cpu_thread_ilvl > 0) {
+#if defined(JIT_HAS_BUS_ERROR_RECOVERY)
+				jit_in_compiled_code = false;
+#endif
 				if (do_specialties_thread()) {
 					break;
 				}
+#if defined(JIT_HAS_BUS_ERROR_RECOVERY)
+				jit_in_compiled_code = true;
+#endif
 			}
 		}
 	}
@@ -6038,6 +6093,9 @@ static void cpu_thread_run_jit(void *v)
 	}
 #endif
 	cpu_thread_active = 0;
+#if defined(JIT_HAS_BUS_ERROR_RECOVERY)
+	jit_in_compiled_code = false;
+#endif
 }
 #endif
 
@@ -6064,6 +6122,16 @@ static void m68k_run_jit(void)
 #ifdef USE_STRUCTURED_EXCEPTION_HANDLING
 		__try {
 #endif
+#if defined(JIT_HAS_BUS_ERROR_RECOVERY)
+			{
+				int bus_error_exc = setjmp(jit_bus_error_jmpbuf);
+				if (bus_error_exc != 0) {
+					jit_in_compiled_code = false;
+					Exception(bus_error_exc);
+				}
+			}
+			jit_in_compiled_code = true;
+#endif
 			for (;;) {
 #ifdef WINUAE_FOR_HATARI
 				//m68k_dumpstate_file(stderr, NULL, 0xffffffff);
@@ -6077,13 +6145,22 @@ static void m68k_run_jit(void)
 				/* Whenever we return from that, we should check spcflags */
 				check_uae_int_request();
 				if (regs.spcflags) {
+#if defined(JIT_HAS_BUS_ERROR_RECOVERY)
+					jit_in_compiled_code = false;
+#endif
 					if (do_specialties(0)) {
 						STOPTRY;
 						return;
 					}
+#if defined(JIT_HAS_BUS_ERROR_RECOVERY)
+					jit_in_compiled_code = true;
+#endif
 				}
 				// If T0, T1 or M got set: run normal emulation loop
 				if (regs.t0 || regs.t1 || regs.m) {
+#if defined(JIT_HAS_BUS_ERROR_RECOVERY)
+					jit_in_compiled_code = false;
+#endif
 					flush_icache(3);
 					struct regstruct *r = &regs;
 					bool exit = false;
@@ -6100,6 +6177,9 @@ static void m68k_run_jit(void)
 						}
 					}
 					unset_special(SPCFLAG_END_COMPILE);
+#if defined(JIT_HAS_BUS_ERROR_RECOVERY)
+					jit_in_compiled_code = true;
+#endif
 				}
 			}
 
@@ -7074,7 +7154,6 @@ static void cpu_thread_run_2(void *v)
 	struct regstruct *r = &regs;
 
 	cpu_thread_tid = uae_thread_get_id();
-
 	cpu_thread_active = 1;
 	while (!exit) {
 		TRY(prb)
@@ -7366,6 +7445,10 @@ void m68k_run(void)
 		currprefs.cpu_model < 68020 ? m68k_run_2_000 : m68k_run_2_020;
 
 	run_func();
+
+#ifdef WITH_THREADED_CPU
+	cpu_thread_tid = 0;
+#endif
 }
 
 void m68k_go (int may_quit)
@@ -8715,7 +8798,11 @@ void exception3_write(uae_u32 opcode, uaecptr addr, int size, uae_u32 val, int f
 
 void exception2_setup(uae_u32 opcode, uaecptr addr, bool read, int size, uae_u32 fc)
 {
+#if defined(JIT_HAS_BUS_ERROR_RECOVERY)
+	last_addr_for_exception_3 = jit_in_compiled_code ? regs.instruction_pc : m68k_getpc();
+#else
 	last_addr_for_exception_3 = m68k_getpc();
+#endif
 	last_fault_for_exception_3 = addr;
 	last_writeaccess_for_exception_3 = read == 0;
 	last_op_for_exception_3 = opcode;
@@ -8757,6 +8844,11 @@ void hardware_exception2(uaecptr addr, uae_u32 v, bool read, bool ins, int size)
 		}
 		// Non-MMU
 		exception2_setup(regs.opcode, addr, read, size, fc);
+#if defined(JIT_HAS_BUS_ERROR_RECOVERY)
+		if (jit_in_compiled_code) {
+			longjmp(jit_bus_error_jmpbuf, 2);
+		}
+#endif
 		THROW(2);
 	}
 }

@@ -36,6 +36,7 @@ extern void DSP_Start(uint8_t mode);
 extern void DSP_Run(int nHostCycles);
 extern void DSP_EnableMemory(void);
 extern void DSP_DisableMemory(void);
+extern void DSP_InitSSI(uint32_t value);
 
 /* Save Dsp state to snapshot */
 extern void DSP_MemorySnapShot_Capture(bool bSave);

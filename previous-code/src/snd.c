@@ -13,23 +13,30 @@ const char Snd_fileid[] = "Previous snd.c";
 #include "m68000.h"
 #include "cycInt.h"
 #include "audio.h"
+#include "grab.h"
 #include "snd.h"
 #include "kms.h"
+#include "dsp.h"
 
 #define LOG_SND_LEVEL   LOG_DEBUG
 #define LOG_VOL_LEVEL   LOG_DEBUG
 
-#define ENABLE_LOWPASS  1 /* experimental */
 
+#define SND_CDDA_FREQUENCY   44100   /* Sound playback frequency */
+#define SND_CODEC_FREQUENCY   8012   /* Sound recording frequency */
+#define SND_CDDA_INTERVAL       23   /* Sound playback frame interval */
+#define SND_CODEC_INTERVAL     125   /* Sound recording frame interval */
 
 uint8_t snd_buffer[SND_BUFFER_SIZE];
 int     snd_buffer_len = 0;
 
 static struct {
+    double volume[2]; /* 0 = left, 1 = right */
+    
     uint8_t mode;
     uint8_t mute;
-    uint8_t lowpass;
-    uint8_t volume[2]; /* 0 = left, 1 = right */
+    uint8_t deemph;
+    uint8_t attenuation[2];
 } sndout_state;
 
 /* Maximum volume (really is attenuation) */
@@ -40,7 +47,7 @@ static struct {
 #define BIAS 0x84       /* define the add-in bias for 16 bit samples */
 #define CLIP 32635
 
-static const int16_t exp_lut[256] = {
+static const uint8_t exp_lut[256] = {
     0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3,
     4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
     5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
@@ -60,11 +67,11 @@ static const int16_t exp_lut[256] = {
 };
 
 static uint8_t snd_make_ulaw(int16_t sample) {
-    int16_t sign, exponent, mantissa;
+    uint8_t sign, exponent, mantissa;
     uint8_t ulawbyte;
     
     /** get the sample into sign-magnitude **/
-    sign = (sample >> 8) & 0x80;        /* set aside the sign */
+    sign = (sample >> 8) & 0x80;  /* set aside the sign */
     if (sign != 0) {
         sample = -sample;         /* get magnitude */
     }
@@ -82,50 +89,61 @@ static uint8_t snd_make_ulaw(int16_t sample) {
     return ulawbyte;
 }
 
-/* These functions apply repeat, zero-fill or nothing on samples */
-static void snd_make_double_samples(uint8_t *buffer, int len, bool repeat) {
-    for (int i=len - 4; i >= 0; i -= 4) {
-        buffer[i*2+7] = repeat ? buffer[i+3] : 0; /* repeat or zero-fill */
-        buffer[i*2+6] = repeat ? buffer[i+2] : 0; /* repeat or zero-fill */
-        buffer[i*2+5] = repeat ? buffer[i+1] : 0; /* repeat or zero-fill */
-        buffer[i*2+4] = repeat ? buffer[i+0] : 0; /* repeat or zero-fill */
-        buffer[i*2+3] =          buffer[i+3];
-        buffer[i*2+2] =          buffer[i+2];
-        buffer[i*2+1] =          buffer[i+1];
-        buffer[i*2+0] =          buffer[i+0];
+/* This variable stores four ulaw samples */
+static uint32_t foursamples;
+static int ulawsamplecount;
+
+/* This function performs two times upsampling using repeat or zero-fill */
+static void snd_make_double_samples(uint8_t* buf, int len, int repeat) {
+    uint32_t copy, fill;
+    uint32_t* src = (uint32_t*)(buf + len);
+    uint32_t* dst = (uint32_t*)(buf + len * 2);
+    while (src < dst) {
+        memcpy(&copy, --src, 4); /* read sample from top of source */
+        fill = copy * repeat;    /* repeat or zero-fill the sample */
+        memcpy(--dst, &fill, 4); /* write filling sample to top of destination */
+        memcpy(--dst, &copy, 4); /* copy original sample to top of destination */
     }
 }
-static void snd_make_normal_samples(uint8_t *buffer, int len) {
-    /* do nothing */
+
+/* This is a de-emphasis filter for 44.1 kHz pre-emphasised CD audio input */
+static struct deemph_t {
+    double li[2];
+    double lo[2];
+} deemph;
+
+static void snd_deemphasis_start(void) {
+    deemph.li[0] = deemph.li[1] = 0.0;
+    deemph.lo[0] = deemph.lo[1] = 0.0;
 }
 
-#if ENABLE_LOWPASS
-/* This is a third-order Butterworth low-pass filter (alpha value 0.1) */
-static int16_t snd_lowpass_filter(int16_t sample, int channel) {
-    static double v[2][4] = { {0.0,0.0,0.0,0.0}, {0.0,0.0,0.0,0.0} };
-    double result;
+static double snd_deemphasis_filter(double i, int c) {
+    /* Coefficients have been calculated as follows:
+     *   T = 1./44100.
+     *   V0 = 0.3365
+     *   OmegaU = 1./19E-6
+     *   B = V0*tan(OmegaU*T/2.)
+     *   a1 = (B-1.)/(B+1.)
+     *   b0 = (1.+(1.-a1)*(V0-1.)/2.)
+     *   b1 = (a1+(a1-1.)*(V0-1.)/2.)
+     */
+    static const double a1 = -0.62786881719628784282;
+    static const double b0 =  0.45995451989513153057;
+    static const double b1 = -0.08782333709141937339;
     
-    v[channel][0] = v[channel][1];
-    v[channel][1] = v[channel][2];
-    v[channel][2] = v[channel][3];
-    v[channel][3] = ( 0.01809893300751444500 * sample)
-                  + ( 0.27805991763454640520 * v[channel][0])
-                  + (-1.18289326203783096148 * v[channel][1])
-                  + ( 1.76004188034316899625 * v[channel][2]);
-    result = (v[channel][0] + v[channel][3]) + 3 * (v[channel][1] + v[channel][2]);
+    double o = i * b0 + deemph.li[c] * b1 - deemph.lo[c] * a1;
     
-    if (result > (double)INT16_MAX) return INT16_MAX;
-    if (result < (double)INT16_MIN) return INT16_MIN;
+    deemph.li[c] = i;
+    deemph.lo[c] = o;
     
-    return (int16_t)result;
+    return o;
 }
-#endif
 
 /* This function returns a factor for adding volume adjustment to samples */
-static double snd_get_volume_factor(int channel) {
-    double gain = sndout_state.volume[channel] * -2.0;
+static double snd_get_volume_factor(uint8_t vol_data) {
+    double gain = (double)vol_data * -2.0;
     
-    switch (sndout_state.volume[channel]) {
+    switch (vol_data) {
         case 0:           return 1.0;
         case SND_MAX_VOL: return 0.0;
         default:          return pow(10.0, gain*0.05);
@@ -133,33 +151,34 @@ static double snd_get_volume_factor(int channel) {
 }
 
 /* This function adjusts sound output volume */
-static void snd_adjust_volume_and_lowpass(uint8_t *buf, int len) {
-    int i;
-    int16_t ldata, rdata;
-    double ladjust, radjust;
+static void snd_adjust_volume_and_deemphasis(uint8_t* buf, int len) {
     if (sndout_state.mute) {
-        for (i=0; i<len; i++) {
-            buf[i] = 0;
-        }
-    } else if (sndout_state.volume[0] || sndout_state.volume[1] || sndout_state.lowpass) {
-        ladjust = snd_get_volume_factor(0);
-        radjust = snd_get_volume_factor(1);
+        memset(buf, 0, len);
+    } else if (sndout_state.attenuation[0] || sndout_state.attenuation[1] || sndout_state.deemph) {
+        int16_t lsample, rsample;
+        double ldata, rdata;
+        int i;
         
-        for (i=0; i<len; i+=4) {
-            ldata = ((int16_t)buf[i+0]<<8)|buf[i+1];
-            rdata = ((int16_t)buf[i+2]<<8)|buf[i+3];
-#if ENABLE_LOWPASS
-            if (sndout_state.lowpass) {
-                ldata = snd_lowpass_filter(ldata, 0);
-                rdata = snd_lowpass_filter(rdata, 1);
+        for (i = 0; i < len; i += 4) {
+            ldata = (double)(int16_t)((buf[i + 0] << 8) | buf[i + 1]);
+            rdata = (double)(int16_t)((buf[i + 2] << 8) | buf[i + 3]);
+            if (sndout_state.deemph) {
+                ldata = snd_deemphasis_filter(ldata, 0);
+                rdata = snd_deemphasis_filter(rdata, 1);
             }
-#endif
-            ldata *= ladjust;
-            rdata *= radjust;
-            buf[i+0] = ldata>>8;
-            buf[i+1] = ldata;
-            buf[i+2] = rdata>>8;
-            buf[i+3] = rdata;
+            ldata *= sndout_state.volume[0];
+            rdata *= sndout_state.volume[1];
+            
+            ldata += (ldata < 0.0) ? -0.5 : +0.5;
+            rdata += (rdata < 0.0) ? -0.5 : +0.5;
+            
+            lsample = (ldata > INT16_MAX) ? INT16_MAX : ((ldata < INT16_MIN) ? INT16_MIN : (int16_t)ldata);
+            rsample = (rdata > INT16_MAX) ? INT16_MAX : ((rdata < INT16_MIN) ? INT16_MIN : (int16_t)rdata);
+            
+            buf[i + 0] = lsample >> 8;
+            buf[i + 1] = lsample;
+            buf[i + 2] = rsample >> 8;
+            buf[i + 3] = rsample;
         }
     }
 }
@@ -171,29 +190,26 @@ static void snd_adjust_volume_and_lowpass(uint8_t *buf, int len) {
 #define SND_MODE_DBL_RP 0x10
 #define SND_MODE_DBL_ZF 0x30
 
-static int snd_send_samples(uint8_t* buffer, int len) {
+static int snd_send_samples(uint8_t* buf, int len) {
     switch (sndout_state.mode) {
         case SND_MODE_NORMAL:
-            snd_make_normal_samples(buffer, len);
-            snd_adjust_volume_and_lowpass(buffer, len);
-            Audio_Output_Queue_Put(buffer, len);
-            return len;
+            break;
         case SND_MODE_DBL_RP:
-            snd_make_double_samples(buffer, len, true);
-            snd_adjust_volume_and_lowpass(buffer, 2*len);
-            Audio_Output_Queue_Put(buffer, len);
-            Audio_Output_Queue_Put(buffer+len, len);
-            return 2*len;
+            snd_make_double_samples(buf, len, 1);
+            len *= 2;
+            break;
         case SND_MODE_DBL_ZF:
-            snd_make_double_samples(buffer, len, false);
-            snd_adjust_volume_and_lowpass(buffer, 2*len);
-            Audio_Output_Queue_Put(buffer, len);
-            Audio_Output_Queue_Put(buffer+len, len);
-            return 2*len;
+            snd_make_double_samples(buf, len, 0);
+            len *= 2;
+            break;
         default:
             Log_Printf(LOG_WARN, "[Sound] Error: Unknown sound output mode!");
             return 0;
     }
+    snd_adjust_volume_and_deemphasis(buf, len);
+    Grab_Sound(buf, len);
+    Audio_Output_Queue_Put(buf, len);
+    return len;
 }
 
 /* This function processes and sends one single sample */
@@ -203,9 +219,9 @@ void snd_send_sample(uint32_t data) {
     if (!snd_output_active())
         return;
     
-    buf[0] = data<<24;
-    buf[1] = data<<16;
-    buf[2] = data<<8;
+    buf[0] = data << 24;
+    buf[1] = data << 16;
+    buf[2] = data << 8;
     buf[3] = data;
     
     snd_send_samples(buf, 4);
@@ -247,17 +263,19 @@ static void snd_save_volume_reg(void) {
     chan_lr = (tmp_vol&0xC0)>>6;
     vol_data = tmp_vol&0x3F;
     
-    if (vol_data>SND_MAX_VOL) {
-        Log_Printf(LOG_WARN, "[Sound] Gain limit exceeded (-%d dB).",vol_data*2);
-        vol_data=SND_MAX_VOL;
+    if (vol_data > SND_MAX_VOL) {
+        Log_Printf(LOG_WARN, "[Sound] Volume data limit exceeded (%d).", vol_data);
+        vol_data = SND_MAX_VOL;
     }
-    if (chan_lr&1) {
-        Log_Printf(LOG_WARN, "[Sound] Setting gain of left channel to -%d dB",vol_data*2);
-        sndout_state.volume[0] = vol_data;
+    if (chan_lr & 1) {
+        Log_Printf(LOG_WARN, "[Sound] Setting gain of left channel to %d dB", vol_data * -2);
+        sndout_state.attenuation[0] = vol_data;
+        sndout_state.volume[0] = snd_get_volume_factor(vol_data);
     }
-    if (chan_lr&2) {
-        Log_Printf(LOG_WARN, "[Sound] Setting gain of right channel to -%d dB",vol_data*2);
-        sndout_state.volume[1] = vol_data;
+    if (chan_lr & 2) {
+        Log_Printf(LOG_WARN, "[Sound] Setting gain of right channel to %d dB", vol_data * -2);
+        sndout_state.attenuation[1] = vol_data;
+        sndout_state.volume[1] = snd_get_volume_factor(vol_data);
     }
 }
 
@@ -284,7 +302,7 @@ void snd_gpo_access(uint8_t data) {
     Log_Printf(LOG_VOL_LEVEL, "[Sound] Control logic access: %02X",data);
     
     sndout_state.mute = data&SND_SPEAKER_ENABLE;
-    sndout_state.lowpass = data&SND_LOWPASS_ENABLE;
+    sndout_state.deemph = data&SND_LOWPASS_ENABLE;
     
     if (data&SND_INTFC_STROBE) {
         snd_save_volume_reg();
@@ -298,42 +316,44 @@ void snd_gpo_access(uint8_t data) {
 
 
 /* Initialise and uninitialise the audio system */
-static bool sndout_inited       = false;
-static bool sndin_inited        = false;
+static bool sound_output_inited = false;
 static bool sound_output_active = false;
 static bool sound_input_active  = false;
+static bool sound_dsp_active    = false;
 
-static void sound_init(void) {
-    if (!sndout_inited && ConfigureParams.Sound.bEnableSound) {
-        Log_Printf(LOG_WARN, "[Sound] Initializing output device.");
-        Audio_Output_Init();
-        sndout_inited = true;
+static void sound_unpause(void) {
+    if (!sound_output_inited && ConfigureParams.Sound.bEnableSound) {
+        Log_Printf(LOG_WARN, "[Sound] Initialising output.");
+        Audio_Output_Init(2, SND_CDDA_FREQUENCY);
+        sound_output_inited = true;
     }
-    if (!sndin_inited && sound_input_active && ConfigureParams.Sound.bEnableSound) {
-        Log_Printf(LOG_WARN, "[Sound] Initializing input device.");
-        Audio_Input_Init();
-        sndin_inited = true;
-    }
-    if (sound_output_active && sndout_inited) {
+    if (sound_output_active && sound_output_inited) {
         Log_Printf(LOG_WARN, "[Sound] Starting output.");
         Audio_Output_Enable(true);
     }
-    if (sound_input_active && sndin_inited) {
+    if (sound_input_active && ConfigureParams.Sound.bEnableSound) {
         Log_Printf(LOG_WARN, "[Sound] Starting input.");
-        Audio_Input_Enable(true);
+        Audio_Input_InitAndEnable(1, SND_CODEC_FREQUENCY);
+    }
+    if (sound_dsp_active && ConfigureParams.Sound.bEnableSound) {
+        Log_Printf(LOG_WARN, "[Sound] Starting DSP input.");
+        Audio_DSP_InitAndEnable(2, SND_CDDA_FREQUENCY);
     }
 }
 
-static void sound_uninit(void) {
-    if (sndout_inited) {
-        Log_Printf(LOG_WARN, "[Sound] Uninitializing output device.");
-        sndout_inited = false;
+static void sound_pause(void) {
+    if (sound_output_inited) {
+        Log_Printf(LOG_WARN, "[Sound] Uninitialising output.");
+        sound_output_inited = false;
         Audio_Output_UnInit();
     }
-    if (sndin_inited) {
-        Log_Printf(LOG_WARN, "[Sound] Uninitializing input device.");
-        sndin_inited = false;
+    if (sound_input_active) {
+        Log_Printf(LOG_WARN, "[Sound] Stopping input.");
         Audio_Input_UnInit();
+    }
+    if (sound_dsp_active) {
+        Log_Printf(LOG_WARN, "[Sound] Stopping DSP input.");
+        Audio_DSP_UnInit();
     }
 }
 
@@ -341,54 +361,67 @@ static void sound_uninit(void) {
 /* Start and stop sound output */
 void snd_start_output(uint8_t mode) {
     sndout_state.mode = mode;
-    /* Starting SDL Audio */
-    if (sndout_inited) {
+    /* Starting host audio playback */
+    if (sound_output_inited) {
         Audio_Output_Enable(true);
     } else {
-        Log_Printf(LOG_SND_LEVEL, "[Sound] Not starting. Sound output device not initialized.");
+        Log_Printf(LOG_SND_LEVEL, "[Sound] Not starting. Sound output device not initialised.");
     }
     /* Starting sound output loop */
     if (!sound_output_active) {
         Log_Printf(LOG_SND_LEVEL, "[Sound] Starting output loop.");
+        snd_deemphasis_start();
         sound_output_active = true;
         Audio_Output_Queue_Clear();
-        CycInt_AddTimeEvent(1, 0, EVENT_SND_OUTPUT);
     } else { /* Even re-enable loop if we are already active. This lowers the delay. */
         Log_Printf(LOG_DEBUG, "[Sound] Restarting output loop.");
-        CycInt_AddTimeEvent(1, 0, EVENT_SND_OUTPUT);
     }
+    CycInt_AddTimeEvent(1, 0, EVENT_SND_OUTPUT);
 }
 
 void snd_stop_output(void) {
-    sound_output_active=false;
+    sound_output_active = false;
 }
 
-void snd_start_input(uint8_t mode) {
-    
-    /* Starting SDL Audio */
-    if (sndin_inited) {
-        Audio_Input_Enable(true);
-    } else if (ConfigureParams.Sound.bEnableSound) {
-        sndin_inited = true;
-        Audio_Input_Init();
-        Audio_Input_Enable(true);
-    }
-    /* Starting sound input loop */
+/* Start and stop sound input */
+void snd_start_input(void) {
     if (!sound_input_active) {
+        /* Start recording from host input if enabled */
+        if (ConfigureParams.Sound.bEnableSound) {
+            Audio_Input_InitAndEnable(1, SND_CODEC_FREQUENCY);
+        }
         Log_Printf(LOG_SND_LEVEL, "[Sound] Starting input loop.");
+        ulawsamplecount = 0;
         sound_input_active = true;
-        CycInt_AddTimeEvent(1, 0, EVENT_SND_INPUT);
     } else { /* Even re-enable loop if we are already active. This lowers the delay. */
         Log_Printf(LOG_DEBUG, "[Sound] Restarting input loop.");
-        CycInt_AddTimeEvent(1, 0, EVENT_SND_INPUT);
     }
+    /* Starting sound input loop */
+    CycInt_AddTimeEvent(1, 0, EVENT_SND_INPUT);
 }
 
 void snd_stop_input(void) {
     sound_input_active = false;
-    sndin_inited = false;
     Audio_Input_UnInit();
 }
+
+/* Start and stop sound input throgh DSP */
+void snd_dsp_start(void) {
+    if (!sound_dsp_active) {
+        if (ConfigureParams.Sound.bEnableSound) {
+            Audio_DSP_InitAndEnable(2, SND_CDDA_FREQUENCY);
+        }
+        Log_Printf(LOG_SND_LEVEL, "[Sound] Starting DSP input loop.");
+        sound_dsp_active = true;
+        CycInt_AddCycleTimeEvent(5, 0, EVENT_SND_DSP_INPUT);
+    }
+}
+
+void snd_dsp_stop(void) {
+    sound_dsp_active = false;
+    Audio_DSP_UnInit();
+}
+
 
 /* Return sound state */
 bool snd_output_active(void) {
@@ -402,14 +435,16 @@ bool snd_input_active(void) {
 
 /* Reset and pause sound */
 void Sound_Reset(void) {
+    sndout_state.volume[0] = snd_get_volume_factor(sndout_state.attenuation[0]);
+    sndout_state.volume[1] = snd_get_volume_factor(sndout_state.attenuation[1]);
     snd_buffer_len = 0;
 }
 
 void Sound_Pause(bool pause) {
     if (pause) {
-        sound_uninit();
+        sound_pause();
     } else {
-        sound_init();
+        sound_unpause();
     }
 }
 
@@ -419,27 +454,34 @@ void Sound_Pause(bool pause) {
 /*
   At a playback rate of 44.1kHz a sample takes about 23 microseconds.
   Assuming that the emulation runs at least 1/3 as fast as a real m68k
-  checking the sound queue every 8 microseconds should be ok.
+  calculating with 8 microseconds per sample should be ok.
  */
-#define SND_CHECK_DELAY 8
-
 void SND_Out_Handler(void) {
+    uint64_t frametime;
+    int count;
+    
     if (!sound_output_active) {
         Audio_Output_Queue_Flush();
         return;
     }
     
-    if (sndout_inited && Audio_Output_Queue_Size() > SOUND_BUFFER_SAMPLES * 2) {
-        CycInt_UpdateTimeEvent(SND_CHECK_DELAY * SOUND_BUFFER_SAMPLES, 0, EVENT_SND_OUTPUT);
-        return;
+    if (sound_output_inited) {
+        frametime = 8;   /* Use short delay for host sound sync. See comment above. */
+        count = Audio_Output_Queue_Size();
+        if (count > 0) { /* Enough sample frames queued. Waiting syncs with playback. */
+            count >>= 2;
+            CycInt_UpdateTimeEvent(frametime * count, 0, EVENT_SND_OUTPUT);
+            return;
+        }
+    } else {
+        frametime = SND_CDDA_INTERVAL;
     }
     
     kms_send_sndout_request();
     
     if (snd_buffer_len) {
-        snd_buffer_len = snd_send_samples(snd_buffer, snd_buffer_len);
-        snd_buffer_len = (snd_buffer_len / 4) + 1;
-        CycInt_UpdateTimeEvent(SND_CHECK_DELAY * snd_buffer_len, 0, EVENT_SND_OUTPUT);
+        count = snd_send_samples(snd_buffer, snd_buffer_len) >> 2;
+        CycInt_UpdateTimeEvent(frametime * count, 0, EVENT_SND_OUTPUT);
     } else {
         kms_send_sndout_underrun();
         /* Call do_dma_sndout_intr() a little bit later */
@@ -448,14 +490,12 @@ void SND_Out_Handler(void) {
 }
 
 /*
-  Sound is recorded at 8012 Hz. One sample (byte) takes about 124 microseconds.
+  Sound is recorded at 8012 Hz. One sample (byte) takes about 125 microseconds.
  */
-#define SNDIN_SAMPLE_TIME 124
-
 void SND_In_Handler(void) {
+    uint64_t frametime;
     int16_t sample;
-    uint32_t foursamples = 0;
-    int size = 0;
+    int count = 0;
     
     if (!sound_input_active) {
         return;
@@ -463,22 +503,28 @@ void SND_In_Handler(void) {
     if (!kms_can_receive_codec()) {
         return;
     }
+    if (ConfigureParams.Sound.bEnableSound) {
+        frametime = SND_CODEC_INTERVAL - 1;
+    } else {
+        frametime = SND_CODEC_INTERVAL;
+    }
     
     /* Process 256 samples at a time and then sync */
-    while (size<256) {
+    while (count < 256) {
         if (Audio_Input_Buffer_Get(&sample) < 0) {
             Log_Printf(LOG_WARN, "[Sound] Waiting for sound input data");
-            size = 256;
+            count = 256; /* Long delay */
             break;
         }
-        
+        count++;
+
         /* Shift in sample (oldest first) */
-        foursamples = (foursamples<<8) | snd_make_ulaw(sample);
-        
-        size++;
+        foursamples = (foursamples << 8) | snd_make_ulaw(sample);
+        ulawsamplecount++;
         
         /* After accumulating 4 samples, send them to KMS */
-        if ((size&3)==0) {
+        if (ulawsamplecount >= 4) {
+            ulawsamplecount = 0;
             if (kms_send_codec_receive(foursamples)) {
                 break;
             }
@@ -488,10 +534,32 @@ void SND_In_Handler(void) {
     /* If we accumulated too much data write it fast */
     if (Audio_Input_Buffer_Size() > 8192) { /* this is 4096 ulaw samples equaling about 0.5 seconds */
         Log_Printf(LOG_WARN, "[Sound] Writing input data fast");
-        size = 16; /* Short delay */
+        count = 16; /* Short delay */
     }
     
     if (kms_can_receive_codec()) {
-        CycInt_UpdateTimeEvent(size*SNDIN_SAMPLE_TIME, 0, EVENT_SND_INPUT);
+        CycInt_UpdateTimeEvent(frametime * count, 0, EVENT_SND_INPUT);
     }
+}
+
+/*
+  Sound can also be recorded at 44,1 kHz through the SSI port of the DSP.
+ */
+void SND_DSP_Handler(void) {
+    uint64_t sampletime;
+    int16_t sample;
+    
+    if (!sound_dsp_active) {
+        return;
+    }
+    if (ConfigureParams.Sound.bEnableSound) {
+        sampletime = SND_CDDA_INTERVAL >> 2;
+    } else {
+        sampletime = SND_CDDA_INTERVAL >> 1;
+    }
+    if (Audio_DSP_Buffer_Get(&sample) == 0) {
+        DSP_SsiWriteRxValue(sample);
+        DSP_SsiReceive_SC0();
+    }
+    CycInt_UpdateCycleTimeEvent(sampletime, 0, EVENT_SND_DSP_INPUT);
 }

@@ -15,129 +15,56 @@ const char Printer_fileid[] = "Previous printer.c";
 #include "sysReg.h"
 #include "dma.h"
 #include "statusbar.h"
+#include "grab.h"
 
-#if HAVE_LIBPNG
-#include "file.h"
-#include <png.h>
-
-/* Helper function for building path and filename of output file */
-static char *lp_png_filename(void) {
-    
-    if (File_DirExists(ConfigureParams.Printer.szPrintToFileName)) {
-        int i;
-        char szFileName[32];
-        char *szPathName = NULL;
-        
-        for (i = 0; i < 1000000; i++) {
-            snprintf(szFileName, sizeof(szFileName), "next_print_%06d", i);
-            szPathName = File_MakePath(ConfigureParams.Printer.szPrintToFileName, szFileName, "png");
-            
-            if (!File_Exists(szPathName)) {
-                return szPathName;
-            }
-            
-            free(szPathName);
-        }
-        
-        Log_Printf(LOG_WARN, "[Printer] Error: Maximum print count exceeded (%d)", i);
-    }
-    return NULL;
-}
-
-/* PNG printing functions */
-const int MAX_PAGE_LEN = 400 * 14; /* 14 inches is the length of US legal paper, longest paper that fits into the NeXT printer cartridge */
-png_structp png_ptr          = NULL;
-png_infop   png_info_ptr     = NULL;
-png_byte**  png_row_pointers = NULL;
-int         png_width;
-int         png_count;
-
-static void lp_png_setup(uint32_t data) {
-    int i;
-    png_width = ((data >> 16) & 0x7F) * 32;
-    
-    if (png_ptr) {
-        for (i = 0; i < MAX_PAGE_LEN; i++) {
-            png_free(png_ptr, png_row_pointers[i]);
-        }
-        png_free(png_ptr, png_row_pointers);
-        png_destroy_write_struct(&png_ptr, &png_info_ptr);
-    }
-    
-    png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-    if (png_ptr == NULL) {
-        return;
-    }
-    png_info_ptr = png_create_info_struct(png_ptr);
-    if (png_info_ptr == NULL) {
-        png_destroy_write_struct(&png_ptr, &png_info_ptr);
-        png_ptr = NULL;
-        return;
-    }
-    
-    png_row_pointers = png_malloc(png_ptr, MAX_PAGE_LEN * sizeof (png_byte *));
-    for (i = 0; i < MAX_PAGE_LEN; i++) {
-        png_row_pointers[i] = png_malloc(png_ptr, sizeof (uint8_t) * (png_width / 8));
-    }
-    png_count  = 0;
-}
-
-static void lp_png_print(void) {
-    if (png_ptr) {
-        int i;
-        
-        for (i = 0; i < lp_buffer.size; i++) {
-            png_row_pointers[png_count/png_width][(png_count%png_width)/8] = ~lp_buffer.data[i];
-            png_count += 8;
-        }
-    }
-}
-
-static void lp_png_finish(void) {
-    if (png_ptr) {
-        char* png_path = NULL;
-        FILE* png_file = NULL;
-        
-        png_set_IHDR(png_ptr,
-                     png_info_ptr,
-                     png_width,
-                     png_count / png_width,
-                     1,
-                     PNG_COLOR_TYPE_GRAY,
-                     PNG_INTERLACE_NONE,
-                     PNG_COMPRESSION_TYPE_DEFAULT,
-                     PNG_FILTER_TYPE_DEFAULT);
-        
-        png_path = lp_png_filename();
-        
-        if (png_path) {
-            png_file = File_Open(png_path, "wb");
-            free(png_path);
-        }
-        
-        if (png_file) {
-            png_init_io(png_ptr, png_file);
-            png_set_rows(png_ptr, png_info_ptr, png_row_pointers);
-            png_write_png(png_ptr, png_info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
-            File_Close(png_file);
-        } else {
-            Statusbar_AddMessage("Laser printer error: Could not create output file", 10000);
-        }
-    }
-}
-#else
-static void lp_png_setup(uint32_t data) {}
-static void lp_png_print(void) {}
-static void lp_png_finish(void) {}
-#endif
-
-
-/* Laser Printer */
 #define LOG_LP_REG_LEVEL    LOG_DEBUG
 #define LOG_LP_LEVEL        LOG_DEBUG
 #define LOG_LP_PRINT_LEVEL  LOG_DEBUG
 
+
+/* Functions for printing to an image file */
 PrinterBuffer lp_buffer;
+
+static uint8_t* print_data;
+static int print_dpi;
+static int print_size;
+static int print_limit;
+static int print_width;
+
+/* 14 inches is the longest paper and 400 DPI is the highest resolution. */
+static const int MAX_PAGE_LEN = 14 * 400; 
+
+static void lp_print_start(uint32_t data) {
+    if (print_data) {
+        free(print_data);
+    }
+    print_width = ((data >> 16) & 0x7F) * 4;
+    if (print_width) {
+        print_limit = MAX_PAGE_LEN * print_width;
+        print_data  = (uint8_t*)malloc(print_limit);
+        print_size  = 0;
+    }
+}
+
+static void lp_print_data(void) {
+    if (print_data) {
+        if (lp_buffer.size > print_limit - print_size) {
+            lp_buffer.size = print_limit - print_size;
+        }
+        memcpy(print_data + print_size, lp_buffer.data, lp_buffer.size);
+        print_size += lp_buffer.size;
+    }
+}
+
+static void lp_print_finish(void) {
+    if (print_data) {
+        Grab_Print(print_data, print_width * 8, print_size / print_width, print_dpi);
+        free(print_data);
+        print_data = NULL;
+        print_size = 0;
+    }
+}
+
 
 struct {
     /* Registers */
@@ -453,12 +380,13 @@ static void lp_start_boot_sequence(void) {
 
 static void lp_printer_reset(void) {
     int i;
-    lp_data_transfer = false;
     for (i = 0; i < 16; i++) {
         lp_serial_status[i] = 0;
     }
     lp_serial_phase = 0;
     lp_copyright_sequence = 0;
+    lp_data_transfer = false;
+    lp_print_finish();
 }
 
 static void lp_interface_on(void) {
@@ -665,10 +593,10 @@ static void lp_command_in(uint8_t cmd, uint32_t data) {
                 if (cmd&LP_CMD_DATA_EN) {
                     Log_Printf(LOG_LP_LEVEL,"[LP] Enable printer data transfer");
                     /* Setup printing buffer */
-                    lp_png_setup(lp.margins);
+                    lp_print_start(lp.margins);
                     lp_data_transfer = true;
                     if (lp_buffer.size) {
-                        lp_png_print();
+                        lp_print_data();
                         lp_buffer.size = 0;
                     }
                     Statusbar_AddMessage("Laser printer printing page", 0);
@@ -677,14 +605,16 @@ static void lp_command_in(uint8_t cmd, uint32_t data) {
                     Log_Printf(LOG_LP_LEVEL, "[LP] Disable printer data transfer");
                     if (lp_data_transfer) {
                         /* Save buffered printing data to image file */
-                        lp_png_finish();
+                        lp_print_finish();
                     }
                     lp_data_transfer = false;
                 }
                 if (cmd&LP_CMD_300DPI) {
                     Log_Printf(LOG_LP_LEVEL, "[LP] 300 DPI mode");
+                    print_dpi = 300;
                 } else {
                     Log_Printf(LOG_LP_LEVEL, "[LP] 400 DPI mode");
+                    print_dpi = 400;
                 }
                 if (cmd&LP_CMD_NORMAL) {
                     Log_Printf(LOG_LP_LEVEL, "[LP] Normal requests for data transfer");
@@ -712,12 +642,16 @@ void Printer_IO_Handler(void) {
             return;
         }
         /* Save data to printing buffer */
-        lp_png_print();
-        
+        lp_print_data();
         lp_buffer.size = 0;
         
         CycInt_UpdateTimeEvent(10000, 1000, EVENT_PRINTER_IO);
     }
+}
+
+/* Free printing buffer */
+void Printer_UnInit(void) {
+    lp_print_finish();
 }
 
 /* Printer reset function */

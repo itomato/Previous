@@ -50,7 +50,8 @@
 #define UAE
 #endif
 
-#if defined(_M_ARM64) || defined(_M_ARM64EC) || defined(__aarch64__)
+#if defined(__aarch64__) || defined(_M_ARM64) || defined(_M_ARM64EC) 
+#define CPU_AARCH64 1
 #define CPU_arm 1
 #define ARM_ASSEMBLY 1
 #define CPU_64_BIT 1
@@ -80,6 +81,9 @@
 #define JITCALL __fastcall
 #elif defined(CPU_x86_64)
 /* Parameters are passed in RDI, RSI by default (System V AMD64 ABI). */
+#define JITCALL
+#elif defined(CPU_arm) || defined(CPU_AARCH64)
+/* ARM/ARM64: parameters are passed in registers by default. */
 #define JITCALL
 #elif defined(HAVE_FUNC_ATTRIBUTE_REGPARM)
 /* Parameters are passed in EAX, EDX on x86 with regparm(2). */

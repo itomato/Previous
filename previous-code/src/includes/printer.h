@@ -27,6 +27,7 @@ typedef struct {
 
 extern PrinterBuffer lp_buffer;
 
+extern void Printer_UnInit(void);
 extern void Printer_Reset(void);
 extern void Printer_IO_Handler(void);
 

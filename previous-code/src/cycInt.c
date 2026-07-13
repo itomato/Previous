@@ -72,6 +72,7 @@ static void (*const pEventHandlers[NUM_EVENTS])(void) =
 	SCC_IO_Handler,
 	Tablet_IO_Handler,
 	DMA_M2M_IO_Handler,
+	SND_DSP_Handler,
 	SND_In_Handler,
 	SND_Out_Handler,
 	Video_VBL_Handler,

@@ -615,7 +615,7 @@ static void kms_command_in(uint8_t command, uint32_t data) {
                 
                 if (command&KMSCMD_SIO_ENABLE) {
                     Log_Printf(LOG_KMS_LEVEL, "[KMS] Sound in enable.");
-                    snd_start_input(command);
+                    snd_start_input();
                 } else {
                     Log_Printf(LOG_KMS_LEVEL, "[KMS] Sound in disable.");
                     kms.status.sound &= ~(SNDIN_DMA_OVERRUN|SNDIN_DMA_REQUEST);

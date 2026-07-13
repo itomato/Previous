@@ -24,6 +24,7 @@ extern char *Str_Dup(const char *str);
 extern long Str_Copy(char *pDest, const char *pSrc, long nBufLen);
 extern char *Str_Trunc(char *str);
 extern bool Str_IsHex(const char *str);
+extern uint8_t *Str_FindInMem(const char *pString , uint8_t *Mem , int MemLen);
 extern void Str_UnEscape(char *str);
 
 #endif  /* HATARI_STR_H */

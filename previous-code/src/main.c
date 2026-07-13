@@ -26,6 +26,7 @@ const char Main_fileid[] = "Previous main.c";
 #include "screen.h"
 #include "snd.h"
 #include "ethernet.h"
+#include "printer.h"
 #include "statusbar.h"
 #include "str.h"
 #include "debugui.h"
@@ -365,6 +366,7 @@ static void Main_UnInit(void) {
 	host_semaphore_destroy(pauseFlag);
 #endif
 	Sound_Pause(true);
+	Printer_UnInit();
 	Ethernet_UnInit();
 	IoMem_UnInit();
 	UI_UnInit();
