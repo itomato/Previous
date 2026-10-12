@@ -268,12 +268,12 @@ static void snd_save_volume_reg(void) {
         vol_data = SND_MAX_VOL;
     }
     if (chan_lr & 1) {
-        Log_Printf(LOG_WARN, "[Sound] Setting gain of left channel to %d dB", vol_data * -2);
+        Log_Printf(LOG_WARN, "[Sound] Setting gain of left channel to %d dB", (int)vol_data * -2);
         sndout_state.attenuation[0] = vol_data;
         sndout_state.volume[0] = snd_get_volume_factor(vol_data);
     }
     if (chan_lr & 2) {
-        Log_Printf(LOG_WARN, "[Sound] Setting gain of right channel to %d dB", vol_data * -2);
+        Log_Printf(LOG_WARN, "[Sound] Setting gain of right channel to %d dB", (int)vol_data * -2);
         sndout_state.attenuation[1] = vol_data;
         sndout_state.volume[1] = snd_get_volume_factor(vol_data);
     }

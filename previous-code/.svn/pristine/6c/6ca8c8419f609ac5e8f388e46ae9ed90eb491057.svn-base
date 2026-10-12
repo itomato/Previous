@@ -1,6 +1,6 @@
 
 
-                                  Previous 4.4
+                                  Previous 4.5
 
 
 
@@ -484,6 +484,11 @@ Previous v4.4:
   > Improves efficiency of monochrome screen drawing routine.
   > Improves generated PNG files to have smaller file sizes.
   > Improves efficiency, reliability and timing of sound output.
+
+Previous v4.5:
+  > Fixes bug that could cause permanent Ethernet DMA failures.
+  > Fixes bug in 68030 MMU that could cause rare guest system crashes.
+  > Fixes bug that made it possible to select invalid SCSI targets.
 
 
  7) Running Previous

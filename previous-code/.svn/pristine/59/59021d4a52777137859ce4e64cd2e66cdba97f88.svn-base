@@ -238,7 +238,7 @@ void DMA_CSR_Write(void) {
             dma_m2m();
         }
     }
-    if (writecsr&DMA_CLRCOMPLETE) {
+    if ((writecsr&DMA_CLRCOMPLETE) && (dma[channel].csr&DMA_ENABLE)) {
         dma[channel].csr &= ~DMA_COMPLETE;
     }
     if (!(dma[channel].csr&DMA_COMPLETE)) {

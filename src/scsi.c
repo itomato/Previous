@@ -180,7 +180,7 @@ struct known_disk {
     uint32_t bs;
 };
 
-#define KNOWN_SIZE(x,n) (x[n].c * x[n].h * x[n].s * x[n].bs)
+#define KNOWN_SIZE(x,n) ((off_t)x[n].c * x[n].h * x[n].s * x[n].bs)
 
 static const struct known_disk known_disks[] =
 {
@@ -991,10 +991,14 @@ static void SCSI_Command(uint8_t *cdb) {
 
 
 /* SCSI disk access */
-bool SCSIdisk_Select(uint8_t target) {
+bool SCSIdisk_Select(uint8_t initiator, uint8_t target) {
     
     /* If there is no disk drive present, return timeout true */
-    if (SCSIdisk[target].devtype==SD_NONE) {
+    if (target == initiator || target >= ESP_MAX_DEVS) {
+        Log_Printf(LOG_WARN, "[SCSI] Invalid selection (initiator %i, target %i)", initiator, target);
+        SCSIbus.phase = PHASE_ST;
+        return true;
+    } else if (SCSIdisk[target].devtype==SD_NONE) {
         Log_Printf(LOG_SCSI_LEVEL, "[SCSI] Selection timeout, target = %i", target);
         SCSIbus.phase = PHASE_ST;
         return true;

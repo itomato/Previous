@@ -31,7 +31,7 @@ typedef enum {
     TARGET
 } SCSI_STATE;
 
-SCSI_STATE esp_state;
+static SCSI_STATE esp_state;
 
 typedef enum {
     ESP_IO_STATE_TRANSFERING,
@@ -39,7 +39,7 @@ typedef enum {
     ESP_IO_STATE_DONE
 } ESP_IO_STATE;
 
-ESP_IO_STATE esp_io_state;
+static ESP_IO_STATE esp_io_state;
 
 /* ESP FIFO */
 #define ESP_FIFO_SIZE 16
@@ -48,7 +48,7 @@ void esp_fifo_write(uint8_t val);
 void esp_fifo_clear(void);
 
 /* ESP Command Register */
-uint8_t esp_cmd_state;
+static uint8_t esp_cmd_state;
 #define ESP_CMD_INPROGRESS  0x01
 #define ESP_CMD_WAITING     0x02
 void esp_start_command(uint8_t cmd);
@@ -147,10 +147,11 @@ uint32_t esp_counter;
 
 /* Configuration Register */
 #define CFG1_RESREPT 0x40
+#define CFG1_BUSID   0x07
 
 
 /* ESP Status Variables */
-uint8_t mode_dma;
+static uint8_t mode_dma;
 
 /* Experimental */
 #define ESP_CLOCK_FREQ  20      /* ESP is clocked at 20 MHz */
@@ -158,7 +159,6 @@ uint8_t mode_dma;
 
 
 /* ESP DMA control and status registers */
-
 void ESP_DMA_CTRL_Read(void) {
     IoMem_WriteByte(IoAccessCurrentAddress, esp_dma.control);
     Log_Printf(LOG_ESPDMA_LEVEL,"ESP DMA control read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
@@ -242,8 +242,8 @@ void ESP_DMA_set_status(void) { /* this is just a guess */
     }
 }
 
-/* ESP Registers */
 
+/* ESP Registers */
 void ESP_TransCountL_Read(void) { /* 0x02014000 */
     IoMem_WriteByte(IoAccessCurrentAddress, esp_counter&0xFF);
     Log_Printf(LOG_ESPREG_LEVEL,"ESP TransCountL read at $%08x val=$%02x PC=$%08x\n", IoAccessCurrentAddress, IoMem_ReadByte(IoAccessCurrentAddress), m68k_getpc());
@@ -650,7 +650,7 @@ void ESP_Interrupt_Handler(void) {
 
 
 void esp_raise_irq(void) {
-    if(!(status & STAT_INT)) {
+    if (!(status & STAT_INT)) {
         status |= STAT_INT;
         
         if (esp_dma.control&ESPCTRL_ENABLE_INT) {
@@ -772,28 +772,28 @@ void esp_flush_fifo(void) {
 
 /* Select with or without ATN */
 void esp_select(bool atn) {
+    uint8_t commandbuf[SCSI_CDB_MAX_SIZE];
     int cmd_size;
     uint8_t identify_msg = 0;
-    uint8_t commandbuf[SCSI_CDB_MAX_SIZE];
-
-    seqstep = 0;
-    
-    /* First select our target */
     uint8_t target = selectbusid & BUSID_DID; /* Get bus ID from register */
-    bool timeout = SCSIdisk_Select(target);
-    if (timeout) {
+    uint8_t initiator = configuration & CFG1_BUSID;
+    
+    seqstep = 0;
+
+    /* First select our target */
+    if (SCSIdisk_Select(initiator, target)) {
         /* If a timeout occurs, generate disconnect interrupt */
+        int seltout = (selecttimeout * 8192 * clockconv) / ESP_CLOCK_FREQ; /* timeout in microseconds */
         intstatus = INTR_DC;
         esp_command_clear();
         esp_state = DISCONNECTED;
-        int seltout = (selecttimeout * 8192 * clockconv) / ESP_CLOCK_FREQ; /* timeout in microseconds */
         Log_Printf(LOG_ESPCMD_LEVEL, "[ESP] Select: Target %i, timeout after %i microseconds",target,seltout);
         CycInt_AddTimeEvent(seltout, 0, EVENT_ESP_INTERRUPT);
         return;
     }
     
     /* Next get our command */
-    if(mode_dma == 1) {
+    if (mode_dma) {
         cmd_size = esp_counter;
         Log_Printf(LOG_WARN, "[ESP] Select: Reading command using DMA, size %i byte (not implemented!)",cmd_size);
         abort();
@@ -947,7 +947,7 @@ void esp_transfer_pad(void) {
 /* Initiator command complete */
 void esp_initiator_command_complete(void) {
     
-    if(mode_dma == 1) {
+    if (mode_dma) {
         Log_Printf(LOG_WARN, "ESP initiator command complete via DMA not implemented!");
         abort();
     } else {

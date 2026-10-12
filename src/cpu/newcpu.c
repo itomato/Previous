@@ -1860,6 +1860,11 @@ void flush_cpu_caches_040(uae_u16 opcode)
 	bool pushinv = (regs.cacr & 0x01000000) == 0; // 68060 DPI
 
 	flush_cpu_caches_040_2(cache, scope, addr, push, pushinv);
+#ifdef WITH_PPC
+	if (cache & 2) {
+		uae_ppc_mark_code_cache_dirty();
+	}
+#endif
 	mmu_flush_cache();
 }
 
@@ -3315,6 +3320,11 @@ static void Exception_mmu030 (int nr, uaecptr oldpc)
 		regs.intmask = nr - 24;
 	m68k_setpci (newpc);
 	fill_prefetch ();
+	// The exception has moved the PC and fill_prefetch() has reloaded the pipe
+	// for it. A stage B opcode captured before the exception belongs to the old
+	// instruction stream, but insretry prefers mmu030_opcode_stageb over
+	// regs.irc, so it would be dispatched at the vector's PC. Drop it.
+	mmu030_opcode_stageb = -1;
 	exception_check_trace (nr);
 }
 
@@ -6529,9 +6539,18 @@ insretry:
 		} CATCH (prb) {
 
 			if (mmu030_opcode == -1) {
-				// full prefetch fill access fault
-				mmufixup[0].reg = -1;
-				mmufixup[1].reg = -1;
+				// Prefetch access fault. Usually raised while filling
+				// the pipe before the instruction starts, but also from
+				// inside an instruction (do_access_or_bus_error() when
+				// the next opcode's fetch lands in an unmapped page) after
+				// it has already adjusted an address register - the
+				// -(sp) of a MOVE that prefetches before its write. The
+				// instruction is restarted from scratch after the RTE,
+				// so undo those adjustments; a completed instruction has
+				// cleared its fixups and this is a no-op for it. The
+				// flags are left alone: a completed RTE/RTR whose target
+				// prefetch faults must keep the CCR it just loaded.
+				cpu_restore_fixup();
 			} else if (mmu030_state[1] & MMU030_STATEFLAG1_LASTWRITE) {
 				mmufixup[0].reg = -1;
 				mmufixup[1].reg = -1;
@@ -7896,7 +7915,6 @@ void m68k_dumpstate(uaecptr *nextpc, uaecptr prevpc)
 	m68k_disasm (pc, nextpc, pc, 1);
 	if (nextpc) {
 		console_out_f (_T("Next PC: %08x\n"), *nextpc);
-		*nextpc = pc;
 	}
 }
 #ifdef WINUAE_FOR_HATARI
@@ -10007,17 +10025,24 @@ void write_dcache030_retry(uaecptr addr, uae_u32 v, uae_u32 fc, int size, int fl
 {
 	regs.fc030 = fc;
 	mmu030_put_generic(addr, v, fc, size, flags);
-	write_dcache030x(addr, v, size, fc);
+	// Without data cache emulation nothing else keeps the cache lines in
+	// step with memory, so they must not be touched here either.
+	if (currprefs.cpu_data_cache)
+		write_dcache030x(addr, v, size, fc);
 }
 
-static void dcache030_maybe_burst(uaecptr addr, struct cache030 *c, int lws)
+static void dcache030_maybe_burst(uaecptr addr, struct cache030 *c, int lws, uae_u32 fc)
 {
 	// Do burst fetch if enabled, cache not frozen, all line slots invalid, and 32-bit CPU local bus (no chip ram).
 	// (See notes about burst fetches in icache routines)
 	if (c->valid[0] + c->valid[1] + c->valid[2] + c->valid[3] == 1) {
 		uaecptr physaddr = addr;
 		if (currprefs.mmu_model) {
-			physaddr = mmu030_translate(addr, regs.s != 0, true, false);
+			// Translate with the function code of the access that missed, not the
+			// CPU's privilege level: MOVES with SFC=user runs in supervisor mode, and
+			// a supervisor translation can match a transparent translation register
+			// and fill the (user-tagged) line from the wrong physical address.
+			physaddr = mmu030_translate(addr, (fc & 4) != 0, (fc & 1) != 0, false);
 		}
 
 #ifndef WINUAE_FOR_PREVIOUS
@@ -10173,7 +10198,7 @@ static bool read_dcache030_2(uaecptr addr, uae_u32 size, uae_u32 *valp)
 		v1 = dcache_lget(addr);
 		update_dcache030(c1, v1, tag1, fc, lws1);
 		if ((cs & CACHE_ENABLE_DATA_BURST) && (regs.cacr & 0x1100) == 0x1100)
-			dcache030_maybe_burst(addr, c1, lws1);
+			dcache030_maybe_burst(addr, c1, lws1, fc);
 #if VALIDATE_68030_DATACACHE
 		validate_dcache030();
 #endif
@@ -10210,7 +10235,7 @@ static bool read_dcache030_2(uaecptr addr, uae_u32 size, uae_u32 *valp)
 		v2 = dcache_lget(addr);
 		update_dcache030(c2, v2, tag2, fc, lws2);
 		if ((cs & CACHE_ENABLE_DATA_BURST) && (regs.cacr & 0x1100) == 0x1100)
-			dcache030_maybe_burst(addr, c2, lws2);
+			dcache030_maybe_burst(addr, c2, lws2, fc);
 #if VALIDATE_68030_DATACACHE
 		validate_dcache030();
 #endif
@@ -10259,7 +10284,10 @@ uae_u32 read_dcache030_retry(uaecptr addr, uae_u32 fc, int size, int flags)
 	uae_u32 val;
 	regs.fc030 = fc;
 
-	if (!read_dcache030_2(addr, size, &val)) {
+	// Without data cache emulation the cache lines are not kept in step
+	// with memory (only this retry path would fill them), so read memory,
+	// as the other 68030 MMU paths do.
+	if (!currprefs.cpu_data_cache || !read_dcache030_2(addr, size, &val)) {
 		return mmu030_get_generic(addr, fc, size, flags);
 	}
 	return val;
@@ -10423,13 +10451,22 @@ uae_u32 get_word_030_prefetch (int o)
 {
 	uae_u32 pc = m68k_getpc () + o;
 	uae_u32 v;
+	bool v_valid;
 
 	v = regs.prefetch020[0];
+	v_valid = regs.prefetch020_valid[0];
 	regs.prefetch020[0] = regs.prefetch020[1];
 	regs.prefetch020[1] = regs.prefetch020[2];
 	regs.prefetch020_valid[0] = regs.prefetch020_valid[1];
 	regs.prefetch020_valid[1] = regs.prefetch020_valid[2];
 	regs.prefetch020_valid[2] = false;
+	if (!v_valid) {
+		// The word being consumed never arrived (its prefetch faulted and
+		// was deferred because a branch was in the pipeline). The
+		// instruction needs it after all - a Bcc.L/BSR.L displacement,
+		// for example - so the deferred fault is taken now.
+		do_access_or_bus_error(0xffffffff, pc);
+	}
 	if (!regs.prefetch020_valid[1]) {
 		if (regs.pipeline_stop) {
 			regs.db = regs.prefetch020[0];

@@ -232,14 +232,14 @@ static void Dialog_TabletDlg(void)
 	}
 	while (but != DLGTABLET_EXIT && but != SDLGUI_QUIT && but != SDLGUI_ERROR && !bQuitProgram);
 	
-	if (tabletdlg[DLGTABLET_NONE].state & SG_SELECTED) {
-		after = TABLET_NONE;
-	} else if (tabletdlg[DLGTABLET_SD420].state & SG_SELECTED) {
+	if (tabletdlg[DLGTABLET_SD420].state & SG_SELECTED) {
 		after = TABLET_SD420E;
 	} else if (tabletdlg[DLGTABLET_MM961].state & SG_SELECTED) {
 		after = TABLET_MM961;
 	} else if (tabletdlg[DLGTABLET_MM1201].state & SG_SELECTED) {
 		after = TABLET_MM1201;
+	} else {
+		after = TABLET_NONE;
 	}
 	
 	if (bTabletEnabled && (after != before)) {

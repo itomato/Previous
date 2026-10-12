@@ -52,7 +52,7 @@ extern uint8_t SCSIdisk_Send_Status(void);
 extern uint8_t SCSIdisk_Send_Message(void);
 extern uint8_t SCSIdisk_Send_Data(void);
 extern void SCSIdisk_Receive_Data(uint8_t val);
-extern bool SCSIdisk_Select(uint8_t target);
+extern bool SCSIdisk_Select(uint8_t initiator, uint8_t target);
 extern void SCSIdisk_Receive_Command(uint8_t *commandbuf, uint8_t identify);
 
 extern int64_t SCSIdisk_Time(void);
